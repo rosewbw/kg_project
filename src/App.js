@@ -30,7 +30,7 @@ class App extends Component {
                         <Menu.Item key="1">
                             <Icon type="pie-chart" />
                             <span>首页</span>
-                            <Link to="/"/>
+                            <Link to="/home"/>
                         </Menu.Item>
                         <Menu.Item key="2">
                             <Icon type="desktop" />
@@ -60,9 +60,6 @@ class App extends Component {
                 </Sider>
                 <Layout style={{ marginLeft: 200 }}>
                     {children}
-                    <Footer style={{ textAlign: 'center' }}>
-                        Ant Design ©2016 Created by Ant UED
-                    </Footer>
                 </Layout>
             </Layout>
 

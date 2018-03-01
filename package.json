@@ -22,5 +22,5 @@
     "babel-plugin-import": "^1.6.5",
     "react-app-rewired": "^1.4.1"
   },
-  "proxy": "http://localhost:3002"
+  "proxy": "http://localhost:3001"
 }
