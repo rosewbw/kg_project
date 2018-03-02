@@ -107,7 +107,8 @@ class Editor extends Component {
                             },
                             'mouseup': function (e) {
                                 let newElementInfo = fn.createBoxOnCanvas(e, dragBoxGhost);
-                                callback && newElementInfo ? callback('pushNewElm', newElementInfo) : '';
+                                //发送新建box数据至服务器
+                                //callback && newElementInfo ? callback('pushNewElm', newElementInfo) : '';
                                 $(document).unbind();
                             }
                         });
@@ -149,7 +150,7 @@ class Editor extends Component {
                                 fn.move_canvas(e, click_position, trans_position, css_trans_origin, css_trans_offset);
                             },
                             'mouseup': function (e) {
-                                fn.canvas_input_abled(control.imgContainer);
+                                fn.canvas_input_abled(control.imgCont);
                                 $(document).unbind();
                             }
                         });
@@ -177,8 +178,9 @@ class Editor extends Component {
                         });
                     } else if (ele.attr('class') === basicOptions.pathCollect) {
                         //No.3 发送添加新路径请求，发送新路径的 fromId 和 targetId
+                        console.log("newpath")
                         let newPathInfo = fn.staticed_path(ele.parent());
-                        callback ? callback('pushNewPath', newPathInfo) : '';
+                        //callback ? callback('pushNewPath', newPathInfo) : '';
                         $(document).unbind();
                     } else if (ele[0].tagName === 'path') {
                         cancle_img_highLight(fn);
@@ -540,6 +542,7 @@ class Editor extends Component {
         }
 
         function path_highLight_ended() {
+
             path_container.map(function (c) {
                 if (c.path) {
                     $(c.path).children('path')[0].setAttribute('stroke', basicOptions.pathBottomColor);
@@ -852,7 +855,11 @@ class Editor extends Component {
                 'box-shadow': '0 0 0',
                 'z-index': '10'
             });
-            _this.imgContainer.find('img').css('-webkit-mask-image', 'url(./mask.png)');
+            //改
+            _this.imgContainer.find('.imgbox').css({
+                '-webkit-mask-image':'url(./mask.png)',
+                'background-color':'white'
+            });
         }
 
         function static_path(ele, path_from, _this) {
