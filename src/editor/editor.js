@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import './editor.css'
-import {ElementOptions, ButtonConstructor, ButtonOptions} from './componentConstructor'
-import animation from './animation'
-import {createElement} from '../utils/utils'
+import './editor.css';
+import {ElementOptions, ButtonConstructor, ButtonOptions} from './componentConstructor';
+import animation from './animation';
+import {createElement} from '../utils/utils';
+import CourseDetails from './coursedetails';
 
 class Editor extends Component {
     constructor(props) {
@@ -21,7 +23,7 @@ class Editor extends Component {
             imgBoxClassOnCanvas: 'canvas-api-imgbox',
             startClass: 'canvas-api-start',
             pathCollect: 'canvas-api-path-collect',
-            butnEditorId: 'start-butn-editor',
+            butnEditorId: 'editBtn',
             removeButtonClass: 'canvas-api-remove-butn',
             removeButtonPosition: null,
             removeButnColor: '#23df67',
@@ -64,9 +66,10 @@ class Editor extends Component {
             let start = createElement('div').addClass(basicOptions.startClass).attr('id', 'transStart').text('Start');
             let imgContainer = createElement('div').addClass('canvasTransform').attr('id', 'trans-img-cont');
             let svgContainer = createElement('div').addClass('canvasTransform').attr('id', 'trans-svg-cont');
-            let remove = createElement('div').addClass(basicOptions.removeButtonClass).attr('id', 'canvas-remove-butn').text('Delete');
+
+            let remove = $('#deleteBtn').addClass(basicOptions.removeButtonClass);
             $(canvas).append(transform.append(start, imgContainer, svgContainer)).css('overflow', 'hidden');
-            basicOptions.removeButtonPosition ? $('#' + basicOptions.removeButtonPosition).append(remove) : $(canvas).append(remove);
+            //basicOptions.removeButtonPosition ? $('#' + basicOptions.removeButtonPosition).append(remove) : $(canvas).append(remove);
             getElementsCtrl(canvas, transform, svgContainer, imgContainer, start, dragBox, remove);
         }
 
@@ -178,7 +181,6 @@ class Editor extends Component {
                         });
                     } else if (ele.attr('class') === basicOptions.pathCollect) {
                         //No.3 发送添加新路径请求，发送新路径的 fromId 和 targetId
-                        console.log("newpath")
                         let newPathInfo = fn.staticed_path(ele.parent());
                         //callback ? callback('pushNewPath', newPathInfo) : '';
                         $(document).unbind();
@@ -535,7 +537,7 @@ class Editor extends Component {
 
         function editorButnHighLight(bool) {
             if (bool) {
-                control.butnEditor.css({'background': 'rgba(240,240,30,0.7)', 'pointer-events': 'auto'});
+                control.butnEditor.css({'background': 'rgb(35, 223, 103)', 'pointer-events': 'auto'});
             } else {
                 control.butnEditor.css({'background': 'rgba(204,204,204,0.7)', 'pointer-events': 'none'});
             }
@@ -733,7 +735,8 @@ class Editor extends Component {
 
         function layout_title(fun) {
             let input = createElement('input');
-            let imgSize = get_img_size();
+            let imgSize = getELemSize(control.dragBox);
+            // let imgSize = get_img_size();
             let node = fun.imgContainer.children('.' + basicOptions.imgBoxClass).length;
             input.attr({
                 'type': 'text',
@@ -769,7 +772,10 @@ class Editor extends Component {
                 'z-index': '10',
                 'cursor': 'pointer'
             }).removeClass('chosen');
-            _this.imgContainer.find('img').css('-webkit-mask-image', 'none');
+            _this.imgContainer.find('.imgbox').css({
+                '-webkit-mask-image': 'none',
+                'background-color': ''
+            });
         }
 
         function recover_pointer_path_ended(fun) {
@@ -857,8 +863,8 @@ class Editor extends Component {
             });
             //改
             _this.imgContainer.find('.imgbox').css({
-                '-webkit-mask-image':'url(./mask.png)',
-                'background-color':'white'
+                '-webkit-mask-image': 'url(./mask.png)',
+                'background-color': 'gray'
             });
         }
 
@@ -1090,6 +1096,14 @@ class Editor extends Component {
         }
     }
 
+
+    buttonEdit(e) {
+        let unitId = $('.chosen').attr('id');
+        ReactDOM.render(
+            <CourseDetails unitId={unitId}/>
+            ,document.getElementById('unitEdit')
+        )
+    }
     componentDidMount() {
         let options = {
             'info': '',
@@ -1107,10 +1121,13 @@ class Editor extends Component {
         return (
             <div id="editorArea">
                 <div id="toolBar">
-                    <div id="dragBox" className="dragBox">dragbox</div>
+                    <div id="dragBox" className="dragBox">Dragbox</div>
+                    <div id="editBtn" className="editBtn editorBtn" onClick={this.buttonEdit}>编辑</div>
+                    <div id="deleteBtn" className="deleteBtn editorBtn">删除</div>
+                    <div id="previewBtn" className="previewBtn editorBtn">预览</div>
                 </div>
-                <div id="mainCanvas">
-                </div>
+                <div id="mainCanvas"/>
+                <div id="unitEdit"/>
             </div>
         )
     }

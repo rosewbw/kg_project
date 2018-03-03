@@ -23,6 +23,8 @@
     border-radius: 4px;
     float: left;
     cursor: pointer;
+    text-align: center;
+    line-height: 56px;
     /* pointer-events: none; */
     /* background: transparent; */
     /* overflow: hidden; */
@@ -73,21 +75,21 @@
     /*pointer-events:auto;*/
 }
 
-.canvas-api-remove-butn {
-    width: 60px;
-    height: 30px;
-    border-radius: 3px;
-    /*background: #23df67;*/
-    background: #ccc;
-    text-align: center;
-    font-size: 15px;
-    font-weight: bold;
-    line-height: 30px;
-    cursor: pointer;
-    position: absolute;
-    left: 7px;
-    bottom: 108px;
-}
+/*.canvas-api-remove-butn {*/
+    /*width: 60px;*/
+    /*height: 30px;*/
+    /*border-radius: 3px;*/
+    /*!*background: #23df67;*!*/
+    /*background: #ccc;*/
+    /*text-align: center;*/
+    /*font-size: 15px;*/
+    /*font-weight: bold;*/
+    /*line-height: 30px;*/
+    /*cursor: pointer;*/
+    /*position: absolute;*/
+    /*left: 7px;*/
+    /*bottom: 108px;*/
+/*}*/
 
 .canvas-api-floatImg{
     /*	width: 86px;
@@ -145,4 +147,20 @@
 .no-border-input{
     border-style: none;
     background: transparent;
+}
+
+.editorBtn{
+    width: 60px;
+    height: 30px;
+    border-radius: 3px;
+    /* background: #23df67; */
+    background: #ccc;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 30px;
+    cursor: pointer;
+    float: left;
+    margin: 20px 2px;
+    /*display:inline-block;*/
 }
