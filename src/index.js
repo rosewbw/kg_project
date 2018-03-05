@@ -1,15 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {BrowserRouter, Route, Switch, HashRouter} from "react-router-dom";
+import {
+    BrowserRouter as Router,
+    Route
+} from "react-router-dom";
 import App from './App';
 import Home from './homepage/homepage'
 import Upload from './upload/upload'
 import MediaGallery from './media-gallery/media-gallery'
 import registerServiceWorker from './registerServiceWorker';
 
-import Reg from './register_login/register';
-import Login from './register_login/login';
+import Reg from './registerandlogin/register';
+import Login from './registerandlogin/login';
 import Editor from './editor/editor'
 
 const getConfirmation = (message, callback) => {
@@ -18,16 +21,23 @@ const getConfirmation = (message, callback) => {
 }
 const supportsHistory = 'pushState' in window.history;
 
+
+
+const IndexPage = () => (
+    <Router>
+        <div>
+            <Route exact path="/" component={Login} />
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/reg" component={Reg} />
+            <Route exact path="/app" component={App} />
+        </div>
+    </Router>
+);
+
+
+
 ReactDOM.render(
-    <BrowserRouter>
-        <App>
-            <Switch>
-                <Route exact path="/" component={Home}/>
-                <Route path="/upload" component={MediaGallery}/>
-                <Route path="/editor" component={Editor}/>
-            </Switch>
-        </App>
-    </BrowserRouter>,
+    <IndexPage />,
     document.getElementById('root')
 );
 registerServiceWorker();

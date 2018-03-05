@@ -14,8 +14,8 @@
   },
   "scripts": {
     "react-app-rewired": "react-app-rewired start",
-    "start": "concurrently \"yarn react-app-rewired\" \"cd server && yarn start\"",
-    "react-build": "react-scripts build",
+    "start": "concurrently \"yarn react-app-rewired\" ",
+    "react-build": "react-scripts build  \"cd server && yarn start\"",
     "build": "concurrently \"yarn react-app-rewired\" \"cd server && yarn build\""
   },
   "devDependencies": {

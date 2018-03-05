@@ -1,7 +1,16 @@
 import React, { Component } from 'react';
 import { Layout, Menu, Icon } from 'antd';
-import { Link } from 'react-router-dom';
 import './App.css';
+import {
+    BrowserRouter as Router,
+    Route,
+    Link,
+    Redirect,
+    withRouter
+} from "react-router-dom";
+
+import Home from './homepage/homepage'
+import Upload from './upload/upload'
 
 const {  Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
@@ -15,6 +24,7 @@ class App extends Component {
         this.setState({ collapsed });
     }
     render() {
+        console.log(`${this.props.match.url}/home`);
         const {children} = this.props;
         return (
             <Layout style={{ minHeight: '100vh' }}>
@@ -30,7 +40,7 @@ class App extends Component {
                         <Menu.Item key="1">
                             <Icon type="pie-chart" />
                             <span>首页</span>
-                            <Link to="/home"/>
+                            <Link to={`${this.props.match.url}/home`}/>
                         </Menu.Item>
                         <Menu.Item key="2">
                             <Icon type="desktop" />
@@ -54,12 +64,18 @@ class App extends Component {
                         <Menu.Item key="9">
                             <Icon type="file" />
                             <span>File</span>
-                            <Link to="/upload"/>
+                            <Link to={`${this.props.match.url}`}/>
                         </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout style={{ marginLeft: 200 }}>
-                    {children}
+                    <Route path={`${this.props.match.url}/home`} component={Home} />
+                    <Route path={`${this.props.match.url}/upload`} component={Home} />
+                    <Route
+                        exact
+                        path={this.props.match.url}
+                        render={() => <h3>Please select a topic.</h3>}
+                    />
                 </Layout>
             </Layout>
 
