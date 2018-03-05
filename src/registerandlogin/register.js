@@ -44,9 +44,11 @@ class Reg extends Component {
                 email
             })
         }).then( res => res.json() ).then( res => {
-            if(res.status === 200){
+
+            if(res.type){
+                localStorage.setItem('token', res.token);
                 // 成功, 处理逻辑
-                this.props.history.push('login')
+                this.props.history.push('login');
                 alert('恭喜您注册成功了');
             }else{
                 this.props.history.push('Reg')

@@ -27,9 +27,9 @@ const IndexPage = () => (
     <Router>
         <div>
             <Route exact path="/" component={Login} />
-            <Route exact path="/login" component={Login} />
-            <Route exact path="/reg" component={Reg} />
-            <Route exact path="/app" component={App} />
+            <Route path="/login" component={Login} />
+            <Route path="/reg" component={Reg} />
+            <Route path="/app" component={App} />
         </div>
     </Router>
 );

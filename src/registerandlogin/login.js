@@ -48,19 +48,21 @@ class Login extends Component {
         } = this.state;
         if (!username) return alert('用户名不能为空');
         if (!password) return alert('密码不能为空');
+        let token = localStorage.getItem('token');
         fetch('/login', {
             method: 'POST',
             mode: "cors",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization":token
             },
             body: JSON.stringify({username, password,type,email})
         }).then(res => res.json()).then(res => {
-            console.log(res);
-            if(res.status === 200){
+            if(res.type){
                 this.props.history.push(`app`);
             }else{
-                this.props.history.push('Reg');
+                alert("登录失败，请重新登录")
+                this.props.history.push('login');
             }
 
         })

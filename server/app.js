@@ -6,14 +6,17 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session')
+
 global.dbHandel = require('./database/dbhandle');
 var index = require('./routes/index');
-
+let config = require('./config/config')
 
 var app = express();
 
 
-global.db = mongoose.connect('mongodb://localhost:27017/kgprojectDB')
+global.db = mongoose.connect(config.database);
+app.set('superSecret',config.secret);
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,6 +28,12 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(function(req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
+    next();
+});
 app.use(session({//session
     secret: 'secret',
     cookie: {

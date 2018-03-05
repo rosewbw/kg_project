@@ -2,17 +2,15 @@ import React, { Component } from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import './App.css';
 import {
-    BrowserRouter as Router,
     Route,
-    Link,
-    Redirect,
-    withRouter
+    Link
 } from "react-router-dom";
 
 import Home from './homepage/homepage'
 import Upload from './upload/upload'
+import Editor from './editor/editor'
 
-const {  Footer, Sider } = Layout;
+const {Sider} = Layout;
 const SubMenu = Menu.SubMenu;
 
 class App extends Component {
@@ -48,15 +46,17 @@ class App extends Component {
                         </Menu.Item>
                         <SubMenu
                             key="sub1"
-                            title={<span><Icon type="user" /><span>User</span></span>}
+                            title={<span><Icon type="user" /><span>课程制作</span></span>}
                         >
-                            <Menu.Item key="3">Tom</Menu.Item>
-                            <Menu.Item key="4">Bill</Menu.Item>
-                            <Menu.Item key="5">Alex</Menu.Item>
+                            <Menu.Item key="3">新建课程
+                                <Link to={`${this.props.match.url}/editor`}/>
+                            </Menu.Item>
+
+                            <Menu.Item key="4">已有课程</Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="sub2"
-                            title={<span><Icon type="team" /><span>Team</span></span>}
+                            title={<span><Icon type="team" /><span>个人中心</span></span>}
                         >
                             <Menu.Item key="6">Team 1</Menu.Item>
                             <Menu.Item key="8">Team 2</Menu.Item>
@@ -64,17 +64,18 @@ class App extends Component {
                         <Menu.Item key="9">
                             <Icon type="file" />
                             <span>File</span>
-                            <Link to={`${this.props.match.url}`}/>
+                            <Link to={`${this.props.match.url}/upload`}/>
                         </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout style={{ marginLeft: 200 }}>
                     <Route path={`${this.props.match.url}/home`} component={Home} />
-                    <Route path={`${this.props.match.url}/upload`} component={Home} />
+                    <Route path={`${this.props.match.url}/upload`} component={Upload} />
+                    <Route path={`${this.props.match.url}/editor`} component={Editor} />
                     <Route
                         exact
                         path={this.props.match.url}
-                        render={() => <h3>Please select a topic.</h3>}
+                        component={Home}
                     />
                 </Layout>
             </Layout>
