@@ -7,8 +7,9 @@ import {
 } from "react-router-dom";
 
 import Home from './homepage/homepage'
-import Upload from './upload/upload'
-import Editor from './editor/editor'
+import FileUpload from './upload/fileupload'
+import EditorControl from './editor/ediorcontrol'
+import MediaGallery from './media-gallery/media-gallery'
 
 const {Sider} = Layout;
 const SubMenu = Menu.SubMenu;
@@ -63,15 +64,15 @@ class App extends Component {
                         </SubMenu>
                         <Menu.Item key="9">
                             <Icon type="file" />
-                            <span>File</span>
+                            <span>资源管理</span>
                             <Link to={`${this.props.match.url}/upload`}/>
                         </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout style={{ marginLeft: 200 }}>
                     <Route path={`${this.props.match.url}/home`} component={Home} />
-                    <Route path={`${this.props.match.url}/upload`} component={Upload} />
-                    <Route path={`${this.props.match.url}/editor`} component={Editor} />
+                    <Route path={`${this.props.match.url}/upload`} component={MediaGallery} />
+                    <Route path={`${this.props.match.url}/editor`} component={EditorControl} />
                     <Route
                         exact
                         path={this.props.match.url}

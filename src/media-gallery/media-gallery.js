@@ -1,15 +1,12 @@
 import React,{Component} from 'react';
-
-import FileUpload from '../fileupload/fileupload'
+import FileUpload from '../upload/fileupload'
 
 class MediaGallery extends Component{
     render(){
         return(
-            <div id="media-gallery">
-                <h1>文件上传</h1>
-                <FileUpload/>
+            <div id="mediaGallery" className="mediaGallery">
+                <FileUpload />
             </div>
-
         )
     }
 }

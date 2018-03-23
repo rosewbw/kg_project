@@ -1,14 +1,6 @@
 import React, {Component} from 'react';
 import './login.css';
 import fetch from 'isomorphic-fetch';
-import {
-    BrowserRouter as Router,
-    Route,
-    Link,
-    Redirect,
-    withRouter
-} from "react-router-dom";
-import Reg from './register'
 
 class Login extends Component {
     constructor(props) {
@@ -22,6 +14,7 @@ class Login extends Component {
         this.stateChange = this.stateChange.bind(this);
         this.handleType = this.handleType.bind(this);
         this.saveUser = this.saveUser.bind(this);
+        this.toRegister = this.toRegister.bind(this);
     }
 
     stateChange(e) {
@@ -37,7 +30,9 @@ class Login extends Component {
             type: value,
         });
     }
-
+    toRegister(){
+        this.props.history.push('Reg')
+    }
 
     saveUser() {
         const {
@@ -48,20 +43,25 @@ class Login extends Component {
         } = this.state;
         if (!username) return alert('用户名不能为空');
         if (!password) return alert('密码不能为空');
-        let token = localStorage.getItem('token');
         fetch('/login', {
             method: 'POST',
-            mode: "cors",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization":token
+                // "Authorization":token
             },
-            body: JSON.stringify({username, password,type,email})
-        }).then(res => res.json()).then(res => {
-            if(res.type){
+            body:JSON.stringify({
+                username:username,
+                password:password,
+                type:type,
+                email:email
+            })
+        }).then(res => {
+            console.log(res);
+            if(res.status === 200){
+
                 this.props.history.push(`app`);
             }else{
-                alert("登录失败，请重新登录")
+                alert("登录失败，请重新登录");
                 this.props.history.push('login');
             }
 
@@ -79,6 +79,7 @@ class Login extends Component {
                         <option value ="teacher">教师</option>
                     </select>
                     <button onClick={this.saveUser}>Log in</button>
+                    <button onClick={this.toRegister}>Register</button>
                 </div>
             </div>
         );

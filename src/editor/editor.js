@@ -6,11 +6,14 @@ import {ElementOptions, ButtonConstructor, ButtonOptions} from './componentConst
 import animation from './animation';
 import {createElement} from '../utils/utils';
 import CourseDetails from './coursedetails';
+import 'jquery-mousewheel'
 
 class Editor extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+
+        };
         this.canvasConstructor = this.canvasConstructor.bind(this);
     }
 
@@ -197,6 +200,7 @@ class Editor extends Component {
                     }
                 },
                 'mousewheel': function (e, delta) {
+                    console.log(delta);
                     fn.zoom(delta);
                 }
             });
@@ -1096,15 +1100,16 @@ class Editor extends Component {
         }
     }
 
-
     buttonEdit(e) {
         let unitId = $('.chosen').attr('id');
         ReactDOM.render(
             <CourseDetails unitId={unitId}/>
-            ,document.getElementById('unitEdit')
+            , document.getElementById('unitEdit')
         )
     }
+
     componentDidMount() {
+        console.log('editorcomponentdidmount')
         let options = {
             'info': '',
             'imgBoxClass': 'imgbox',
@@ -1119,18 +1124,17 @@ class Editor extends Component {
 
     render() {
         return (
-            <div id="editorArea">
-                <div id="toolBar">
-                    <div id="dragBox" className="dragBox">Dragbox</div>
-                    <div id="editBtn" className="editBtn editorBtn" onClick={this.buttonEdit}>编辑</div>
-                    <div id="deleteBtn" className="deleteBtn editorBtn">删除</div>
-                    <div id="previewBtn" className="previewBtn editorBtn">预览</div>
+                <div id="editorArea">
+                    <div id="toolBar">
+                        <div id="dragBox" className="dragBox">Dragbox</div>
+                        <div id="editBtn" className="editBtn editorBtn" onClick={this.buttonEdit}>编辑</div>
+                        <div id="deleteBtn" className="deleteBtn editorBtn">删除</div>
+                        <div id="previewBtn" className="previewBtn editorBtn">预览</div>
+                    </div>
+                    <div id="mainCanvas"/>
+                    <div id="unitEdit"/>
                 </div>
-                <div id="mainCanvas"/>
-                <div id="unitEdit"/>
-            </div>
         )
     }
 }
-
 export default Editor;

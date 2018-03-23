@@ -14,6 +14,7 @@ class Reg extends Component {
         this.stateChange = this.stateChange.bind(this);
         this.handleType = this.handleType.bind(this);
         this.saveUser = this.saveUser.bind(this);
+        this.toLoginIn = this.toLoginIn.bind(this);
 
     }
     stateChange(e){
@@ -22,6 +23,10 @@ class Reg extends Component {
             [target.name]: target.value
         })
     }
+    toLoginIn(){
+        this.props.history.push('login')
+    }
+
     saveUser() {
         const {
             username,
@@ -37,12 +42,12 @@ class Reg extends Component {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
+            body: {
                 username,
                 password,
                 type,
                 email
-            })
+            }
         }).then( res => res.json() ).then( res => {
 
             if(res.type){
@@ -75,7 +80,8 @@ class Reg extends Component {
                     <option value ="student">学生</option>
                     <option value ="teacher">教师</option>
                 </select>
-                <button onClick={this.saveUser}>Log in</button>
+                <button onClick={this.saveUser}>Register</button>
+                <button onClick={this.toLoginIn}>Log in</button>
             </div>
         );
     }
