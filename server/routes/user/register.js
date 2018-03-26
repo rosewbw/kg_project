@@ -1,5 +1,5 @@
 let jwt = require('jsonwebtoken');
-let uuid = require('uuid')
+let uuid = require('uuid');
 module.exports = function (req, res, next) {
     let tUser = global.dbHandel.getModel('tUser');
     let username = req.body.username,
@@ -18,7 +18,7 @@ module.exports = function (req, res, next) {
                 data: "User already exists!"
             });
         } else {
-            let token = jwt.sign({name: username}, 'shhhhh');
+            let token = jwt.sign({name: username}, '12345');
             let tuser = {
                 _id: uuid.v4(),
                 name: username,
@@ -45,21 +45,3 @@ module.exports = function (req, res, next) {
         }
     });
 };
-
-// if (err) {
-//     res.sendStatus(500);
-// } else if (doc) {
-//     //req.session.error='用户名已存在！';
-//     res.json("username exists");
-//     res.end();
-// } else {
-//     tUser.create(docs, function (err, doc) {
-//         if (err) {
-//             res.sendStatus(404);
-//         } else {
-//             req.session.user = doc.name;
-//             req.session.userId = doc._id;
-//             res.json({status:200});
-//         }
-//     })
-// }

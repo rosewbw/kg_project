@@ -12,6 +12,7 @@
     "debug": "~2.6.9",
     "express": "^4.15.5",
     "express-session": "^1.15.6",
+    "fluent-ffmpeg": "^2.1.2",
     "isomorphic-fetch": "^2.2.1",
     "jade": "^1.11.0",
     "jquery": "^3.3.1",
@@ -19,6 +20,9 @@
     "jsonwebtoken": "^8.2.0",
     "mongoose": "^5.0.8",
     "morgan": "^1.9.0",
+    "multer": "^0.1.8",
+    "node-uuid": "^1.4.8",
+    "request": "^2.85.0",
     "serve-favicon": "^2.4.5",
     "uuid": "^3.2.1"
   },

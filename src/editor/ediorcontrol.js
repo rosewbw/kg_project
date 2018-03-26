@@ -18,7 +18,6 @@ class EditorControl extends Component{
         if(!this.state.hasCreate){
             return <EditorInfo onButtonClick={this.onButtonClick} stateChange={this.stateChange}/>
         }else{
-            console.log(this.state.projectName);
             return <Editor projectName={this.state.projectName}/>
         }
     }

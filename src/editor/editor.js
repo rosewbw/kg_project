@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import './editor.css';
-import {ElementOptions, ButtonConstructor, ButtonOptions} from './componentConstructor';
+import {KnowledgeUnit, TeachUnit, Course, ButtonConstructor} from './componentConstructor';
 import animation from './animation';
 import {createElement} from '../utils/utils';
 import CourseDetails from './coursedetails';
@@ -12,7 +12,7 @@ class Editor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            knowledgeUnitList: []
         };
         this.canvasConstructor = this.canvasConstructor.bind(this);
     }
@@ -22,7 +22,8 @@ class Editor extends Component {
         let basicOptions = {
             imgClassOnList: 'canvas-api-img-main',
             imgClassOnCanvas: 'canvas-api-img-main',
-            imgBoxClass: 'canvas-api-imgbox',
+            // imgBoxClass: 'canvas-api-imgbox',
+            imgBoxClass: 'imgbox',
             imgBoxClassOnCanvas: 'canvas-api-imgbox',
             startClass: 'canvas-api-start',
             pathCollect: 'canvas-api-path-collect',
@@ -37,7 +38,7 @@ class Editor extends Component {
             pathAboveColor: '#000',
             pathBottomColor: '#fff',
             pathAboveWidth: 2,
-            pathHighLight: '#fff',
+            pathHighLight: 'black',
             pathBottomWidth: 3,
             arrowBottom: 4,
             arrowHeight: 6
@@ -49,6 +50,7 @@ class Editor extends Component {
         let path_container = [];
         let path_from = null;
         let elements = [];
+        let _this = this;
 
         function updateBasicOptions(options) {
             for (let item in options) {
@@ -105,6 +107,7 @@ class Editor extends Component {
                         let dragBoxGhost = addDragBoxGhost(e, ele);
                         $(document).bind({
                             'mousemove': function (e) {
+                                e.preventDefault();
                                 let dragBoxSize = getELemSize(control.dragBox);
                                 dragBoxGhost.offset({
                                     left: e.clientX - dragBoxSize[0] * scale,
@@ -113,6 +116,15 @@ class Editor extends Component {
                             },
                             'mouseup': function (e) {
                                 let newElementInfo = fn.createBoxOnCanvas(e, dragBoxGhost);
+                                if (newElementInfo) {
+                                    let knowledgeUnitList = _this.state.knowledgeUnitList;
+                                    knowledgeUnitList.push(newElementInfo);
+                                    _this.setState({
+                                        knowledgeUnitList: knowledgeUnitList
+                                    });
+                                    console.log(_this.state.knowledgeUnitList);
+                                }
+
                                 //发送新建box数据至服务器
                                 //callback && newElementInfo ? callback('pushNewElm', newElementInfo) : '';
                                 $(document).unbind();
@@ -134,11 +146,12 @@ class Editor extends Component {
                         fn.canvas_input_disabled($(this), ele);
                         $(document).bind({
                             'mousemove': function (e) {
+                                e.preventDefault();
                                 fn.move_canvas_ele(e, ele, click_position_on_img);
                             },
                             'mouseup': function (e) {
-//No.2 发送元素移动信息，发送元素移动后的新位置信息 position{x: , y: }
-                                console.log(control);
+                                //No.2 发送元素移动信息，发送元素移动后的新位置信息 position{x: , y: }
+                                //     console.log(control);
                                 let newPositionInfo = fn.canvas_input_abled(control.imgCont, ele);
                                 if (ele.attr('id') === control.start.attr('id')) {
                                     callback ? callback('pushStartPosition', newPositionInfo) : '';
@@ -153,6 +166,7 @@ class Editor extends Component {
                         fn.canvas_input_disabled($(this));
                         $(document).bind({
                             'mousemove': function (e) {
+                                e.preventDefault();
                                 fn.move_canvas(e, click_position, trans_position, css_trans_origin, css_trans_offset);
                             },
                             'mouseup': function (e) {
@@ -179,6 +193,7 @@ class Editor extends Component {
                         path_highLight_ended();
                         $(document).bind({
                             'mousemove': function (e) {
+                                e.preventDefault();
                                 fn.path_moving(e, svgobj, ele);
                             }
                         });
@@ -200,7 +215,6 @@ class Editor extends Component {
                     }
                 },
                 'mousewheel': function (e, delta) {
-                    console.log(delta);
                     fn.zoom(delta);
                 }
             });
@@ -219,30 +233,36 @@ class Editor extends Component {
                         type = 'delPath';
                     }
                     path_container.map(function (c) {
-                        if (c.from == ele[0]) {
+                        if (c.from === ele[0]) {
+                            console.log('1');
                             remove_ele(c, fn);
-                        } else if (c.to == ele[0]) {
+                        } else if (c.to === ele[0]) {
+                            console.log('2')
                             if (c.from.id === fn.start.attr('id')) {
                                 butnArray.push({elmId: 'isStart', butnId: c.to.id});
                             } else {
                                 butnArray.push({elmId: c.from.id, butnId: c.to.id});
                             }
                             remove_ele(c, fn);
-                        } else if (c.path == ele[0]) {
+                        } else if (c.path === ele[0]) {
                             butnId = c.to.id;
                             if (c.from.id === fn.start.attr('id')) {
                                 elmId = 'isStart';
                             } else {
                                 elmId = c.from.id;
                             }
+                            deletePath(c);
                             remove_ele(c, fn);
                         }
                     });
-//No.4 发送删除元素或路径的信息，发送要删除元素的id，或要删除路径的目标id，type='delElement'为删除元素，type='delPath'为删除路径
+                    //No.4 发送删除元素或路径的信息，发送要删除元素的id，或要删除路径的目标id，type='delElement'为删除元素，type='delPath'为删除路径
                     if (type === 'delElement') {
                         ele.remove();
                         $(ele[0].circle).remove();
                         callback ? callback(type, {elmId: ele.attr('id'), butn: butnArray}) : '';
+                        let kUnit = getKnowledgeObjectById(ele.attr('id'));
+                        deleteKnowledgeUnit(kUnit);
+
                     } else if (type === 'delPath') {
                         callback ? callback(type, {butn: [{elmId: elmId, butnId: butnId}]}) : '';
                     } else {
@@ -253,6 +273,83 @@ class Editor extends Component {
                 }
             });
 
+        }
+
+        function deletePath(pathObject) {
+            let pathFrom, pathTo;
+
+            pathFrom = getKnowledgeObjectById(pathObject.from.id);
+            pathTo = getKnowledgeObjectById(pathObject.to.id);
+
+            unlink(pathFrom, pathObject.to.id, 'contain');
+            unlink(pathTo, pathObject.from.id, 'parent');
+            updateKnowledgeUnit(pathFrom);
+            updateKnowledgeUnit(pathTo);
+
+        }
+
+        function unlink(kUnit, targetId, type) {
+            for (let idx in kUnit[type]) {
+                if (kUnit[type][idx] === targetId) {
+                    kUnit[type].splice(idx, 1);
+                }
+            }
+            return kUnit
+        }
+
+        function deleteKnowledgeUnit(kUnit) {
+            let tempUnit;
+            let KnowledgeObjects = _this.state.knowledgeUnitList;
+
+            if (kUnit.parent.length !== 0) {
+                for (let index in kUnit.parent) {
+                    tempUnit = getKnowledgeObjectById(kUnit.parent[index]);
+                    updateKnowledgeUnit(unlink(tempUnit,kUnit.id,'contain'))
+                }
+            }
+            if (kUnit.contain.length !== 0) {
+                for (let index in kUnit.contain) {
+                    tempUnit = getKnowledgeObjectById(kUnit.contain[index]);
+                    updateKnowledgeUnit(unlink(tempUnit,kUnit.id,'parent'))
+                }
+            }
+
+
+            /*
+            if (kUnit.parent.length !== 0) {
+                for (let index in kUnit.parent) {
+                    tempUnit = getKnowledgeObjectById(kUnit.parent[index]);
+                    for (let idx in tempUnit.contain) {
+                        if (tempUnit.contain[idx] === kUnit.id) {
+                            tempUnit.contain.splice(idx, 1);
+                            updateKnowledgeUnit(tempUnit)
+                        }
+                    }
+                }
+
+            }
+            if (kUnit.contain.length !== 0) {
+                for (let index in kUnit.contain) {
+                    tempUnit = getKnowledgeObjectById(kUnit.contain[index]);
+                    for (let idx in tempUnit.parent) {
+                        if (tempUnit.parent[idx] === kUnit.id) {
+                            tempUnit.parent.splice(idx, 1);
+                            console.log(tempUnit)
+                            updateKnowledgeUnit(tempUnit)
+                        }
+                    }
+                }
+
+            }
+            */
+            for (let index in KnowledgeObjects) {
+                if (KnowledgeObjects[index].id === kUnit.id) {
+                    KnowledgeObjects.splice(parseInt(index), 1);
+                    _this.setState({
+                        knowledgeUnitList: KnowledgeObjects
+                    });
+                }
+            }
         }
 
         function func(ctrl, basicOptions) {
@@ -350,14 +447,20 @@ class Editor extends Component {
         }
 
         func.prototype.createBoxOnCanvas = function (e, dragBoxGhost) {
+            // console.log(typeof(animation));
             if (this.getTarget(e).attr('id') === this.canvas.attr('id')) {
                 dragBoxGhost.remove();
                 return addImgOnCanvas(dragBoxGhost, e, this);
-            } else if (typeof(animation) === 'object') {
+            }
+            /*
+            else if (typeof(animation) === 'object') {
+                console.log('what')
                 animation.displacementAnimation(dragBoxGhost.offset().left, dragBoxGhost.offset().top, img_ori_position.left, img_ori_position.top, dragBoxGhost, 0.8, true, scale);
                 dragBoxGhost.remove();
                 return null;
-            } else {
+            }
+            */
+            else {
                 dragBoxGhost.remove();
                 return null;
             }
@@ -596,7 +699,7 @@ class Editor extends Component {
                 .css({
                     'width': ele.innerWidth(),
                     'height': ele.innerHeight(),
-                    'background-color': 'white',
+                    'background-color': 'gainsboro',
                     'transform': 'scale(' + scale + ')',
                     'border-radius': '4px',
                     //'transform-origin': e.innerWidth()/2 + 'px ' + e.innerHeight()/2 + 'px 0'
@@ -627,7 +730,7 @@ class Editor extends Component {
             let id = element.attr('id');
             let x = element.css('left').match(/\d+/)[0];
             let y = element.css('top').match(/\d+/)[0];
-            return new ElementOptions(videoUrl, imgUrl, name, id, x, y, 0);
+            return new KnowledgeUnit(name, id, x, y, imgUrl);
         }
 
         /*
@@ -662,14 +765,13 @@ class Editor extends Component {
         */
         function createNewElement(fun, id, imgUrl, videoUrl) {
             let img, collect, newBox, title;
+            let defaultUrl = "./defaultImg.jpg";
             newBox = createElement('div').addClass(basicOptions.imgBoxClass).css({
                 'position': 'absolute',
                 'margin': '0'
             }).attr('id', id);
-            if (imgUrl) {
-                img = createElement('img').attr('src', imgUrl);
-                newBox.append(img);
-            }
+            img = !imgUrl ? createElement('img').attr("src", "http://localhost:3000/defaultImg.jpg") : createElement('img').attr('src', imgUrl)
+            newBox.append(img);
             if (videoUrl) {
                 newBox[0].videoUrl = videoUrl;
             }
@@ -687,7 +789,7 @@ class Editor extends Component {
             let id = uuid();
             targetUrl = {
                 videoUrl: "",
-                imgUrl: ""
+                imgUrl: "http://localhost:3000/defaultImg.jpg"
             }
             let div = createNewElement(fun, id, targetUrl.imgUrl, targetUrl.videoUrl);
             let imgSize = getELemSize(control.dragBox);
@@ -862,13 +964,13 @@ class Editor extends Component {
 
         function add_mask(_this) {
             _this.imgContainer.find('.' + _this.imgBox).css({
-                'box-shadow': '0 0 0',
-                'z-index': '10'
+
+                'box-shadow': '0 0 3px #000',
+                'z-index': '1000'
             });
             //改
             _this.imgContainer.find('.imgbox').css({
-                '-webkit-mask-image': 'url(./mask.png)',
-                'background-color': 'gray'
+                '-webkit-mask-image': 'url(http://localhost:3000/mask.png)'
             });
         }
 
@@ -883,11 +985,61 @@ class Editor extends Component {
                 $(_this.start[0].circle).css('display', 'none');
                 isStart = true;
             }
-            return {
-                isStart: isStart,
-                newPathInfo: new ButtonConstructor(ele.attr('id'), ele.children('input').attr('value')),
-                fromId: path_from.attr('id')
-            };
+
+            let kUnitAId = path_from.attr('id');
+            let kUnitBId = ele.attr('id');
+            let kUnitA = getKnowledgeObjectById(kUnitAId);
+            let kUnitB = getKnowledgeObjectById(kUnitBId);
+
+            if (kUnitAId === 'transStart') {
+                connectObjects(kUnitA, kUnitB, 'start');
+            } else {
+                connectObjects(kUnitA, kUnitB);
+            }
+            // return {
+            //     isStart: isStart,
+            //     newPathInfo: new ButtonConstructor(ele.attr('id'), ele.children('input').attr('value')),
+            //     fromId: path_from.attr('id')
+            // };
+        }
+
+        function connectObjects(kUnitA, kUnitB, relation) {
+            let _relation = relation || 'contain';
+            if (relation === 'start') {
+                kUnitB.root = true;
+                updateKnowledgeUnit(kUnitB);
+            }
+            if (kUnitA && kUnitB) {
+                if (_relation === 'contain') {
+                    kUnitA.contain.push(kUnitB.id);//id好还是对象好???
+                    kUnitB.parent.push(kUnitA.id);
+                }
+                updateKnowledgeUnit(kUnitA);
+                updateKnowledgeUnit(kUnitB);
+            }
+        }
+
+        function updateKnowledgeUnit(kUnit) {
+            let KnowledgeObjects = _this.state.knowledgeUnitList;
+            for (let index in KnowledgeObjects) {
+                if (KnowledgeObjects[index].id === kUnit.id) {
+                    KnowledgeObjects.splice(parseInt(index), 1, kUnit);
+                    _this.setState({
+                        knowledgeUnitList: KnowledgeObjects
+                    });
+                }
+            }
+        }
+
+
+        function getKnowledgeObjectById(kUnitId) {
+            let KnowledgeObjects = _this.state.knowledgeUnitList;
+            for (let index in KnowledgeObjects) {
+                if (KnowledgeObjects[index].id === kUnitId) {
+                    return KnowledgeObjects[index];
+                }
+            }
+            return null
         }
 
         function path_move_with_img(from, to, path) {
@@ -1109,7 +1261,6 @@ class Editor extends Component {
     }
 
     componentDidMount() {
-        console.log('editorcomponentdidmount')
         let options = {
             'info': '',
             'imgBoxClass': 'imgbox',
@@ -1124,17 +1275,18 @@ class Editor extends Component {
 
     render() {
         return (
-                <div id="editorArea">
-                    <div id="toolBar">
-                        <div id="dragBox" className="dragBox">Dragbox</div>
-                        <div id="editBtn" className="editBtn editorBtn" onClick={this.buttonEdit}>编辑</div>
-                        <div id="deleteBtn" className="deleteBtn editorBtn">删除</div>
-                        <div id="previewBtn" className="previewBtn editorBtn">预览</div>
-                    </div>
-                    <div id="mainCanvas"/>
-                    <div id="unitEdit"/>
+            <div id="editorArea">
+                <div id="toolBar">
+                    <div id="dragBox" className="dragBox">Dragbox</div>
+                    <div id="editBtn" className="editBtn editorBtn" onClick={this.buttonEdit}>编辑</div>
+                    <div id="deleteBtn" className="deleteBtn editorBtn">删除</div>
+                    <div id="previewBtn" className="previewBtn editorBtn">预览</div>
                 </div>
+                <div id="mainCanvas"/>
+                <div id="unitEdit"/>
+            </div>
         )
     }
 }
+
 export default Editor;

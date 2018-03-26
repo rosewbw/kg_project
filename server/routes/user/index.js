@@ -1,4 +1,5 @@
 module.exports = {
     register:require('./register'),
-    login:require('./login')
+    login:require('./login'),
+    upload:require('../graph/material')
 }

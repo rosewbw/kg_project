@@ -2,13 +2,26 @@ import React from 'react';
 import './fileupload.css';
 import {Upload, Button, Icon, message} from 'antd';
 import fetch from 'isomorphic-fetch';
+import Uploadform from './uploadform'
 
 
 class FileUpload extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            fileList: [],
+            fileList: [{
+                uid: -1,
+                name: 'xxx.png',
+                status: 'done',
+                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                thumbUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+            }, {
+                uid: -2,
+                name: 'yyy.png',
+                status: 'done',
+                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                thumbUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+            }],
             uploading: false
         };
     }
@@ -46,32 +59,34 @@ class FileUpload extends React.Component {
     render() {
         const {uploading} = this.state;
         const props = {
-            // onRemove: (file) => {
-            //     this.setState(({fileList}) => {
-            //         const index = fileList.indexOf(file);
-            //         const newFileList = fileList.slice();
-            //         newFileList.splice(index, 1);
-            //         return {
-            //             fileList: newFileList,
-            //         };
-            //     });
-            // },
-            // beforeUpload: (file) => {
-            //     this.setState(({fileList}) => ({
-            //         fileList: [...fileList, file],
-            //     }));
-            //     return false;
-            // },
-            // fileList: this.state.fileList,
+            onRemove: (file) => {
+                this.setState(({fileList}) => {
+                    const index = fileList.indexOf(file);
+                    const newFileList = fileList.slice();
+                    newFileList.splice(index, 1);
+                    return {
+                        fileList: newFileList,
+                    };
+                });
+            },
+            beforeUpload: (file) => {
+                this.setState(({fileList}) => ({
+                    fileList: [...fileList, file],
+                }));
+                return false;
+            },
+            // defaultFileList: [...fileList],
+            fileList: this.state.fileList,
             // multiple: true,
             // listType: 'picture',
             // defaultFileList: [...fileList],
             listType: 'picture',
-            defaultFileList: [...fileList],
+
             className: 'upload-list-inline',
         };
         return (
-            <div>
+            <div style={{width:'50%'}}>
+                <Uploadform/>
                 <Upload {...props}>
                     <Button>
                         <Icon type="upload"/> Select File
@@ -90,6 +105,8 @@ class FileUpload extends React.Component {
         )
     }
 }
+
+
 
 
 const fileList = [{
