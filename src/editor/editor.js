@@ -5,7 +5,8 @@ import './editor.css';
 import {KnowledgeUnit, TeachUnit, Course, ButtonConstructor} from './componentConstructor';
 import animation from './animation';
 import {createElement} from '../utils/utils';
-import CourseDetails from './coursedetails';
+
+import KnowledgeEditor from './knowledge-editor';
 import 'jquery-mousewheel'
 
 class Editor extends Component {
@@ -15,6 +16,11 @@ class Editor extends Component {
             knowledgeUnitList: []
         };
         this.canvasConstructor = this.canvasConstructor.bind(this);
+        this.getKnowledgeObjectById = this.getKnowledgeObjectById.bind(this);
+        this.buttonEdit = this.buttonEdit.bind(this);
+        this.onTeachUnitChanged = this.onTeachUnitChanged.bind(this);
+        this.updateKnowledgeUnit = this.updateKnowledgeUnit.bind(this);
+        this.onUpdateUrlAndName = this.onUpdateUrlAndName.bind(this);
     }
 
     canvasConstructor(canvas, dragBox, options, callback) {
@@ -234,10 +240,10 @@ class Editor extends Component {
                     }
                     path_container.map(function (c) {
                         if (c.from === ele[0]) {
-                            console.log('1');
+                            // console.log('1');
                             remove_ele(c, fn);
                         } else if (c.to === ele[0]) {
-                            console.log('2')
+                            // console.log('2')
                             if (c.from.id === fn.start.attr('id')) {
                                 butnArray.push({elmId: 'isStart', butnId: c.to.id});
                             } else {
@@ -260,7 +266,7 @@ class Editor extends Component {
                         ele.remove();
                         $(ele[0].circle).remove();
                         callback ? callback(type, {elmId: ele.attr('id'), butn: butnArray}) : '';
-                        let kUnit = getKnowledgeObjectById(ele.attr('id'));
+                        let kUnit = _this.getKnowledgeObjectById(ele.attr('id'));
                         deleteKnowledgeUnit(kUnit);
 
                     } else if (type === 'delPath') {
@@ -278,19 +284,19 @@ class Editor extends Component {
         function deletePath(pathObject) {
             let pathFrom, pathTo;
 
-            pathFrom = getKnowledgeObjectById(pathObject.from.id);
-            pathTo = getKnowledgeObjectById(pathObject.to.id);
+            pathFrom = _this.getKnowledgeObjectById(pathObject.from.id);
+            pathTo = _this.getKnowledgeObjectById(pathObject.to.id);
 
             unlink(pathFrom, pathObject.to.id, 'contain');
             unlink(pathTo, pathObject.from.id, 'parent');
-            updateKnowledgeUnit(pathFrom);
-            updateKnowledgeUnit(pathTo);
+            _this.updateKnowledgeUnit(pathFrom);
+            _this.updateKnowledgeUnit(pathTo);
 
         }
 
         function unlink(kUnit, targetId, type) {
             for (let idx in kUnit[type]) {
-                if (kUnit[type][idx] === targetId) {
+                if (kUnit[type][idx].id === targetId) {
                     kUnit[type].splice(idx, 1);
                 }
             }
@@ -300,17 +306,16 @@ class Editor extends Component {
         function deleteKnowledgeUnit(kUnit) {
             let tempUnit;
             let KnowledgeObjects = _this.state.knowledgeUnitList;
-
             if (kUnit.parent.length !== 0) {
                 for (let index in kUnit.parent) {
-                    tempUnit = getKnowledgeObjectById(kUnit.parent[index]);
-                    updateKnowledgeUnit(unlink(tempUnit,kUnit.id,'contain'))
+                    tempUnit = _this.getKnowledgeObjectById(kUnit.parent[index].id);
+                    _this.updateKnowledgeUnit(unlink(tempUnit, kUnit.id, 'contain'))
                 }
             }
             if (kUnit.contain.length !== 0) {
                 for (let index in kUnit.contain) {
-                    tempUnit = getKnowledgeObjectById(kUnit.contain[index]);
-                    updateKnowledgeUnit(unlink(tempUnit,kUnit.id,'parent'))
+                    tempUnit = _this.getKnowledgeObjectById(kUnit.contain[index].id);
+                    _this.updateKnowledgeUnit(unlink(tempUnit, kUnit.id, 'parent'))
                 }
             }
 
@@ -850,6 +855,12 @@ class Editor extends Component {
             })
                 .addClass('canvas-api-img-title no-border-input')
                 .css('width', imgSize[0] * 2);
+            input.change((e) => {
+                let kUnit = _this.getKnowledgeObjectById(e.target.parentNode.id);
+                kUnit.name = e.target.value;
+                _this.updateKnowledgeUnit(kUnit);
+            });
+
             return input;
         }
 
@@ -962,34 +973,34 @@ class Editor extends Component {
             };
         }
 
-        function add_mask(_this) {
-            _this.imgContainer.find('.' + _this.imgBox).css({
+        function add_mask(that) {
+            that.imgContainer.find('.' + that.imgBox).css({
 
                 'box-shadow': '0 0 3px #000',
                 'z-index': '1000'
             });
             //改
-            _this.imgContainer.find('.imgbox').css({
+            that.imgContainer.find('.imgbox').css({
                 '-webkit-mask-image': 'url(http://localhost:3000/mask.png)'
             });
         }
 
-        function static_path(ele, path_from, _this) {
+        function static_path(ele, path_from, that) {
             let isStart = false;
             let tagSvg = $('.path-active');
             tagSvg[0].moving = path_move_with_img;
             tagSvg[0].setAttribute('class', 'path-static');
             path_move_with_img(path_from, ele, tagSvg);
             path_container.push(new path_container_construct(path_from, tagSvg, ele));
-            if (path_from.attr('id') === _this.start.attr('id')) {
-                $(_this.start[0].circle).css('display', 'none');
+            if (path_from.attr('id') === that.start.attr('id')) {
+                $(that.start[0].circle).css('display', 'none');
                 isStart = true;
             }
 
             let kUnitAId = path_from.attr('id');
             let kUnitBId = ele.attr('id');
-            let kUnitA = getKnowledgeObjectById(kUnitAId);
-            let kUnitB = getKnowledgeObjectById(kUnitBId);
+            let kUnitA = _this.getKnowledgeObjectById(kUnitAId);
+            let kUnitB = _this.getKnowledgeObjectById(kUnitBId);
 
             if (kUnitAId === 'transStart') {
                 connectObjects(kUnitA, kUnitB, 'start');
@@ -1007,18 +1018,19 @@ class Editor extends Component {
             let _relation = relation || 'contain';
             if (relation === 'start') {
                 kUnitB.root = true;
-                updateKnowledgeUnit(kUnitB);
+                _this.updateKnowledgeUnit(kUnitB);
             }
             if (kUnitA && kUnitB) {
                 if (_relation === 'contain') {
-                    kUnitA.contain.push(kUnitB.id);//id好还是对象好???
-                    kUnitB.parent.push(kUnitA.id);
+                    kUnitA.contain.push(kUnitB);//id好还是对象好???
+                    kUnitB.parent.push(kUnitA);
                 }
-                updateKnowledgeUnit(kUnitA);
-                updateKnowledgeUnit(kUnitB);
+                _this.updateKnowledgeUnit(kUnitA);
+                _this.updateKnowledgeUnit(kUnitB);
             }
         }
 
+        /*
         function updateKnowledgeUnit(kUnit) {
             let KnowledgeObjects = _this.state.knowledgeUnitList;
             for (let index in KnowledgeObjects) {
@@ -1030,8 +1042,9 @@ class Editor extends Component {
                 }
             }
         }
+        */
 
-
+        /*
         function getKnowledgeObjectById(kUnitId) {
             let KnowledgeObjects = _this.state.knowledgeUnitList;
             for (let index in KnowledgeObjects) {
@@ -1041,6 +1054,7 @@ class Editor extends Component {
             }
             return null
         }
+        */
 
         function path_move_with_img(from, to, path) {
             let path_from_position = get_path_from_position(from);
@@ -1252,10 +1266,61 @@ class Editor extends Component {
         }
     }
 
+    getKnowledgeObjectById(kUnitId) {
+        let KnowledgeObjects = this.state.knowledgeUnitList;
+        for (let index in KnowledgeObjects) {
+            if (KnowledgeObjects[index].id === kUnitId) {
+                return KnowledgeObjects[index];
+            }
+        }
+        return null
+    }
+
+
+    updateKnowledgeUnit(kUnit) {
+        let KnowledgeObjects = this.state.knowledgeUnitList;
+        for (let index in KnowledgeObjects) {
+            if (KnowledgeObjects[index].id === kUnit.id) {
+                KnowledgeObjects.splice(parseInt(index), 1, kUnit);
+                this.setState({
+                    knowledgeUnitList: KnowledgeObjects
+                });
+            }
+        }
+    }
+
+    onTeachUnitChanged(tUnit) {
+        // console.log(tUnit)
+        let kUnit = this.getKnowledgeObjectById(tUnit.knowledgeUnitId);
+        if (kUnit) {
+            this.updateKnowledgeUnit(kUnit);
+        }
+
+    }
+    //这种写法好烂......
+    onUpdateUrlAndName(kUnitId, type, value) {
+        let kUnitDOM = document.getElementById(kUnitId);
+        console.log(kUnitDOM);
+        if(type === 'name'){
+            kUnitDOM.childNodes[1].value = value;
+        }else{
+            kUnitDOM.childNodes[0].src = value;
+        }
+
+    }
+
+
     buttonEdit(e) {
-        let unitId = $('.chosen').attr('id');
+        let kUnitData = this.getKnowledgeObjectById($('.chosen').attr('id'))
+
         ReactDOM.render(
-            <CourseDetails unitId={unitId}/>
+            <KnowledgeEditor
+                kUnitData={kUnitData}
+                onUpdatekUnit={this.updateKnowledgeUnit}
+                knowledgeUnitList={this.state.knowledgeUnitList}
+                onUpdateUrlAndName={this.onUpdateUrlAndName}
+
+            />
             , document.getElementById('unitEdit')
         )
     }
@@ -1284,6 +1349,7 @@ class Editor extends Component {
                 </div>
                 <div id="mainCanvas"/>
                 <div id="unitEdit"/>
+                <div id="tUnitEdit"/>
             </div>
         )
     }

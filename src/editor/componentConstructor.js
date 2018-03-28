@@ -33,14 +33,14 @@ function KnowledgeUnit(name, id, x, y,thumbnailUrl) {
 }
 
 
-function TeachUnit() {
+function TeachUnit(kUnitId) {
     //教学单元基本信息
     this.id = uuid();
     this.keyword = [];
     this.status = '';
     this.description = '';
     this.title = '';
-    this.knowledgeUnit = '';
+    this.knowledgeUnitId = kUnitId || '';
 
     //课时信息
     this.mainCourse = [];

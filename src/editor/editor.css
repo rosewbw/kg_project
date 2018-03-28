@@ -1,20 +1,20 @@
-#editorArea{
+#editorArea {
     width: 100%;
     height: 100%;
 }
 
-#toolBar{
+#toolBar {
     height: 70px;
-    width:100%;
+    width: 100%;
 }
 
-#mainCanvas{
+#mainCanvas {
     width: 100%;
     height: calc(100% - 70px);
     background: white;
 }
 
-.dragBox{
+.dragBox {
     width: 86px;
     height: 56px;
     margin: 7px 14px 7px 14px;
@@ -29,7 +29,8 @@
     /* background: transparent; */
     /* overflow: hidden; */
 }
-.canvasTransform{
+
+.canvasTransform {
     width: 0;
     height: 0;
     position: relative;
@@ -39,7 +40,7 @@
     transform-origin: 450px 240px 0;
 }
 
-.canvas-api-start{
+.canvas-api-start {
     width: 50px;
     height: 20px;
     position: absolute;
@@ -53,10 +54,10 @@
     line-height: 21px;
 }
 
-.img-box-circle-cover{
-    position:absolute;
-    width:20px;
-    height:20px;
+.img-box-circle-cover {
+    position: absolute;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
     /*	top: 20px;
         left: 76px;*/
@@ -64,10 +65,10 @@
     /*pointer-events:auto;*/
 }
 
-.canvas-api-circle{
-    position:absolute;
-    width:20px;
-    height:20px;
+.canvas-api-circle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
     /*	top: 20px;
         left: 76px;*/
@@ -76,22 +77,22 @@
 }
 
 /*.canvas-api-remove-butn {*/
-    /*width: 60px;*/
-    /*height: 30px;*/
-    /*border-radius: 3px;*/
-    /*!*background: #23df67;*!*/
-    /*background: #ccc;*/
-    /*text-align: center;*/
-    /*font-size: 15px;*/
-    /*font-weight: bold;*/
-    /*line-height: 30px;*/
-    /*cursor: pointer;*/
-    /*position: absolute;*/
-    /*left: 7px;*/
-    /*bottom: 108px;*/
+/*width: 60px;*/
+/*height: 30px;*/
+/*border-radius: 3px;*/
+/*!*background: #23df67;*!*/
+/*background: #ccc;*/
+/*text-align: center;*/
+/*font-size: 15px;*/
+/*font-weight: bold;*/
+/*line-height: 30px;*/
+/*cursor: pointer;*/
+/*position: absolute;*/
+/*left: 7px;*/
+/*bottom: 108px;*/
 /*}*/
 
-.canvas-api-floatImg{
+.canvas-api-floatImg {
     /*	width: 86px;
         height:56px;*/
     opacity: 0.7;
@@ -102,7 +103,7 @@
     pointer-events: none;
 }
 
-.imgbox{
+.imgbox {
     width: 86px;
     height: 56px;
     margin: 7px;
@@ -118,15 +119,15 @@
     background-color: gainsboro;
 }
 
-
-.imgbox img{
+.imgbox img {
     width: 100%;
     height: 100%;
     pointer-events: none;
     border-radius: 4px;
     background-color: white;
 }
-.canvas-api-img-title{
+
+.canvas-api-img-title {
     position: absolute;
     pointer-events: auto;
     left: 0;
@@ -134,7 +135,7 @@
     font-size: 12px;
 }
 
-.canvas-api-path-collect{
+.canvas-api-path-collect {
     width: 32px;
     height: 32px;
     border-radius: 100%;
@@ -145,12 +146,12 @@
     display: none;
 }
 
-.no-border-input{
+.no-border-input {
     border-style: none;
     background: transparent;
 }
 
-.editorBtn{
+.editorBtn {
     width: 60px;
     height: 30px;
     border-radius: 3px;
@@ -165,3 +166,115 @@
     margin: 20px 2px;
     /*display:inline-block;*/
 }
+
+/*coursedetails*/
+.editorContainerArea {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.editorContainer {
+    width: 90%;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    margin-left: -45%;
+    background: rgba(34, 34, 34, 0.5);
+}
+
+.editorHeader {
+    height: 24px;
+    border-radius: 5px 5px 0 0;
+    background: white;
+    position: relative;
+}
+
+.editorHeader span {
+    height: 100%;
+    position: absolute;
+    cursor: pointer;
+    right: 10px;
+    font-size: 25px;
+    color: #000;
+    line-height: 24px
+}
+
+.editorBody {
+    width: 100%;
+    height: calc(100% - 24px);
+}
+
+.courseInfo {
+    width: 100%;
+    height: 100%;
+}
+
+/*knowledge-editor*/
+
+.kEditorContainerArea {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.kEditorContainer {
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -25%;
+    margin-top: -12.5%;
+    /*background: rgba(34, 34, 34, 0.5);*/
+}
+
+.kEditorBody {
+    width: 100%;
+
+    position: relative;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+
+
+.kEditorBody .kUnitUrl img {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+.kEditorBody .kUnitInfo section label {
+
+}
+
+.kUnitInfo .ant-input {
+    width: 100%;
+}
+
+
+.kEditorBody .skUnitInfo {
+    width: 100%;
+    /*border-bottom: 1px solid #ebedf0;*/
+    /*border-right: 1px solid #ebedf0;*/
+    padding: 5px 20px 10px;
+    color: rgba(0, 0, 0, 0.65);
+}
+
+.kEditorBody .skUnitUrl,.kEditorBody .skUnitRelation,.kEditorBody .skUnitBtn{
+    padding: 5px 20px 10px;
+}
+
+.gutter-box {
+    padding: 5px 0;
+}
+

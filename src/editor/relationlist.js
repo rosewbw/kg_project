@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import './relationlist.css'
 import $ from 'jquery';
 
 class RelationList extends Component{
