@@ -167,7 +167,7 @@
     /*display:inline-block;*/
 }
 
-/*coursedetails*/
+/*teachunit-editor*/
 .editorContainerArea {
     width: 100%;
     height: 100%;
@@ -180,7 +180,7 @@
 
 .editorContainer {
     width: 90%;
-    height: 100%;
+    /*height: 100%;*/
     position: absolute;
     left: 50%;
     margin-left: -45%;
@@ -209,9 +209,17 @@
     height: calc(100% - 24px);
 }
 
-.courseInfo {
+.teachunit {
     width: 100%;
     height: 100%;
+}
+
+.teachunit .gutter-box {
+    background-color: #00a2d4;
+}
+
+.teachunit video {
+    width: 100%;
 }
 
 /*knowledge-editor*/
@@ -244,14 +252,10 @@
     background: rgba(255, 255, 255, 0.8);
 }
 
-
-
 .kEditorBody .kUnitUrl img {
     width: 100%;
     height: 100%;
 }
-
-
 
 .kEditorBody .kUnitInfo section label {
 
@@ -261,7 +265,6 @@
     width: 100%;
 }
 
-
 .kEditorBody .skUnitInfo {
     width: 100%;
     /*border-bottom: 1px solid #ebedf0;*/
@@ -270,7 +273,7 @@
     color: rgba(0, 0, 0, 0.65);
 }
 
-.kEditorBody .skUnitUrl,.kEditorBody .skUnitRelation,.kEditorBody .skUnitBtn{
+.kEditorBody .skUnitUrl, .kEditorBody .skUnitRelation, .kEditorBody .skUnitBtn {
     padding: 5px 20px 10px;
 }
 
@@ -278,3 +281,15 @@
     padding: 5px 0;
 }
 
+/*teachunit-editor*/
+.teachUnitInfo {
+    background-color: white;
+}
+
+.basicInfo {
+    padding: 10px 20px 10px;
+}
+
+.basicInfo span {
+    margin-bottom: 10px;
+}

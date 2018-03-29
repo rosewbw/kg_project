@@ -18,7 +18,7 @@ class TabController extends React.Component {
     }
 
     render() {
-        let _this = this
+        let _this = this;
         return (
             <div>
                 <div className="tab_title_wrap">
@@ -35,6 +35,7 @@ class TabController extends React.Component {
                 <div className="tab_item_wrap">
                     {
                         React.Children.map(this.props.children, (element, index) => {
+                            console.log(this.props.children);
                             return (
                                 <div className={this.check_item_index(index)}>{element}</div>
                             )

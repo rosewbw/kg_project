@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './editor.css'
 
-import CourseDetails from './coursedetails';
+import TeachUnitEditor from './teachunit-editor';
 
 import {Input, Select} from 'antd';
 import {Row, Col} from 'antd';
@@ -21,6 +21,7 @@ class KnowledgeEditor extends Component {
         this.kUnitInfoChange = this.kUnitInfoChange.bind(this);
         this.relationChange = this.relationChange.bind(this);
         this.tUnitEdit = this.tUnitEdit.bind(this);
+        this.onTeachUnitChanged = this.onTeachUnitChanged.bind(this);
     }
 
     cancelHandler() {
@@ -40,7 +41,7 @@ class KnowledgeEditor extends Component {
     tUnitEdit(e) {
         //teachUnitChanged={this.onTeachUnitChanged}
         ReactDOM.render(
-            <CourseDetails kUnitData={{}} teachUnitChanged={{}}/>
+            <TeachUnitEditor kUnitData={this.state.kUnit} teachUnitChanged={this.onTeachUnitChanged}/>
             , document.getElementById('tUnitEdit')
         )
         // ReactDOM.render(
@@ -54,6 +55,25 @@ class KnowledgeEditor extends Component {
         //     , document.getElementById('unitEdit')
         // )
     }
+
+
+    onTeachUnitChanged(tUnit) {
+        let kUnitId, tempkUnit;
+        if (!tUnit) {
+            return
+        }
+        kUnitId = tUnit.knowledgeUnitId;
+        if(kUnitId === this.state.kUnit.id){
+            tempkUnit = this.state.kUnit;
+        }
+        tempkUnit.teachUnit.push(tUnit);
+        this.setState({
+            kUnit:tempkUnit
+        },function (e) {
+            this.props.onUpdatekUnit(this.state.kUnit);
+        })
+    }
+
 
     kUnitInfoChange(e) {
         let inputType = e.target.id;
@@ -70,17 +90,18 @@ class KnowledgeEditor extends Component {
         }
     }
 
-    relationChange(e){
+    relationChange(e) {
         console.log(e);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.setState({
             kUnit: this.props.kUnitData
         })
     }
 
     render() {
+
 
         let kUnit = this.state.kUnit;
         let knowledgeUnitList = this.props.knowledgeUnitList;
@@ -99,7 +120,6 @@ class KnowledgeEditor extends Component {
             contain: [],
             parallel: []
         };
-
         for (let item in defaultChildren) {
             if (kUnit[item]) {
                 kUnit[item].map((object) => {
@@ -108,7 +128,6 @@ class KnowledgeEditor extends Component {
 
             }
         }
-
         return (
             <div id="kEditorContainerArea" className="kEditorContainerArea">
                 <div id="kEditorContainer" className="kEditorContainer">
@@ -123,28 +142,31 @@ class KnowledgeEditor extends Component {
                                             <Input
                                                 id="name"
                                                 size="small"
-                                                defaultValue={kUnit.name}/>
+                                                value={kUnit.name}
+                                            />
                                         </section>
                                         <section>
                                             <label>知识点缩略图</label>
                                             <Input
                                                 id="thumbnailUrl"
                                                 size="small"
-                                                defaultValue={kUnit.thumbnailUrl}/>
+                                                value={kUnit.thumbnailUrl}
+
+                                            />
                                         </section>
                                         <section>
                                             <label>知识点大纲要求难度</label>
                                             <Input
                                                 id="demand"
                                                 size="small"
-                                                defaultValue={kUnit.demand}/>
+                                                value={kUnit.demand}/>
                                         </section>
                                         <section>
                                             <label>知识点学生掌握程度</label>
                                             <Input
                                                 id="achieve"
                                                 size="small"
-                                                defaultValue={kUnit.achieve}/>
+                                                value={kUnit.achieve}/>
                                         </section>
                                     </div>
                                 </section>
@@ -164,7 +186,19 @@ class KnowledgeEditor extends Component {
                                                 mode="multiple"
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
-                                                defaultValue={defaultChildren.parent}
+                                                value={defaultChildren.parent}
+                                                onChange={this.relationChange}
+                                            >
+                                                {children}
+                                            </Select>
+                                        </div>
+                                        <div id="containNode" className="containNode">
+                                            <label>子节点</label>
+                                            <Select
+                                                mode="multiple"
+                                                style={{width: '100%'}}
+                                                placeholder="Please select"
+                                                value={defaultChildren.contain}
                                                 onChange={this.relationChange}
                                             >
                                                 {children}
@@ -176,7 +210,7 @@ class KnowledgeEditor extends Component {
                                                 mode="multiple"
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
-                                                defaultValue={defaultChildren.rely}
+                                                value={defaultChildren.rely}
                                                 onChange={this.relationChange}
                                             >
                                                 {children}
@@ -188,7 +222,7 @@ class KnowledgeEditor extends Component {
                                                 mode="multiple"
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
-                                                defaultValue={defaultChildren.related}
+                                                value={defaultChildren.related}
                                                 onChange={this.relationChange}
                                             >
                                                 {children}
@@ -200,7 +234,7 @@ class KnowledgeEditor extends Component {
                                                 mode="multiple"
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
-                                                defaultValue={defaultChildren.brothers}
+                                                value={defaultChildren.brothers}
                                                 onChange={this.relationChange}
                                             >
                                                 {children}
@@ -212,24 +246,13 @@ class KnowledgeEditor extends Component {
                                                 mode="multiple"
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
-                                                defaultValue={defaultChildren.parallel}
+                                                value={defaultChildren.parallel}
                                                 onChange={this.relationChange}
                                             >
                                                 {children}
                                             </Select>
                                         </div>
-                                        <div id="containNode" className="containNode">
-                                            <label>包含关系</label>
-                                            <Select
-                                                mode="multiple"
-                                                style={{width: '100%'}}
-                                                placeholder="Please select"
-                                                defaultValue={defaultChildren.contain}
-                                                onChange={this.relationChange}
-                                            >
-                                                {children}
-                                            </Select>
-                                        </div>
+
                                     </div>
                                 </section>
                                 <section id="skUnitBtn" className="skUnitBtn">

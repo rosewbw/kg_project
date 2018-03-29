@@ -43,8 +43,8 @@ function TeachUnit(kUnitId) {
     this.knowledgeUnitId = kUnitId || '';
 
     //课时信息
-    this.mainCourse = [];
-    this.auxiliaryCourse = [];
+    this.mCourseUnit = [];
+    this.aCourseUnit = [];
 
     //学生信息
     this.student = [];
@@ -53,9 +53,9 @@ function TeachUnit(kUnitId) {
     this.comments = [];
 }
 
-function Course() {
+function Course(type, TeachUnitId) {
     this.id = uuid();
-    this.type = '';
+    this.type = type;
     this.title = '';
     this.duration = 0;
 
@@ -70,6 +70,8 @@ function Course() {
     this.learningObjectType = '';
     this.averageRetentionRate = 0;
     this.semanticDensity = 0;
+
+    this.hasTeachUnitId = TeachUnitId;
 }
 
 
