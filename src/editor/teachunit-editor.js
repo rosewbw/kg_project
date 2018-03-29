@@ -17,7 +17,7 @@ class TeachUnitEditor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tUnit: {}
+            tUnit: this.props.kUnitData
         };
         this.cancelEditor = this.cancelEditor.bind(this);
         this.onTeachUnitChanged = this.onTeachUnitChanged.bind(this);
@@ -31,24 +31,23 @@ class TeachUnitEditor extends Component {
     }
 
     componentDidMount() {
-        let kUnitData = this.props.kUnitData;
-        let tUnitData;
-        console.log(kUnitData);
-        if (kUnitData) {
-            if (kUnitData.teachUnit.length === 0) {
-                tUnitData = new TeachUnit(kUnitData.id);
-            } else {
-                tUnitData = kUnitData.teachUnit[0]
-            }
-            console.log(tUnitData);
-            this.setState({
-                tUnit: tUnitData
-            }, function () {
-                console.log(this.state.tUnit);
-                console.log('2222');
-            })
-
-        }
+        // let kUnitData = this.props.kUnitData;
+        // let tUnitData;
+        // if (kUnitData) {
+        //     if (kUnitData.teachUnit.length === 0) {
+        //         tUnitData = new TeachUnit(kUnitData.id);
+        //     } else {
+        //         tUnitData = kUnitData.teachUnit[0]
+        //     }
+        //     console.log(tUnitData);
+        //     this.setState({
+        //         tUnit: tUnitData
+        //     }, function () {
+        //         console.log(this.state.tUnit);
+        //         console.log('2222');
+        //     })
+        //
+        // }
     }
 
     //这个写的就超烂了
@@ -61,7 +60,7 @@ class TeachUnitEditor extends Component {
     }
 
     render() {
-        console.log(this.state.kUnit);
+        console.log(this.state)
         return (
             <div id="editorContainerArea" className="editorContainerArea">
                 <div id="editorContainer" className="editorContainer">

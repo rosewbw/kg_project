@@ -1316,8 +1316,8 @@ class Editor extends Component {
         ReactDOM.render(
             <KnowledgeEditor
                 kUnitData={kUnitData}
-                onUpdatekUnit={this.updateKnowledgeUnit}
                 knowledgeUnitList={this.state.knowledgeUnitList}
+                onUpdatekUnit={this.updateKnowledgeUnit}
                 onUpdateUrlAndName={this.onUpdateUrlAndName}
 
             />

@@ -29,7 +29,7 @@ function KnowledgeUnit(name, id, x, y,thumbnailUrl) {
     this.parallel = [];
 
     //包含的教学单元
-    this.teachUnit = [];
+    this.teachUnit = new TeachUnit(this.id);
 }
 
 
@@ -43,7 +43,7 @@ function TeachUnit(kUnitId) {
     this.knowledgeUnitId = kUnitId || '';
 
     //课时信息
-    this.mCourseUnit = [];
+    this.mCourseUnit = new Course('main',this.id);
     this.aCourseUnit = [];
 
     //学生信息
