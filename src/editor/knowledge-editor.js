@@ -93,9 +93,6 @@ class KnowledgeEditor extends Component {
         // this.setState({
         //     kUnit: tempkUnit
         // })
-
-
-
         //     ,function (e) {
         //     this.props.onUpdatekUnit(this.state.kUnit);
         // }
@@ -176,7 +173,7 @@ class KnowledgeEditor extends Component {
                                             />
                                         </section>
                                         <section>
-                                            <label>知识点大纲要求难度</label>
+                                            <label>知识点大纲要求难度（0-100）</label>
                                             <Input
                                                 id="demand"
                                                 size="small"
@@ -185,7 +182,7 @@ class KnowledgeEditor extends Component {
 
                                         </section>
                                         <section>
-                                            <label>知识点学生掌握程度</label>
+                                            <label>知识点学生掌握程度（0-100）</label>
                                             <Input
                                                 id="achieve"
                                                 size="small"

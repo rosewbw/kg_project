@@ -71,7 +71,7 @@ function Course(type, TeachUnitId) {
     this.averageRetentionRate = 0;
     this.semanticDensity = 0;
 
-    this.hasTeachUnitId = TeachUnitId;
+    this.TeachUnitId = TeachUnitId;
 }
 
 

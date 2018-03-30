@@ -6,7 +6,7 @@ import TabController from '../utils/tabcontrol';
 import {TeachUnit, Course} from './componentConstructor';
 
 import {Row, Col} from 'antd';
-import {Tabs, Icon} from 'antd';
+import {Tabs, Icon, Tag} from 'antd';
 import {Input, Select, InputNumber, DatePicker, AutoComplete, Cascader} from 'antd';
 
 const TabPane = Tabs.TabPane;
@@ -60,14 +60,13 @@ class TeachUnitEditor extends Component {
     }
 
     render() {
-        console.log(this.state)
         return (
             <div id="editorContainerArea" className="editorContainerArea">
                 <div id="editorContainer" className="editorContainer">
                     <EditorHeader closeBtn={this.cancelEditor}/>
                     <div id="editorBody" className="editorBody">
                         <CourseEdit
-                            kUnitData={this.state.kUnit}
+                            tUnitData={this.state.tUnit}
                             onTeachUnitChanged={this.onTeachUnitChanged}
                             onCourseUnitChanged={this.onCourseUnitChanged}
                         />
@@ -79,21 +78,17 @@ class TeachUnitEditor extends Component {
 }
 
 
-class CourseEdit extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            tUnit: [],
-            mCUnit: [],
-            aCUnit: []
-        };
-        this.onBasicInfoChanged = this.onBasicInfoChanged.bind(this);
-    }
+const CourseEdit = (props) => {
 
-    onBasicInfoChanged(data) {
-        this.props.onTeachUnitChanged(data)
-    }
+    let mCourseUnit = props.tUnitData.mCourseUnit;
+    const onBasicInfoChanged = (data) => {
+        props.onTeachUnitChanged(data)
+    };
 
+    const onMainCourseInfoChanged = (data) => {
+
+    };
+    /*
     componentWillReceiveProps() {
         let kUnitData = this.props.kUnitData;
         let mCUnit, aCUnit = [];
@@ -116,53 +111,54 @@ class CourseEdit extends Component {
             })
         }
     }
+    */
+    return (
+        <div id="teachunit" className="teachunit">
+            <Row gutter={16}>
+                <Col className="gutter-row" span={18}>
+                    <Row gutter={2}>
+                        <Col className="gutter-row" span={18}>
+                            <section>
+                                <MainVideoArea/>
+                            </section>
+                        </Col>
+                        <Col className="gutter-row" span={6}>
+                            <div className="gutter-box">辅课时列表</div>
+                        </Col>
+                    </Row>
+                    <Row gutter={2}>
+                        <Col span={18}>
+                            <section id="teachUnitInfo" className="teachUnitInfo">
+                                <Tabs defaultActiveKey="1">
+                                    <TabPane tab={<span><Icon type="edit"/>基础设置</span>} key="1">
+                                        <BasicInfo
+                                            onBasicInfoChanged={onBasicInfoChanged}
+                                            tUnit={props.tUnitData}
+                                        />
+                                    </TabPane>
+                                    <TabPane tab={<span><Icon type="file"/>主课时设置</span>} key="2">
+                                        <MainCourseInfo
+                                            mCourseUnit={mCourseUnit}
+                                            onMainCourseInfoChanged={onMainCourseInfoChanged}
+                                        />
+                                    </TabPane>
+                                    <TabPane tab={<span><Icon type="file-text"/>辅课时设置</span>} key="3">
+                                        Tab 3
+                                    </TabPane>
+                                </Tabs>
+                            </section>
+                        </Col>
+                    </Row>
 
+                </Col>
+                <Col className="gutter-row" span={6}>
+                    <div className="gutter-box">素材列表</div>
+                </Col>
+            </Row>
 
-    render() {
-        return (
-            <div id="teachunit" className="teachunit">
-                <Row gutter={16}>
-                    <Col className="gutter-row" span={18}>
-                        <Row gutter={2}>
-                            <Col className="gutter-row" span={18}>
-                                <section>
-                                    <MainVideoArea/>
-                                </section>
-                            </Col>
-                            <Col className="gutter-row" span={6}>
-                                <div className="gutter-box">辅课时列表</div>
-                            </Col>
-                        </Row>
-                        <Row gutter={2}>
-                            <Col span={18}>
-                                <section id="teachUnitInfo" className="teachUnitInfo">
-                                    <Tabs defaultActiveKey="1">
-                                        <TabPane tab={<span><Icon type="edit"/>基础设置</span>} key="1">
-                                            {/*<BasicInfo*/}
-                                                {/*onBasicInfoChanged={this.onBasicInfoChanged}*/}
-                                                {/*tUnit={this.state.tUnit}*/}
-                                            {/*/>*/}
-                                        </TabPane>
-                                        <TabPane tab={<span><Icon type="file"/>主课时设置</span>} key="2">
-                                            Tab 2
-                                        </TabPane>
-                                        <TabPane tab={<span><Icon type="file-text"/>辅课时设置</span>} key="3">
-                                            Tab 3
-                                        </TabPane>
-                                    </Tabs>
-                                </section>
-                            </Col>
-                        </Row>
+        </div>
+    )
 
-                    </Col>
-                    <Col className="gutter-row" span={6}>
-                        <div className="gutter-box">素材列表</div>
-                    </Col>
-                </Row>
-
-            </div>
-        )
-    }
 }
 
 
@@ -214,6 +210,7 @@ const AuxVideoArea = ({}) => {
 
 const BasicInfo = (props) => {
     let basicInfoChanged = props.onBasicInfoChanged;
+    console.log(basicInfoChanged);
     let tUnit = props.tUnit;
     const children = [];
     for (let index in tUnit.keyword) {
@@ -221,12 +218,16 @@ const BasicInfo = (props) => {
     }
 
     function handleChange(value) {
-        tUnit.keyword.push(value);
+        tUnit.keyword = value;
+        basicInfoChanged(tUnit);
+    }
+
+    function statusChange(value) {
+        tUnit.status = value;
         basicInfoChanged(tUnit);
     }
 
     const basicInfoChange = (e) => {
-        // console.log(tUnit)
         let targetId = e.target.id;
         if (targetId === 'keyword') {
             return;
@@ -265,6 +266,7 @@ const BasicInfo = (props) => {
                                 style={{width: '100%'}}
                                 placeholder="教学单元关键字"
                                 onChange={handleChange}
+                                defaultValue={tUnit.keyword}
                                 id="keyword"
                             >
                                 {children}
@@ -274,10 +276,15 @@ const BasicInfo = (props) => {
                     <InputGroup label="status" size="middle">
                         <Col span={8}>
                             <label>教学单元发布状态</label>
-                            <Input
-                                defaultValue={tUnit.status}
+                            <Select
+                                defaultValue={tUnit.status || '未发布'}
+                                style={{width: '100%'}}
                                 id="status"
-                            />
+                                onChange={statusChange}>
+                                <Option value="publish">已发布</Option>
+                                <Option value="unpublish">未发布</Option>
+
+                            </Select>
                         </Col>
                     </InputGroup>
                 </div>
@@ -286,9 +293,201 @@ const BasicInfo = (props) => {
     )
 };
 
-const MainCourse = ({}) => {
+const MainCourseInfo = (props) => {
+    let mCInfo = props.mCourseUnit;
+    const mainCourseInfoChanged = (e) => {
+        console.log(e);
+    };
     return (
-        <div/>
+        <div>
+            <Row>
+                <Col className="gutter-row" span={8}>
+                    <section id="mainCourseBasicInfo" className="mainCourseBasicInfo">
+                        <div onChange={{mainCourseInfoChanged}}>
+                            <InputGroup label="title" size="middle">
+                                <Col>
+                                    <label>主课时名称</label>
+                                    <Input
+                                        defaultValue={mCInfo.title}
+                                        id="title"
+                                    />
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="difficulty" size="middle">
+                                <Col>
+                                    <label>课时难度</label>
+                                    <Select
+                                        defaultValue={mCInfo.difficulty || '中'}
+                                        style={{width: '100%'}}
+                                        id="difficulty">
+                                        <Option value="veryhigh">很高</Option>
+                                        <Option value="high">高</Option>
+                                        <Option value="middle">中</Option>
+                                        <Option value="low">低</Option>
+                                        <Option value="verylow">很低</Option>
+                                    </Select>
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="interactionDegree" size="middle">
+                                <Col>
+                                    <label>交互程度</label>
+                                    <Select
+                                        defaultValue={mCInfo.interactionDegree || '中'}
+                                        style={{width: '100%'}}
+                                        id="status"
+                                    >
+                                        <Option value="veryhigh">很高</Option>
+                                        <Option value="high">高</Option>
+                                        <Option value="middle">中</Option>
+                                        <Option value="low">低</Option>
+                                        <Option value="verylow">很低</Option>
+                                    </Select>
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="interactionType" size="middle">
+                                <Col>
+                                    <label>交互类型</label>
+                                    <Select
+                                        defaultValue={mCInfo.interactionType || '未定义'}
+                                        style={{width: '100%'}}
+                                        id="status"
+                                    >
+                                        <Option value="active">主动型</Option>
+                                        <Option value="commentary">解说型</Option>
+                                        <Option value="mixing">混合型</Option>
+                                        <Option value="undefined">未定义</Option>
+                                    </Select>
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="learningObjectType" size="middle">
+                                <Col>
+                                    <label>学习对象类型</label>
+                                    <Select
+                                        defaultValue={mCInfo.learningObjectType || '未定义'}
+                                        style={{width: '100%'}}
+                                        id="status"
+                                    >
+                                        <Option value="video">视频</Option>
+                                        <Option value="audio">音频</Option>
+                                        <Option value="image">图片</Option>
+                                        <Option value="word">文字</Option>
+                                        <Option value="webpage">网页链接</Option>
+                                        <Option value="richmedia">富媒体作品</Option>
+                                    </Select>
+                                </Col>
+                            </InputGroup>
+                        </div>
+                    </section>
+                </Col>
+                <Col className="gutter-row" span={8}>
+                    <section id="mainCourseBasicInfo" className="mainCourseBasicInfo">
+                        <div onChange={{mainCourseInfoChanged}}>
+                            <InputGroup label="title" size="middle">
+                                <Col>
+                                    <section>
+                                        <div >
+                                            <span>点击人数：</span>{mCInfo.clickNum}
+                                        </div>
+                                    </section>
+
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="difficulty" size="middle">
+                                <Col>
+                                    <section>
+                                        <div >
+                                            <span>观看人数：</span>{mCInfo.watchNum}
+                                        </div>
+                                    </section>
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="averageRetentionRate" size="middle">
+                                <Col>
+                                    <section>
+                                        <div >
+                                            <span>平均滞留率：</span>{mCInfo.averageRetentionRate}
+                                        </div>
+                                    </section>
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="semanticDensity" size="middle">
+                                <Col>
+                                    <section>
+                                        <div >
+                                            <span>典型学习时间：</span>{mCInfo.semanticDensity}
+                                        </div>
+                                    </section>
+                                </Col>
+                            </InputGroup>
+
+                        </div>
+                    </section>
+                </Col>
+                <Col className="gutter-row" span={8}>
+                    <section id="mainCourseBasicInfo" className="mainCourseBasicInfo">
+                        <div onChange={{mainCourseInfoChanged}}>
+                            <InputGroup label="title" size="middle">
+                                <Col>
+                                    <label>主课时名称</label>
+                                    <Input
+                                        defaultValue={mCInfo.title}
+                                        id="title"
+                                    />
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="difficulty" size="middle">
+                                <Col>
+                                    <label>课时难度</label>
+                                    <Select
+                                        defaultValue={mCInfo.difficulty || '中'}
+                                        style={{width: '100%'}}
+                                        id="difficulty">
+                                        <Option value="veryhigh">很高</Option>
+                                        <Option value="high">高</Option>
+                                        <Option value="middle">中</Option>
+                                        <Option value="low">低</Option>
+                                        <Option value="verylow">很低</Option>
+                                    </Select>
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="interactionDegree" size="middle">
+                                <Col>
+                                    <label>交互程度</label>
+                                    <Select
+                                        defaultValue={mCInfo.interactionDegree || '中'}
+                                        style={{width: '100%'}}
+                                        id="status"
+                                    >
+                                        <Option value="veryhigh">很高</Option>
+                                        <Option value="high">高</Option>
+                                        <Option value="middle">中</Option>
+                                        <Option value="low">低</Option>
+                                        <Option value="verylow">很低</Option>
+                                    </Select>
+                                </Col>
+                            </InputGroup>
+                            <InputGroup label="interactionType" size="middle">
+                                <Col>
+                                    <label>交互类型</label>
+                                    <Select
+                                        defaultValue={mCInfo.interactionType || '未定义'}
+                                        style={{width: '100%'}}
+                                        id="status"
+                                    >
+                                        <Option value="active">主动型</Option>
+                                        <Option value="commentary">解说型</Option>
+                                        <Option value="mixing">混合型</Option>
+                                        <Option value="undefined">未定义</Option>
+                                    </Select>
+                                </Col>
+                            </InputGroup>
+
+                        </div>
+                    </section>
+                </Col>
+            </Row>
+
+        </div>
     )
 };
 
