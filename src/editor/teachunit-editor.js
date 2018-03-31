@@ -31,13 +31,75 @@ class TeachUnitEditor extends Component {
         ReactDOM.unmountComponentAtNode(document.getElementById('tUnitEdit'));
     }
 
-    onMainCourseInfoChanged(data){
-        this.setState({
-
-        })
+    componentDidMount() {
     }
 
-    componentDidMount() {
+    //这个写的就超烂了
+    onTeachUnitChanged(data) {
+        console.log(data);
+    }
+
+    onCourseUnitChanged(data) {
+        console.log(data);
+    }
+
+    render() {
+        return (
+            <div id="editorContainerArea" className="editorContainerArea">
+                <div id="editorContainer" className="editorContainer">
+                    <EditorHeader closeBtn={this.cancelEditor}/>
+                    <div id="editorBody" className="editorBody">
+                        <CourseEdit
+                            tUnitData={this.state.tUnit}
+                            // tMaterialList={this.state.tMaterialList}
+                            onTeachUnitChanged={this.onTeachUnitChanged}
+                            onCourseUnitChanged={this.onCourseUnitChanged}
+                        />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
+class CourseEdit extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            tUnit:this.props.tUnitData,
+            mCUnit:this.props.tUnitData.mCourseUnit,
+            aCUnit:this.props.tUnitData.aCourseUnit,
+            tMList:[],
+        };
+        this.onBasicInfoChanged = this.onBasicInfoChanged.bind(this);
+        this.onMainCourseInfoChanged = this.onMainCourseInfoChanged.bind(this);
+        this.onMainCourseMaterialInfoChanged = this.onMainCourseMaterialInfoChanged.bind(this);
+    }
+
+    onBasicInfoChanged = (data) => {
+        this.props.onTeachUnitChanged(data)
+    };
+
+    onMainCourseInfoChanged = (data) => {
+        this.setState({
+            mCUnit:data
+        })
+    };
+
+    onMainCourseMaterialInfoChanged = (data) => {
+        let materialId = data;
+        let mCUnit = this.state.mCUnit;
+        let tMList = this.state.tMList;
+        for(let index in tMList){
+            if(tMList[index].id === materialId){
+                mCUnit.material.push(tMList[index]);
+                this.setState({
+                    mCUnit:mCUnit
+                })
+            }
+        }
+    };
+    componentDidMount(){
         let _this = this;
         // let kUnitData = this.props.kUnitData;
         // let tUnitData;
@@ -64,7 +126,7 @@ class TeachUnitEditor extends Component {
             },
             success:(res) => {
                 _this.setState({
-                    tMaterialList:[]
+                    tMList:[]
                 });
                 console.log(res);
             },
@@ -73,51 +135,6 @@ class TeachUnitEditor extends Component {
             }
 
         })
-
-    }
-
-    //这个写的就超烂了
-    onTeachUnitChanged(data) {
-        console.log(data);
-    }
-
-    onCourseUnitChanged(data) {
-        console.log(data);
-    }
-
-    render() {
-        return (
-            <div id="editorContainerArea" className="editorContainerArea">
-                <div id="editorContainer" className="editorContainer">
-                    <EditorHeader closeBtn={this.cancelEditor}/>
-                    <div id="editorBody" className="editorBody">
-                        <CourseEdit
-                            tUnitData={this.state.tUnit}
-                            tMaterialList={this.state.tMaterialList}
-                            onTeachUnitChanged={this.onTeachUnitChanged}
-                            onCourseUnitChanged={this.onCourseUnitChanged}
-                        />
-                    </div>
-                </div>
-            </div>
-        )
-    }
-}
-
-
- CourseEdit = (props) => {
-    let tMaterialList = props.tMaterialList;
-    let mCourseUnit = props.tUnitData.mCourseUnit;
-    const onBasicInfoChanged = (data) => {
-        props.onTeachUnitChanged(data)
-    };
-
-    const onMainCourseInfoChanged = (data) => {
-
-    };
-
-    const onMainCourseMaterialInfoChanged = (data) => {
-
     }
     /*
     componentWillReceiveProps() {
@@ -143,53 +160,58 @@ class TeachUnitEditor extends Component {
         }
     }
     */
-    return (
-        <div id="teachunit" className="teachunit">
-            <Row gutter={16}>
-                <Col className="gutter-row" span={18}>
-                    <Row gutter={2}>
-                        <Col className="gutter-row" span={18}>
-                            <section>
-                                <MainVideoArea/>
-                            </section>
-                        </Col>
-                        <Col className="gutter-row" span={6}>
-                            <div className="gutter-box">辅课时列表</div>
-                        </Col>
-                    </Row>
-                    <Row gutter={2}>
-                        <Col span={18}>
-                            <section id="teachUnitInfo" className="teachUnitInfo">
-                                <Tabs defaultActiveKey="1">
-                                    <TabPane tab={<span><Icon type="edit"/>基础设置</span>} key="1">
-                                        <BasicInfo
-                                            onBasicInfoChanged={onBasicInfoChanged}
-                                            tUnit={props.tUnitData}
-                                        />
-                                    </TabPane>
-                                    <TabPane tab={<span><Icon type="file"/>主课时设置</span>} key="2">
-                                        <MainCourseInfo
-                                            tMaterialList={tMaterialList}
-                                            mCourseUnit={mCourseUnit}
-                                            onMainCourseInfoChanged={onMainCourseInfoChanged}
-                                            onMainCourseMaterialInfoChanged={}
-                                        />
-                                    </TabPane>
-                                    <TabPane tab={<span><Icon type="file-text"/>辅课时设置</span>} key="3">
-                                        Tab 3
-                                    </TabPane>
-                                </Tabs>
-                            </section>
-                        </Col>
-                    </Row>
+    render(){
+        return (
+            <div id="teachunit" className="teachunit">
+                <Row gutter={16}>
+                    <Col className="gutter-row" span={18}>
+                        <Row gutter={2}>
+                            <Col className="gutter-row" span={18}>
+                                <section>
+                                    <MainVideoArea
+                                        materialData={this.state.mCUnit.material}
+                                    />
+                                </section>
+                            </Col>
+                            <Col className="gutter-row" span={6}>
+                                <div className="gutter-box">辅课时列表</div>
+                            </Col>
+                        </Row>
+                        <Row gutter={2}>
+                            <Col span={18}>
+                                <section id="teachUnitInfo" className="teachUnitInfo">
+                                    <Tabs defaultActiveKey="1">
+                                        <TabPane tab={<span><Icon type="edit"/>基础设置</span>} key="1">
+                                            <BasicInfo
+                                                onBasicInfoChanged={this.onBasicInfoChanged}
+                                                tUnit={this.state.tUnit}
+                                            />
+                                        </TabPane>
+                                        <TabPane tab={<span><Icon type="file"/>主课时设置</span>} key="2">
+                                            <MainCourseInfo
+                                                tMaterialList={this.state.tMList}
+                                                mCourseUnit={this.state.mCUnit}
+                                                onMainCourseInfoChanged={this.onMainCourseInfoChanged}
+                                                onMainCourseMaterialInfoChanged={this.onMainCourseMaterialInfoChanged}
+                                            />
+                                        </TabPane>
+                                        <TabPane tab={<span><Icon type="file-text"/>辅课时设置</span>} key="3">
+                                            Tab 3
+                                        </TabPane>
+                                    </Tabs>
+                                </section>
+                            </Col>
+                        </Row>
 
-                </Col>
-                <Col className="gutter-row" span={6}>
-                    <div className="gutter-box">素材列表</div>
-                </Col>
-            </Row>
-        </div>
-    )
+                    </Col>
+                    <Col className="gutter-row" span={6}>
+                        <div className="gutter-box">素材列表</div>
+                    </Col>
+                </Row>
+            </div>
+        )
+    }
+
 };
 
 
@@ -201,10 +223,21 @@ const EditorHeader = ({closeBtn}) => {
 };
 
 
-const MainVideoArea = ({videoUrl}) => {
+const MainVideoArea = (props) => {
+    let materialData = props.materialData;
+    let url = materialData.url;
+    let type = materialData.type;
+    let playArea;
+    if(type === 'video'){
+        playArea = <video id="editor-video" src={url} controls="controls"/>
+    }else if(type === 'image'){
+        playArea = <img id="editor-video" src={url} />;
+    }else{
+        playArea = <video id="editor-video" src={url} controls="controls"/>
+    }
     return (
         <div id="editor-video-area">
-            <video id="editor-video" src={videoUrl} controls="controls"/>
+            {playArea}
             <div id="editor-butn-layer"/>
         </div>
     )
@@ -241,7 +274,6 @@ const AuxVideoArea = ({}) => {
 
 const BasicInfo = (props) => {
     let basicInfoChanged = props.onBasicInfoChanged;
-    console.log(basicInfoChanged);
     let tUnit = props.tUnit;
     const children = [];
     for (let index in tUnit.keyword) {
@@ -326,13 +358,39 @@ const BasicInfo = (props) => {
 
 const MainCourseInfo = (props) => {
     let mCInfo = props.mCourseUnit;
+    let mCInfoChanged = props.onMainCourseInfoChanged;
     let tMaterialList = props.tMaterialList;
-    const mainCourseInfoChanged = (e) => {
-        console.log(e);
+    const mainCourseInfoChanged = (e, option) => {
+        console.log(e, option);
     };
 
     const mainCourseMaterialInfoChanged = (data) => {
         props.onMainCourseMaterialInfoChanged(data);
+    };
+
+    const mCInfoChange = (e) => {
+        let targetId = e.target.id;
+        mCInfo[targetId] = e.target.value;
+        mCInfoChanged(mCInfo);
+    };
+
+    const dHandleChange = (value) => {
+        mCInfo.difficulty = value;
+        mCInfoChanged(mCInfo);
+    };
+    const iDHandleChange = (value) => {
+        mCInfo.interactionDegree = value;
+        mCInfoChanged(mCInfo);
+    };
+
+    const iTHandleChange = (value) => {
+        mCInfo.interactionType = value;
+        mCInfoChanged(mCInfo);
+    };
+
+    const lOTHandleChange = (value) => {
+        mCInfo.learningObjectType = value;
+        mCInfoChanged(mCInfo);
     };
     const children = [];
     let type;
@@ -347,7 +405,7 @@ const MainCourseInfo = (props) => {
             <Row>
                 <Col className="gutter-row" span={8}>
                     <section id="mainCourseBasicInfo" className="mainCourseBasicInfo">
-                        <div onChange={mainCourseInfoChanged}>
+                        <div onChange={mCInfoChange}>
                             <InputGroup label="title" size="middle">
                                 <Col>
                                     <label>主课时名称</label>
@@ -363,7 +421,9 @@ const MainCourseInfo = (props) => {
                                     <Select
                                         defaultValue={mCInfo.difficulty || '中'}
                                         style={{width: '100%'}}
-                                        id="difficulty">
+                                        id="difficulty"
+                                        onChange={dHandleChange}
+                                    >
                                         <Option value="veryhigh">很高</Option>
                                         <Option value="high">高</Option>
                                         <Option value="middle">中</Option>
@@ -379,6 +439,7 @@ const MainCourseInfo = (props) => {
                                         defaultValue={mCInfo.interactionDegree || '中'}
                                         style={{width: '100%'}}
                                         id="status"
+                                        onChange={iDHandleChange}
                                     >
                                         <Option value="veryhigh">很高</Option>
                                         <Option value="high">高</Option>
@@ -395,6 +456,7 @@ const MainCourseInfo = (props) => {
                                         defaultValue={mCInfo.interactionType || '未定义'}
                                         style={{width: '100%'}}
                                         id="status"
+                                        onChange={iTHandleChange}
                                     >
                                         <Option value="active">主动型</Option>
                                         <Option value="commentary">解说型</Option>
@@ -410,6 +472,7 @@ const MainCourseInfo = (props) => {
                                         defaultValue={mCInfo.learningObjectType || '未定义'}
                                         style={{width: '100%'}}
                                         id="status"
+                                        onChange={lOTHandleChange}
                                     >
                                         <Option value="video">视频</Option>
                                         <Option value="audio">音频</Option>
