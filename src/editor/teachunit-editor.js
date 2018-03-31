@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './editor.css'
-// import $ from 'jquery';
+import $ from 'jquery';
 import TabController from '../utils/tabcontrol';
 import {TeachUnit, Course} from './componentConstructor';
 
@@ -12,12 +12,13 @@ import {Input, Select, InputNumber, DatePicker, AutoComplete, Cascader} from 'an
 const TabPane = Tabs.TabPane;
 const InputGroup = Input.Group;
 const Option = Select.Option;
+const OptGroup = Select.OptGroup;
 
 class TeachUnitEditor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tUnit: this.props.kUnitData
+            tUnit: this.props.kUnitData,
         };
         this.cancelEditor = this.cancelEditor.bind(this);
         this.onTeachUnitChanged = this.onTeachUnitChanged.bind(this);
@@ -30,7 +31,14 @@ class TeachUnitEditor extends Component {
         ReactDOM.unmountComponentAtNode(document.getElementById('tUnitEdit'));
     }
 
+    onMainCourseInfoChanged(data){
+        this.setState({
+
+        })
+    }
+
     componentDidMount() {
+        let _this = this;
         // let kUnitData = this.props.kUnitData;
         // let tUnitData;
         // if (kUnitData) {
@@ -48,6 +56,24 @@ class TeachUnitEditor extends Component {
         //     })
         //
         // }
+        $.ajax('/getMediaList',{
+            type:"POST",
+            dataType:'json',
+            data:{
+                username:_this.state.tUnit.username || 'debug-user'
+            },
+            success:(res) => {
+                _this.setState({
+                    tMaterialList:[]
+                });
+                console.log(res);
+            },
+            error:(err) => {
+                console.log(err)
+            }
+
+        })
+
     }
 
     //这个写的就超烂了
@@ -67,6 +93,7 @@ class TeachUnitEditor extends Component {
                     <div id="editorBody" className="editorBody">
                         <CourseEdit
                             tUnitData={this.state.tUnit}
+                            tMaterialList={this.state.tMaterialList}
                             onTeachUnitChanged={this.onTeachUnitChanged}
                             onCourseUnitChanged={this.onCourseUnitChanged}
                         />
@@ -78,8 +105,8 @@ class TeachUnitEditor extends Component {
 }
 
 
-const CourseEdit = (props) => {
-
+ CourseEdit = (props) => {
+    let tMaterialList = props.tMaterialList;
     let mCourseUnit = props.tUnitData.mCourseUnit;
     const onBasicInfoChanged = (data) => {
         props.onTeachUnitChanged(data)
@@ -88,6 +115,10 @@ const CourseEdit = (props) => {
     const onMainCourseInfoChanged = (data) => {
 
     };
+
+    const onMainCourseMaterialInfoChanged = (data) => {
+
+    }
     /*
     componentWillReceiveProps() {
         let kUnitData = this.props.kUnitData;
@@ -138,8 +169,10 @@ const CourseEdit = (props) => {
                                     </TabPane>
                                     <TabPane tab={<span><Icon type="file"/>主课时设置</span>} key="2">
                                         <MainCourseInfo
+                                            tMaterialList={tMaterialList}
                                             mCourseUnit={mCourseUnit}
                                             onMainCourseInfoChanged={onMainCourseInfoChanged}
+                                            onMainCourseMaterialInfoChanged={}
                                         />
                                     </TabPane>
                                     <TabPane tab={<span><Icon type="file-text"/>辅课时设置</span>} key="3">
@@ -155,11 +188,9 @@ const CourseEdit = (props) => {
                     <div className="gutter-box">素材列表</div>
                 </Col>
             </Row>
-
         </div>
     )
-
-}
+};
 
 
 const EditorHeader = ({closeBtn}) => {
@@ -295,15 +326,28 @@ const BasicInfo = (props) => {
 
 const MainCourseInfo = (props) => {
     let mCInfo = props.mCourseUnit;
+    let tMaterialList = props.tMaterialList;
     const mainCourseInfoChanged = (e) => {
         console.log(e);
     };
+
+    const mainCourseMaterialInfoChanged = (data) => {
+        props.onMainCourseMaterialInfoChanged(data);
+    };
+    const children = [];
+    let type;
+    for(let index in tMaterialList){
+        if(tMaterialList[index]){
+            type = tMaterialList[index].type;
+            children[type].push(<Option key={tMaterialList[index].id}>{tMaterialList[index].name}</Option>);
+        }
+    }
     return (
         <div>
             <Row>
                 <Col className="gutter-row" span={8}>
                     <section id="mainCourseBasicInfo" className="mainCourseBasicInfo">
-                        <div onChange={{mainCourseInfoChanged}}>
+                        <div onChange={mainCourseInfoChanged}>
                             <InputGroup label="title" size="middle">
                                 <Col>
                                     <label>主课时名称</label>
@@ -380,8 +424,48 @@ const MainCourseInfo = (props) => {
                     </section>
                 </Col>
                 <Col className="gutter-row" span={8}>
-                    <section id="mainCourseBasicInfo" className="mainCourseBasicInfo">
-                        <div onChange={{mainCourseInfoChanged}}>
+                    <section id="mainCourseMaterialInfo" className="mainCourseMaterialInfo">
+                        <div >
+                            <label>请选择主课时素材</label>
+                            <br/>
+                            <Select
+                                defalt
+                                style={{ width: 200 }}
+                                defaultValue={mCInfo.material[0]||''}
+                                id="material"
+                                onChange={mainCourseMaterialInfoChanged}
+                            >
+                                {children}
+                                <OptGroup label="图片">
+                                    {/*{children.image}*/}
+                                    <Option key="1" >Jack</Option>
+                                    <Option key="2" >Lucy</Option>
+                                </OptGroup>
+                                {/*<OptGroup label="文字">*/}
+                                    {/*{children.word}*/}
+                                {/*</OptGroup>*/}
+                                {/*<OptGroup label="音频">*/}
+                                    {/*{children.audio}*/}
+                                {/*</OptGroup>*/}
+                                {/*<OptGroup label="视频">*/}
+                                    {/*{children.video}*/}
+                                {/*</OptGroup>*/}
+                                {/*<OptGroup label="动画">*/}
+                                    {/*{children.flash}*/}
+                                {/*</OptGroup>*/}
+                                {/*<OptGroup label="链接">*/}
+                                    {/*{children.webpage}*/}
+                                {/*</OptGroup>*/}
+                                {/*<OptGroup label="富媒体">*/}
+                                    {/*{children.richmedia}*/}
+                                {/*</OptGroup>*/}
+                            </Select>
+                        </div>
+                    </section>
+                </Col>
+                <Col className="gutter-row" span={8}>
+                    <section id="mainCourseStatInfo" className="mainCourseStatInfo">
+                        <div onChange={mainCourseInfoChanged}>
                             <InputGroup label="title" size="middle">
                                 <Col>
                                     <section>
@@ -389,7 +473,6 @@ const MainCourseInfo = (props) => {
                                             <span>点击人数：</span>{mCInfo.clickNum}
                                         </div>
                                     </section>
-
                                 </Col>
                             </InputGroup>
                             <InputGroup label="difficulty" size="middle">
@@ -423,68 +506,6 @@ const MainCourseInfo = (props) => {
                         </div>
                     </section>
                 </Col>
-                <Col className="gutter-row" span={8}>
-                    <section id="mainCourseBasicInfo" className="mainCourseBasicInfo">
-                        <div onChange={{mainCourseInfoChanged}}>
-                            <InputGroup label="title" size="middle">
-                                <Col>
-                                    <label>主课时名称</label>
-                                    <Input
-                                        defaultValue={mCInfo.title}
-                                        id="title"
-                                    />
-                                </Col>
-                            </InputGroup>
-                            <InputGroup label="difficulty" size="middle">
-                                <Col>
-                                    <label>课时难度</label>
-                                    <Select
-                                        defaultValue={mCInfo.difficulty || '中'}
-                                        style={{width: '100%'}}
-                                        id="difficulty">
-                                        <Option value="veryhigh">很高</Option>
-                                        <Option value="high">高</Option>
-                                        <Option value="middle">中</Option>
-                                        <Option value="low">低</Option>
-                                        <Option value="verylow">很低</Option>
-                                    </Select>
-                                </Col>
-                            </InputGroup>
-                            <InputGroup label="interactionDegree" size="middle">
-                                <Col>
-                                    <label>交互程度</label>
-                                    <Select
-                                        defaultValue={mCInfo.interactionDegree || '中'}
-                                        style={{width: '100%'}}
-                                        id="status"
-                                    >
-                                        <Option value="veryhigh">很高</Option>
-                                        <Option value="high">高</Option>
-                                        <Option value="middle">中</Option>
-                                        <Option value="low">低</Option>
-                                        <Option value="verylow">很低</Option>
-                                    </Select>
-                                </Col>
-                            </InputGroup>
-                            <InputGroup label="interactionType" size="middle">
-                                <Col>
-                                    <label>交互类型</label>
-                                    <Select
-                                        defaultValue={mCInfo.interactionType || '未定义'}
-                                        style={{width: '100%'}}
-                                        id="status"
-                                    >
-                                        <Option value="active">主动型</Option>
-                                        <Option value="commentary">解说型</Option>
-                                        <Option value="mixing">混合型</Option>
-                                        <Option value="undefined">未定义</Option>
-                                    </Select>
-                                </Col>
-                            </InputGroup>
-
-                        </div>
-                    </section>
-                </Col>
             </Row>
 
         </div>
@@ -499,15 +520,3 @@ const ListItem = ({itemId}, {itemName}) => {
 
 
 export default TeachUnitEditor;
-
-/*
-<TabController>
-    <BasicInfo
-        name="基础设置"
-        basicInfoChanged={this.onBaseInfoChanged}
-        basicInfoComponent={<BasicInfo />}
-    />
-    <MainCourse name="主课时设置"/>
-    <MainCourse name="辅课时设置"/>
-</TabController>
-*/

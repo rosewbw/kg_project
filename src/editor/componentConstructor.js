@@ -3,6 +3,7 @@ import uuid from '../utils/uuid'
 function KnowledgeUnit(name, id, x, y,thumbnailUrl) {
     //知识点基本信息
     this.id = id;
+    this.user
     this.name = name;
     this.thumbnailUrl = thumbnailUrl || '';
     this.root = false;
@@ -64,7 +65,7 @@ function Course(type, TeachUnitId) {
 
     this.clickNum = 0;
     this.difficulty = '';
-    this.watchNum = '';
+    this.watchNum = 0;
 
     this.material = [];
     this.learningObjectType = '';
