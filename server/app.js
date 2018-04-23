@@ -10,7 +10,8 @@ var session = require('express-session')
 
 global.dbHandel = require('./database/dbhandle');
 var index = require('./routes/index');
-let config = require('./config/config')
+let config = require('./config/config');
+
 
 var app = express();
 
@@ -44,7 +45,6 @@ app.use(session({//session
     resave: true,
     saveUninitialized: true
 }));
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 

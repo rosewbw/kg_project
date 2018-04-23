@@ -5,10 +5,11 @@ import {
     BrowserRouter as Router,
     Route
 } from "react-router-dom";
-import App from './App';
+import app from './editorPage/App';
 import registerServiceWorker from './registerServiceWorker';
 import Reg from './registerandlogin/register';
 import Login from './registerandlogin/login';
+import LearningPage from './learningPage/index';
 
 const IndexPage = () => (
     <Router>
@@ -16,7 +17,8 @@ const IndexPage = () => (
             <Route exact path="/" component={Login} />
             <Route path="/login" component={Login} />
             <Route path="/reg" component={Reg} />
-            <Route path="/app" component={App} />
+            <Route path="/editorPage" component={app} />
+            <Route path="/learningPage" component={LearningPage} />
         </div>
     </Router>
 );

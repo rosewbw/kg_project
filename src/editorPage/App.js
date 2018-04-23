@@ -6,10 +6,12 @@ import {
     Link
 } from "react-router-dom";
 
-import Home from './homepage/homepage'
-import FileUpload from './upload/fileupload'
-import EditorControl from './editor/ediorcontrol'
-import MediaGallery from './media-gallery/media-gallery'
+import Home from '../homepage/homepage'
+import FileUpload from '../upload/fileupload'
+import EditorControl from '../editor/ediorcontrol'
+import MediaGallery from '../media-gallery/media-gallery'
+
+import fetch from 'isomorphic-fetch';
 
 const {Sider} = Layout;
 const SubMenu = Menu.SubMenu;
@@ -17,10 +19,24 @@ const SubMenu = Menu.SubMenu;
 class App extends Component {
     state = {
         collapsed: false,
+        username:''
     };
     onCollapse = (collapsed) => {
         console.log(collapsed);
         this.setState({ collapsed });
+    };
+
+    componentDidMount(){
+        let routerState = this.props.location.state;
+        if(routerState){
+            let username = this.props.location.state.username;
+            this.setState({
+                username:username
+            })
+        }else{
+            this.props.history.push(`/login`);
+        }
+
     }
     render() {
         console.log(`${this.props.match.url}/home`);

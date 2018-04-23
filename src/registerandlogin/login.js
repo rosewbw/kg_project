@@ -15,8 +15,12 @@ class Login extends Component {
         this.handleType = this.handleType.bind(this);
         this.saveUser = this.saveUser.bind(this);
         this.toRegister = this.toRegister.bind(this);
+        this.getToken = this.getToken.bind(this);
     }
 
+    getToken(){
+        return localStorage.getItem('token');
+    }
     stateChange(e) {
         const target = e.target;
         this.setState({
@@ -35,6 +39,7 @@ class Login extends Component {
     }
 
     saveUser() {
+        let token = this.getToken();
         const {
             username,
             password,
@@ -47,7 +52,7 @@ class Login extends Component {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
-                // "Authorization":token
+                "Authorization":token
             },
             body:JSON.stringify({
                 username:username,
@@ -55,11 +60,20 @@ class Login extends Component {
                 type:type,
                 email:email
             })
-        }).then(res => {
+        }).then( res => res.json()).then(res => {
             console.log(res);
-            if(res.status === 200){
+            if(res.status === 'success'){
+                let options =res.data;
+                localStorage.setItem('token', options.token);
+                if(options.usertype === 'student'){
+                    this.props.history.push(`/learningPage/${options.username}`);
+                }else{
+                    // this.props.history.push(`/editorPage/${options.username}`);
+                    this.props.history.push({pathname:'/editorPage',state:{
+                        username:options.username
+                    }});
+                }
 
-                this.props.history.push(`app`);
             }else{
                 alert("登录失败，请重新登录");
                 this.props.history.push('login');
@@ -79,7 +93,7 @@ class Login extends Component {
                         <option value ="teacher">教师</option>
                     </select>
                     <button onClick={this.saveUser}>Log in</button>
-                    <button onClick={this.toRegister}>Register</button>
+                    <button onClick={this.toRegister}>Go Register</button>
                 </div>
             </div>
         );

@@ -42,24 +42,25 @@ class Reg extends Component {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: {
-                username,
-                password,
-                type,
-                email
-            }
+            body: JSON.stringify({
+                username:username,
+                password:password,
+                type:type,
+                email:email
+            })
         }).then( res => res.json() ).then( res => {
-
-            if(res.type){
-                localStorage.setItem('token', res.token);
-                // 成功, 处理逻辑
+            console.log(res);
+            if(res.status === 'success'){
+                // localStorage.setItem('token', res.data.token);//res.token
                 this.props.history.push('login');
                 alert('恭喜您注册成功了');
+            }else if(res.status === 'exist'){
+                alert('用户名已被注册');
+                this.props.history.push('Reg')
             }else{
+                alert('注册失败，请重新注册');
                 this.props.history.push('Reg')
             }
-
-
         })
     }
 
