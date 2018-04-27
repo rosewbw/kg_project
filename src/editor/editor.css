@@ -286,7 +286,7 @@
     background-color: white;
 }
 
-.basicInfo, .mainCourseBasicInfo, .mainCourseStatInfo,.mainCourseMaterialInfo {
+.basicInfo, .mainCourseBasicInfo, .mainCourseStatInfo, .mainCourseMaterialInfo {
     padding: 10px 20px 10px;
 }
 
@@ -298,7 +298,42 @@
 
 }
 
-.mainCourseStatInfo section{
+.mainCourseStatInfo section {
     font-size: 1.5em;
     margin-bottom: 1.5em;
+}
+
+/*editorcontrol*/
+.pBox {
+    width: 200px;
+    height: 180px;
+    border: 2px solid gray;
+    border-radius: 3px;
+}
+
+.pBox .pThumbnail {
+    width: 100%;
+    height: 100%;
+}
+
+.pBox .pThumbnail img {
+    width: 100%;
+    height: 100%;
+}
+
+.jumbotron-heading {
+    font-weight: 300
+}
+
+.galleryWrapper .card-text {
+    height: 6rem;
+    border-bottom: 1px solid #ebedf0;
+    border-top: 1px solid #ebedf0;
+}
+.galleryWrapper .card-text p {
+    overflow: hidden;
+}
+
+.buttonGroup {
+    margin-bottom:10px;
 }

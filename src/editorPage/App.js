@@ -8,7 +8,7 @@ import {
 
 import Home from '../homepage/homepage'
 import FileUpload from '../upload/fileupload'
-import EditorControl from '../editor/ediorcontrol'
+import EditorControl from '../editor/editorcontrol'
 import MediaGallery from '../media-gallery/media-gallery'
 
 import fetch from 'isomorphic-fetch';
@@ -39,8 +39,7 @@ class App extends Component {
 
     }
     render() {
-        console.log(`${this.props.match.url}/home`);
-        const {children} = this.props;
+        let name = this.state.username;
         return (
             <Layout style={{ minHeight: '100vh' }}>
                 <Sider
@@ -57,16 +56,12 @@ class App extends Component {
                             <span>首页</span>
                             <Link to={`${this.props.match.url}/home`}/>
                         </Menu.Item>
-                        <Menu.Item key="2">
-                            <Icon type="desktop" />
-                            <span>Option 2</span>
-                        </Menu.Item>
                         <SubMenu
                             key="sub1"
                             title={<span><Icon type="user" /><span>课程制作</span></span>}
                         >
                             <Menu.Item key="3">新建课程
-                                <Link to={`${this.props.match.url}/editor`}/>
+                                <Link to={`${this.props.match.url}/editor/${name}`}/>
                             </Menu.Item>
 
                             <Menu.Item key="4">已有课程</Menu.Item>
@@ -88,7 +83,7 @@ class App extends Component {
                 <Layout style={{ marginLeft: 200 }}>
                     <Route path={`${this.props.match.url}/home`} component={Home} />
                     <Route path={`${this.props.match.url}/upload`} component={MediaGallery} />
-                    <Route path={`${this.props.match.url}/editor`} component={EditorControl} />
+                    <Route path={`${this.props.match.url}/editor/:username`} component={EditorControl} />
                     <Route
                         exact
                         path={this.props.match.url}
