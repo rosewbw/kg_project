@@ -13,10 +13,10 @@ class EditorControl extends Component {
         super(props);
         this.state = {
             hasCreate: false,
-            projectName: '',
             projectData: [],
             visible: false,
-            username: ''
+            username: '',
+            currentProjectId:''
         };
         this.getEditorComponent = this.getEditorComponent.bind(this);
         this.stateChange = this.stateChange.bind(this);
@@ -25,6 +25,8 @@ class EditorControl extends Component {
         this.getProjectData = this.getProjectData.bind(this);
         this.request = this.request.bind(this);
         this.addProject = this.addProject.bind(this);
+        this.onEditClick = this.onEditClick.bind(this);
+        this.onDeleteClick = this.onDeleteClick.bind(this);
     }
 
     getProjectData(username, callback) {
@@ -67,22 +69,38 @@ class EditorControl extends Component {
         });
 
     }
-    onDeleteHandle(){
 
+    onEditClick(e){
+        this.setState({
+            hasCreate:true,
+            currentProjectId:e.target.parentNode.dataset.pid
+        })
     }
 
+    onDeleteClick(e){
+        let pid = e.target.parentNode.dataset.pid;
+        let _this = this;
+        _this.request('/deleteProject',{username:_this.state.username,projectId:pid},function (e) {
+            let pData = e;
+            _this.setState({
+                projectData:pData
+            })
+        })
+    }
 
     getEditorComponent() {
         if (!this.state.hasCreate) {
-            return <EditorInfo onButtonClick={this.onButtonClick}
+            return <EditorInfo onEditClick={this.onEditClick}
                                stateChange={this.stateChange}
                                projectData={this.state.projectData}
                                username={this.state.username}
                                onCreateHandle={this.onCreateHandle}
-                               onDeleteHandle={this.onDeleteHandle}
+                               onDeleteClick={this.onDeleteClick}
+
             />
         } else {
-            return <Editor projectName={this.state.projectName}
+            console.log(this.state.currentProjectId);
+            return <Editor projectId={this.state.currentProjectId}
                            username={this.state.username}
             />
         }
@@ -123,9 +141,9 @@ class EditorControl extends Component {
 }
 
 const EditorInfo = (props) => {
-    const {onButtonClick, stateChange, projectData, onCreateHandle} = props;
+    const {projectData, onCreateHandle} = props;
+    const {onEditClick, onDeleteClick, onPublishClick} = props;
     let children = [];
-    console.log(projectData);
     if (projectData.length === 0) {
         children.push(<NoProject key={0}/>)
     } else {
@@ -135,7 +153,9 @@ const EditorInfo = (props) => {
                 <div className="col-2" key={index}>
                     <ProjectBox
                         pData={project}
-
+                        onEditClick={onEditClick}
+                        onDeleteClick={onDeleteClick}
+                        onPublishClick={onPublishClick}
                     />
                 </div>
             );
@@ -155,20 +175,13 @@ const EditorInfo = (props) => {
                 </div>
             </div>
         </div>
-        /*
-        <div onChange={(e) => stateChange(e)} style={{width: '100%', height: '100%'}}>
-            <ProjectBox/>
-            <input name="projectName" className="projectName" placeholder="请输入课程名称"/>
-            <button onClick={(e) => onButtonClick(e)}>创建课程</button>
-        </div>
-        */
     )
 };
 
 const ProjectBox = (props) => {
     const pData = props.pData;
     let publishStatus,publishStatusClassName;
-    console.log(pData);
+    const {onEditClick, onDeleteClick, onPublishClick} = props;
     if(pData.publishStatus === 'unPublish'){
         publishStatusClassName = 'unPublish';
         publishStatus = '未发布';
@@ -177,17 +190,17 @@ const ProjectBox = (props) => {
         publishStatusClassName = 'publish';
     }
     return (
-        <div className="card mb-4 box-shadow">
+        <div className="card mb-4 box-shadow" >
             <img className="card-img-top" src={pData.thumbnailUrl||defaultImg}
                  alt="Card image cap"/>
             <div className="card-body">
-                <div className="projectName">{pData.projectName}</div>
-                <p className="card-text">{pData.description}</p>
+                <div className="projectName" style={{overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis' }}>{pData.projectName}</div>
+                <p className="card-text" style={{overflow:'hidden'}} title={pData.description}>{pData.description}</p>
                 <div className="d-flex justify-content-between align-items-center buttonGroup">
-                    <div className="btn-group">
-                        <button type="button" className="btn btn-sm btn-outline-secondary edit">编辑</button>
-                        <button type="button" className="btn btn-sm btn-outline-secondary delete">删除</button>
-                        <button type="button" className="btn btn-sm btn-outline-secondary publishStatus">
+                    <div className="btn-group" data-pid={pData._id}>
+                        <button type="button" className="btn btn-sm btn-outline-secondary edit" onClick={onEditClick}>编辑</button>
+                        <button type="button" className="btn btn-sm btn-outline-secondary delete" onClick={onDeleteClick}>删除</button>
+                        <button type="button" className="btn btn-sm btn-outline-secondary publishStatus" onClick={onPublishClick}>
                             <span className={publishStatusClassName}>{publishStatus}</span>
                         </button>
                     </div>

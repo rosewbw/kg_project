@@ -19,6 +19,9 @@ router.post('/upload', tokenObj.checkToken, graph.upload);
 router.post('/upload', tokenObj.checkToken, graph.updateTeacher);
 router.post('/addProject', tokenObj.checkToken, project.addProject);
 router.post('/getProject', tokenObj.checkToken, project.getProject);
+router.post('/getProjectData', tokenObj.checkToken, project.getProjectData);
+router.post('/saveProjectData', tokenObj.checkToken, project.saveProjectData);
+router.post('/deleteProject', tokenObj.checkToken, project.deleteProject);
 
 
 module.exports = router;

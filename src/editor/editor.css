@@ -76,6 +76,16 @@
     /*pointer-events:auto;*/
 }
 
+.projectStatus {
+    float: right;
+    height: 30px;
+    border-radius: 3px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 30px;
+    margin: 20px 60px;
+}
+
 /*.canvas-api-remove-butn {*/
 /*width: 60px;*/
 /*height: 30px;*/
@@ -152,20 +162,25 @@
 }
 
 .editorBtn {
-    width: 60px;
-    height: 30px;
-    border-radius: 3px;
+    /*width: 60px;*/
+    /*height: 30px;*/
+    /*border-radius: 3px;*/
     /* background: #23df67; */
-    background: #ccc;
-    text-align: center;
+    /*background: #ccc;*/
+    /*text-align: center;*/
     font-size: 15px;
-    font-weight: bold;
+    /*font-weight: bold;*/
     line-height: 30px;
     cursor: pointer;
     float: left;
     margin: 20px 2px;
     /*display:inline-block;*/
 }
+
+.toolBar .selected {
+
+}
+
 
 /*teachunit-editor*/
 .editorContainerArea {
@@ -336,4 +351,14 @@
 
 .buttonGroup {
     margin-bottom:10px;
+}
+
+.btn-group .delete{
+    color: #ff4d4f;
+}
+
+.btn-group .delete:hover {
+    color: #fff;
+    background-color: #ff4d4f;
+    border-color: #ff4d4f;
 }

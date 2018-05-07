@@ -9,11 +9,16 @@ import {createElement} from '../utils/utils';
 import KnowledgeEditor from './knowledge-editor';
 import 'jquery-mousewheel'
 
+import {Input, Button} from 'antd';
+
 class Editor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            knowledgeUnitList: []
+            knowledgeUnitList: [],
+            projectId: '',
+            username: '',
+            projectName: ''
         };
         this.canvasConstructor = this.canvasConstructor.bind(this);
         this.getKnowledgeObjectById = this.getKnowledgeObjectById.bind(this);
@@ -21,6 +26,9 @@ class Editor extends Component {
         this.onTeachUnitChanged = this.onTeachUnitChanged.bind(this);
         this.updateKnowledgeUnit = this.updateKnowledgeUnit.bind(this);
         this.onUpdateUrlAndName = this.onUpdateUrlAndName.bind(this);
+        this.getProjectData = this.getProjectData.bind(this);
+        this.updateProjectName = this.updateProjectName.bind(this);
+        this.saveProject = this.saveProject.bind(this);
     }
 
     canvasConstructor(canvas, dragBox, options, callback) {
@@ -36,7 +44,7 @@ class Editor extends Component {
             butnEditorId: 'editBtn',
             removeButtonClass: 'canvas-api-remove-butn',
             removeButtonPosition: null,
-            removeButnColor: '#23df67',
+            removeButnColor: '#1890ff',
             circle: 'canvas-api-circle',
             circleSize: [20, 20],
             floatImgOpacity: 0.7,
@@ -649,7 +657,7 @@ class Editor extends Component {
 
         function editorButnHighLight(bool) {
             if (bool) {
-                control.butnEditor.css({'background': 'rgb(35, 223, 103)', 'pointer-events': 'auto'});
+                control.butnEditor.css({'background': '#1890ff', 'pointer-events': 'auto', color:'white'});
             } else {
                 control.butnEditor.css({'background': 'rgba(204,204,204,0.7)', 'pointer-events': 'none'});
             }
@@ -1277,6 +1285,21 @@ class Editor extends Component {
     }
 
 
+    saveProject() {
+        let _this = this;
+        _this.request('/saveProjectData', {}, function () {
+            _this.setState({
+                hasCreate: false
+            })
+        })
+    }
+
+    updateProjectName(e) {
+        this.setState({
+            projectName: e.target.value
+        });
+    }
+
     updateKnowledgeUnit(kUnit) {
         let KnowledgeObjects = this.state.knowledgeUnitList;
         for (let index in KnowledgeObjects) {
@@ -1297,13 +1320,14 @@ class Editor extends Component {
         }
 
     }
+
     //这种写法好烂......
     onUpdateUrlAndName(kUnitId, type, value) {
         let kUnitDOM = document.getElementById(kUnitId);
         console.log(kUnitDOM);
-        if(type === 'name'){
+        if (type === 'name') {
             kUnitDOM.childNodes[1].value = value;
-        }else{
+        } else {
             kUnitDOM.childNodes[0].src = value;
         }
 
@@ -1325,7 +1349,45 @@ class Editor extends Component {
         )
     }
 
+    request(url, data, callback) {
+        let token = localStorage.getItem('token');
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify(data)
+        }).then(res => res.json()).then(res => {
+            if (res.status === 'success') {
+                let options = res.data;
+                callback(options);
+            } else {
+                alert("验证失败，请重新登录");
+                this.props.history.push('login');
+            }
+
+        })
+    }
+
+
+    getProjectData() {
+        let _this = this;
+        _this.request('/getProjectData', {
+            projectId: _this.props.projectId,
+            username: this.props.username
+        }, function (data) {
+            console.log(data[0]);
+            _this.setState({
+                projectName: data[0].projectName,
+                // knowledgeUnitList:data.data
+            });
+
+        })
+    }
+
     componentDidMount() {
+        this.getProjectData();
         let options = {
             'info': '',
             'imgBoxClass': 'imgbox',
@@ -1343,9 +1405,22 @@ class Editor extends Component {
             <div id="editorArea">
                 <div id="toolBar">
                     <div id="dragBox" className="dragBox">Dragbox</div>
-                    <div id="editBtn" className="editBtn editorBtn" onClick={this.buttonEdit}>编辑</div>
-                    <div id="deleteBtn" className="deleteBtn editorBtn">删除</div>
-                    <div id="previewBtn" className="previewBtn editorBtn">预览</div>
+                    <Button id="editBtn"
+                            onClick={this.buttonEdit}
+                            className="editBtn editorBtn"
+                            disabled>编辑</Button>
+                    <Button id="deleteBtn"
+                            className="editBtn editorBtn"
+                            disabled>删除</Button>
+                    <Button id="previewBtn"
+                            className="previewBtn editorBtn">预览</Button>
+                    <div id="projectStatus" className="projectStatus">
+                        <Input
+                            addonBefore="课程名称"
+                            placeholder={this.state.projectName}
+                            onChange={this.updateProjectName}
+                        />
+                    </div>
                 </div>
                 <div id="mainCanvas"/>
                 <div id="unitEdit"/>

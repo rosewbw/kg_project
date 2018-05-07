@@ -1,16 +1,16 @@
 module.exports = function (req, res, next) {
     let tokenKey = req.api_user;
     let username = req.body.username;
+    let projectId = req.body.projectId;
     if (tokenKey.param !== username) {
         res.json({
             status: false,
             message: "验证失败"
         });
         res.end();
-
     } else {
         let tProject = global.dbHandel.getModel('tProject');
-        tProject.find({userName:username}, function (err, doc) {
+        tProject.find({userName:username,_id:projectId}, function (err, doc) {
             if (doc) {
                 res.json({
                     status:'success',
@@ -23,7 +23,5 @@ module.exports = function (req, res, next) {
                 })
             }
         })
-
     }
-
 };

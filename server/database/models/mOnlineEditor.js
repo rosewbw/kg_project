@@ -27,6 +27,6 @@ module.exports = {
         publishStatus: {type: String, required: true},
         createDate: {type: String},
         updateDate: {type: String},
-        description: {type: String, required: true}
+        description: {type: String}
     }
 };
