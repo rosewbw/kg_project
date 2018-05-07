@@ -84,6 +84,7 @@
     font-size: 15px;
     line-height: 30px;
     margin: 20px 60px;
+    display: flex;
 }
 
 /*.canvas-api-remove-butn {*/
@@ -177,10 +178,16 @@
     /*display:inline-block;*/
 }
 
-.toolBar .selected {
-
+#toolBar .selected {
+    background: #1890ff;
+    color: white;
 }
 
+#toolBar .selected:hover {
+    color: #fff;
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+}
 
 /*teachunit-editor*/
 .editorContainerArea {
@@ -345,15 +352,16 @@
     border-bottom: 1px solid #ebedf0;
     border-top: 1px solid #ebedf0;
 }
+
 .galleryWrapper .card-text p {
     overflow: hidden;
 }
 
 .buttonGroup {
-    margin-bottom:10px;
+    margin-bottom: 10px;
 }
 
-.btn-group .delete{
+.btn-group .delete {
     color: #ff4d4f;
 }
 

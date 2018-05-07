@@ -90,6 +90,8 @@ class Editor extends Component {
             $(canvas).append(transform.append(start, imgContainer, svgContainer)).css('overflow', 'hidden');
             //basicOptions.removeButtonPosition ? $('#' + basicOptions.removeButtonPosition).append(remove) : $(canvas).append(remove);
             getElementsCtrl(canvas, transform, svgContainer, imgContainer, start, dragBox, remove);
+            control.remove.attr('disabled','disabled');
+            control.butnEditor.attr('disabled','disabled');
         }
 
         function getElementsCtrl(canvas, trans, svgCont, imgCont, start, dragBox, remove) {
@@ -649,17 +651,29 @@ class Editor extends Component {
 
         function removeButnHighLight(bool) {
             if (bool) {
-                control.remove.css('background', basicOptions.removeButnColor).addClass('remove-active');
+                console.log('3')
+                control.remove.removeAttr('disabled');
+                control.remove.addClass('ant-btn-primary')
+                //control.remove.css('background', basicOptions.removeButnColor).addClass('remove-active');
             } else {
-                control.remove.css('background', '#ccc').removeClass('remove-active');
+                console.log('4')
+                control.remove.attr("disabled","disabled");
+                control.remove.removeClass('ant-btn-primary')
+                //control.remove.css('background', '#ccc').removeClass('remove-active');
             }
         }
 
         function editorButnHighLight(bool) {
+            console.log('???')
             if (bool) {
-                control.butnEditor.css({'background': '#1890ff', 'pointer-events': 'auto', color:'white'});
+                console.log('1')
+                control.butnEditor.removeAttr('disabled');
+                control.butnEditor.addClass('ant-btn-primary')
             } else {
-                control.butnEditor.css({'background': 'rgba(204,204,204,0.7)', 'pointer-events': 'none'});
+                console.log('2')
+                control.butnEditor.attr("disabled","disabled");
+                control.butnEditor.removeClass('ant-btn-primary')
+                //control.butnEditor.css({'background': 'rgba(204,204,204,0.7)', 'pointer-events': 'none'});
             }
         }
 
@@ -1287,10 +1301,9 @@ class Editor extends Component {
 
     saveProject() {
         let _this = this;
-        _this.request('/saveProjectData', {}, function () {
-            _this.setState({
-                hasCreate: false
-            })
+        _this.request('/saveProjectData', {data:'data'}, function (e) {
+            console.log(e);
+            _this.props.onSaveClick()
         })
     }
 
@@ -1401,19 +1414,24 @@ class Editor extends Component {
     }
 
     render() {
+        console.log('q')
         return (
             <div id="editorArea">
                 <div id="toolBar">
                     <div id="dragBox" className="dragBox">Dragbox</div>
-                    <Button id="editBtn"
-                            onClick={this.buttonEdit}
-                            className="editBtn editorBtn"
-                            disabled>编辑</Button>
+                    <Button onClick={this.buttonEdit}
+                            id="editBtn"
+                            className="editBtn editorBtn ant-btn-primary"
+                            >编辑</Button>
                     <Button id="deleteBtn"
-                            className="editBtn editorBtn"
-                            disabled>删除</Button>
+                            className="editBtn editorBtn ant-btn-primary"
+                            >删除</Button>
                     <Button id="previewBtn"
                             className="previewBtn editorBtn">预览</Button>
+                    <Button id="saveBtn"
+                            onClick={this.saveProject}
+                            className="saveBtn editorBtn">保存</Button>
+
                     <div id="projectStatus" className="projectStatus">
                         <Input
                             addonBefore="课程名称"

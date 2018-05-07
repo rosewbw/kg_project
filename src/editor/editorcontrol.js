@@ -26,6 +26,7 @@ class EditorControl extends Component {
         this.request = this.request.bind(this);
         this.addProject = this.addProject.bind(this);
         this.onEditClick = this.onEditClick.bind(this);
+        this.onSaveClick = this.onSaveClick.bind(this);
         this.onDeleteClick = this.onDeleteClick.bind(this);
     }
 
@@ -77,6 +78,18 @@ class EditorControl extends Component {
         })
     }
 
+    onSaveClick(e){
+        let _this = this;
+        _this.request('/getProject', {username: _this.state.username}, function (res) {
+            let projectData = res;
+            _this.setState({
+                hasCreate:false,
+                projectData:projectData
+            })
+        });
+
+    }
+
     onDeleteClick(e){
         let pid = e.target.parentNode.dataset.pid;
         let _this = this;
@@ -102,6 +115,7 @@ class EditorControl extends Component {
             console.log(this.state.currentProjectId);
             return <Editor projectId={this.state.currentProjectId}
                            username={this.state.username}
+                           onSaveClick={this.onSaveClick}
             />
         }
     }

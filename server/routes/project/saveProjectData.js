@@ -27,5 +27,5 @@ module.exports = function (req, res, next) {
     //     })
     //
     // }
-    res.json({status:'success'})
+    res.json({status:'success',data:{data:'data'}})
 };
