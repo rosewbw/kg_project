@@ -60,11 +60,11 @@ class App extends Component {
                             key="sub1"
                             title={<span><Icon type="user" /><span>课程制作</span></span>}
                         >
-                            <Menu.Item key="3">新建课程
-                                <Link to={`${this.props.match.url}/editor/${name}`}/>
+                            <Menu.Item key="3">课程管理
+                                <Link to={`${this.props.match.url}/editor`}/>
                             </Menu.Item>
 
-                            <Menu.Item key="4">已有课程</Menu.Item>
+                            {/*<Menu.Item key="4">已有课程</Menu.Item>*/}
                         </SubMenu>
                         <SubMenu
                             key="sub2"
@@ -83,10 +83,15 @@ class App extends Component {
                 <Layout style={{ marginLeft: 200 }}>
                     <Route path={`${this.props.match.url}/home`} component={Home} />
                     <Route path={`${this.props.match.url}/upload`} component={MediaGallery} />
-                    <Route path={`${this.props.match.url}/editor/:username`} component={EditorControl} />
+                    <Route path={`${this.props.match.url}/editor/`}
+                           render={() => (
+                               <EditorControl
+                                   username={name}
+                               />
+                           )}
+                    />
                     <Route
-                        exact
-                        path={this.props.match.url}
+                        exact path={this.props.match.url}
                         component={Home}
                     />
                 </Layout>

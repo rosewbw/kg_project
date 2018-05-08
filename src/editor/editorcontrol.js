@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Editor from './editor'
+import createHistory from 'history/createBrowserHistory';
 import defaultImg from './defaultImg.jpg'
 import './editor.css'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -7,6 +8,7 @@ import fetch from 'isomorphic-fetch';
 import {Button, Modal, Form, Input, Radio} from 'antd';
 
 const FormItem = Form.Item;
+const history = createHistory();
 
 class EditorControl extends Component {
     constructor(props) {
@@ -49,7 +51,7 @@ class EditorControl extends Component {
                 callback(options);
             } else {
                 alert("验证失败，请重新登录");
-                this.props.history.push('login');
+                history.push('login');
             }
 
         })
@@ -135,7 +137,7 @@ class EditorControl extends Component {
 
     componentDidMount() {
         let _this = this;
-        let username = this.props.match.params.username;
+        let username = this.props.username;
         this.getProjectData(username, function (res) {
             let projectData = res;
             _this.setState({
