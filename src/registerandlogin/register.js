@@ -62,6 +62,7 @@ class Reg extends Component {
                 this.props.history.push('Reg')
             }
         })
+        .catch( e => console.log(e) )
     }
 
     handleType(e) {

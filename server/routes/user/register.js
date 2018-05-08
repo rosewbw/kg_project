@@ -5,6 +5,7 @@ module.exports = function (req, res, next) {
         password = req.body.password,
         type = req.body.type,
         email = req.body.email;
+
     tUser.findOne({name: username}, function (err, doc) {
         if (err) {
             res.json({

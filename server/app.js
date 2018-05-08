@@ -6,18 +6,26 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var mongoose = require('mongoose');
-var session = require('express-session')
+var session = require('express-session');
 
 global.dbHandel = require('./database/dbhandle');
 var index = require('./routes/index');
-let config = require('./config/config');
+const config = require('config');
 
 
 var app = express();
 
 
-global.db = mongoose.connect(config.database);
-app.set('superSecret',config.secret);
+const DATABASE_PARAMS = config.get('database');
+const DATABASE_URL = (({ protocol, userName, passWord, host, port, dataset }) => {
+    return userName && passWord
+        ? `${protocol}://${userName}:${passWord}@${host}:${port}/${dataset}`
+        : `${protocol}://${host}:${port}/${dataset}`;
+})(DATABASE_PARAMS);
+
+global.db = mongoose.connect(DATABASE_URL);
+
+app.set('superSecret',config.get('secret'));
 
 
 // view engine setup
