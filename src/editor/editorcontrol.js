@@ -12,7 +12,7 @@ class EditorControl extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            hasCreate: false,
+            editorSwitch: false,
             projectData: [],
             visible: false,
             username: '',
@@ -73,7 +73,7 @@ class EditorControl extends Component {
 
     onEditClick(e){
         this.setState({
-            hasCreate:true,
+            editorSwitch:true,
             currentProjectId:e.target.parentNode.dataset.pid
         })
     }
@@ -83,7 +83,7 @@ class EditorControl extends Component {
         _this.request('/getProject', {username: _this.state.username}, function (res) {
             let projectData = res;
             _this.setState({
-                hasCreate:false,
+                editorSwitch:false,
                 projectData:projectData
             })
         });
@@ -102,7 +102,7 @@ class EditorControl extends Component {
     }
 
     getEditorComponent() {
-        if (!this.state.hasCreate) {
+        if (!this.state.editorSwitch) {
             return <EditorInfo onEditClick={this.onEditClick}
                                stateChange={this.stateChange}
                                projectData={this.state.projectData}
@@ -122,7 +122,7 @@ class EditorControl extends Component {
 
     onButtonClick(e) {
         this.setState({
-            hasCreate: true
+            editorSwitch: true
         })
     }
 

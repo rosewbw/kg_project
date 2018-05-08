@@ -236,6 +236,7 @@ class Editor extends Component {
             });
 
             fn.removeButn.bind('click', function (e) {
+                console.log("lll")
                 let type = '';
                 let elmId = '';
                 let butnId = '';
@@ -651,26 +652,21 @@ class Editor extends Component {
 
         function removeButnHighLight(bool) {
             if (bool) {
-                console.log('3')
                 control.remove.removeAttr('disabled');
-                control.remove.addClass('ant-btn-primary')
+                control.remove.addClass('ant-btn-primary').addClass('remove-active');
                 //control.remove.css('background', basicOptions.removeButnColor).addClass('remove-active');
             } else {
-                console.log('4')
                 control.remove.attr("disabled","disabled");
-                control.remove.removeClass('ant-btn-primary')
+                control.remove.removeClass('ant-btn-primary').removeClass('remove-active');
                 //control.remove.css('background', '#ccc').removeClass('remove-active');
             }
         }
 
         function editorButnHighLight(bool) {
-            console.log('???')
             if (bool) {
-                console.log('1')
                 control.butnEditor.removeAttr('disabled');
                 control.butnEditor.addClass('ant-btn-primary')
             } else {
-                console.log('2')
                 control.butnEditor.attr("disabled","disabled");
                 control.butnEditor.removeClass('ant-btn-primary')
                 //control.butnEditor.css({'background': 'rgba(204,204,204,0.7)', 'pointer-events': 'none'});
