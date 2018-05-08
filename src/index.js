@@ -5,11 +5,10 @@ import {
     BrowserRouter as Router,
     Route
 } from "react-router-dom";
-import app from './editorPage/App';
+import { App } from './editorPage';
 import registerServiceWorker from './registerServiceWorker';
-import Reg from './registerandlogin/register';
-import Login from './registerandlogin/login';
-import LearningPage from './learningPage/index';
+import { Reg, Login } from './registerandlogin';
+import LearningPage from './learningPage';
 
 const IndexPage = () => (
     <Router>
@@ -17,16 +16,19 @@ const IndexPage = () => (
             <Route exact path="/" component={Login} />
             <Route path="/login" component={Login} />
             <Route path="/reg" component={Reg} />
-            <Route path="/editorPage" component={app} />
+            <Route path="/editorPage" component={App} />
             <Route path="/learningPage" component={LearningPage} />
         </div>
     </Router>
 );
-
-
 
 ReactDOM.render(
     <IndexPage />,
     document.getElementById('root')
 );
 registerServiceWorker();
+
+// 打开热更新
+if (module.hot) {
+    module.hot.accept();
+}

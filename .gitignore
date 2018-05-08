@@ -58,3 +58,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# WebStorm file
+.idea/
+
+# config file
+server/config/
+!server/config/default.json
