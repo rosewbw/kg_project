@@ -62,5 +62,5 @@ typings/
 .idea/
 
 # config file
-server/config/
+server/config/*
 !server/config/default.json
