@@ -30,21 +30,10 @@ class App extends Component {
         this.setState({ collapsed });
     };
 
-    componentDidMount(){
-        // let routerState = this.props.location.state;
-        // if(routerState){
-        //     let username = this.props.location.state.username;
-        //     this.setState({
-        //         username:username
-        //     })
-        // }else{
-        //     this.props.history.push(`/login`);
-        // }
-
-    }
     render() {
         const name = this.props.username;
-        if (!name) return <Redirect to={'/login'} />;
+        if (!name) return <Redirect to={'/'} />;
+
         return (
             <Layout style={{ minHeight: '100vh' }}>
                 <Sider

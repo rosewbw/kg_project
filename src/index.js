@@ -19,6 +19,7 @@ class IndexPage extends Component {
         this.state = {
             username: '',
             usertype: '',
+            loginChecked: false,
         };
 
         this.logIn = this.logIn.bind(this);
@@ -41,6 +42,7 @@ class IndexPage extends Component {
                         this.setState({
                             username: res.data.username,
                             usertype: res.data.usertype,
+                            loginChecked: true,
                         });
                     }
                 });
@@ -91,16 +93,16 @@ class IndexPage extends Component {
                 <Route exact path="/"
                        render={() => {
                            const token = localStorage.getItem('token');
-                           const usertype = this.state.usertype;
+                           const { usertype, loginChecked } = this.state;
 
                            if (token && usertype) {
                                return usertype === 'student'
                                    ? <Redirect to={"/learning-page"}/>
                                    : <Redirect to={"/editor-page"} />
                            } else {
-                               return <Login
-                                   onLogin={this.logIn}
-                               />
+                               return loginChecked
+                                   ? <Redirect to={"/login"}/>
+                                   : <p>正在验证登录...</p>
                            }
                        }}
                 />
