@@ -15,6 +15,7 @@ router.get('/', function (req, res, next) {
 
 router.post('/login', user.login);
 router.post('/register', user.register);
+router.get('/fetchUserInfoWithToken', tokenObj.checkToken, user.fetchUserInfo);
 router.post('/upload', tokenObj.checkToken, graph.upload);
 router.post('/upload', tokenObj.checkToken, graph.updateTeacher);
 router.post('/addProject', tokenObj.checkToken, project.addProject);

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
+import { withRouter } from 'react-router-dom';
 import $ from 'jquery';
 import './editor.css';
 import {KnowledgeUnit, TeachUnit, Course, ButtonConstructor} from './componentConstructor';
@@ -1373,7 +1374,7 @@ class Editor extends Component {
                 callback(options);
             } else {
                 alert("验证失败，请重新登录");
-                this.props.history.push('login');
+                this.props.history.push('/login');
             }
 
         })
@@ -1381,10 +1382,10 @@ class Editor extends Component {
 
 
     getProjectData() {
-        let _this = this;
+        const _this = this;
         _this.request('/getProjectData', {
             projectId: _this.props.projectId,
-            username: this.props.username
+            username: _this.props.username
         }, function (data) {
             console.log(data[0]);
             _this.setState({
@@ -1444,4 +1445,4 @@ class Editor extends Component {
     }
 }
 
-export default Editor;
+export default withRouter(Editor);
