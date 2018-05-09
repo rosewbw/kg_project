@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Editor from './editor'
+import { Route } from 'react-router-dom';
 import createHistory from 'history/createBrowserHistory';
 import defaultImg from './defaultImg.jpg'
 import './editor.css'
@@ -14,15 +15,12 @@ class EditorControl extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            editorSwitch: false,
             projectData: [],
             visible: false,
             username: '',
             currentProjectId:''
         };
-        this.getEditorComponent = this.getEditorComponent.bind(this);
         this.stateChange = this.stateChange.bind(this);
-        this.onButtonClick = this.onButtonClick.bind(this);
         this.onCreateHandle = this.onCreateHandle.bind(this);
         this.getProjectData = this.getProjectData.bind(this);
         this.request = this.request.bind(this);
@@ -74,18 +72,26 @@ class EditorControl extends Component {
     }
 
     onEditClick(e){
+        const { history, match } = this.props;
+        const courseid = e.target.parentNode.dataset.pid;
+
         this.setState({
-            editorSwitch:true,
-            currentProjectId:e.target.parentNode.dataset.pid
-        })
+            currentProjectId: courseid,
+        });
+        history.push({
+            pathname: `${match.url}/edit`,
+            search: `?courseid=${courseid}`,
+        });
     }
 
     onSaveClick(e){
-        let _this = this;
+        const _this = this;
         _this.request('/getProject', {username: _this.state.username}, function (res) {
-            let projectData = res;
+            const projectData = res;
+            const { history, match } = this.props;
+
+            history.push(`${match.url}`);
             _this.setState({
-                editorSwitch:false,
                 projectData:projectData
             })
         });
@@ -100,31 +106,6 @@ class EditorControl extends Component {
             _this.setState({
                 projectData:pData
             })
-        })
-    }
-
-    getEditorComponent() {
-        if (!this.state.editorSwitch) {
-            return <EditorInfo onEditClick={this.onEditClick}
-                               stateChange={this.stateChange}
-                               projectData={this.state.projectData}
-                               username={this.state.username}
-                               onCreateHandle={this.onCreateHandle}
-                               onDeleteClick={this.onDeleteClick}
-
-            />
-        } else {
-            console.log(this.state.currentProjectId);
-            return <Editor projectId={this.state.currentProjectId}
-                           username={this.state.username}
-                           onSaveClick={this.onSaveClick}
-            />
-        }
-    }
-
-    onButtonClick(e) {
-        this.setState({
-            editorSwitch: true
         })
     }
 
@@ -148,9 +129,25 @@ class EditorControl extends Component {
     }
 
     render() {
+        const { match } = this.props;
+
         return (
             <div style={{width: '100%', height: '100%'}}>
-                {this.getEditorComponent()}
+                <Route path={`${match.url}/edit`} render={() => (
+                    <Editor projectId={this.state.currentProjectId}
+                              username={this.state.username}
+                              onSaveClick={this.onSaveClick}
+                    />)}
+                />
+                <Route exact path={`${match.url}`} render={() => (
+                    <EditorInfo onEditClick={this.onEditClick}
+                                stateChange={this.stateChange}
+                                projectData={this.state.projectData}
+                                username={this.state.username}
+                                onCreateHandle={this.onCreateHandle}
+                                onDeleteClick={this.onDeleteClick}
+                    />)}
+                />
             </div>
         )
     }

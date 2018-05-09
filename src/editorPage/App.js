@@ -78,9 +78,10 @@ class App extends Component {
                     <Route path={`${this.props.match.url}/home`} component={Home} />
                     <Route path={`${this.props.match.url}/upload`} component={MediaGallery} />
                     <Route path={`${this.props.match.url}/course-manage/`}
-                           render={() => (
+                           render={(props) => (
                                <EditorControl
                                    username={name}
+                                   {...props}
                                />
                            )}
                     />
