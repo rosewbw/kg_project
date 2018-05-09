@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import { Layout, Menu, Icon } from 'antd';
 import './App.css';
 import {
@@ -7,39 +8,43 @@ import {
 } from "react-router-dom";
 
 import Home from '../homepage/homepage'
-import FileUpload from '../upload/fileupload'
+// import FileUpload from '../upload/fileupload'
 import EditorControl from '../editor/editorcontrol'
 import MediaGallery from '../media-gallery/media-gallery'
-
-import fetch from 'isomorphic-fetch';
 
 const {Sider} = Layout;
 const SubMenu = Menu.SubMenu;
 
 class App extends Component {
-    state = {
-        collapsed: false,
-        username:''
-    };
+    constructor(props){
+        super(props);
+
+        this.state = {
+            collapsed: false,
+        };
+
+        this.onCollapse = this.onCollapse.bind(this);
+    }
     onCollapse = (collapsed) => {
         console.log(collapsed);
         this.setState({ collapsed });
     };
 
     componentDidMount(){
-        let routerState = this.props.location.state;
-        if(routerState){
-            let username = this.props.location.state.username;
-            this.setState({
-                username:username
-            })
-        }else{
-            this.props.history.push(`/login`);
-        }
+        // let routerState = this.props.location.state;
+        // if(routerState){
+        //     let username = this.props.location.state.username;
+        //     this.setState({
+        //         username:username
+        //     })
+        // }else{
+        //     this.props.history.push(`/login`);
+        // }
 
     }
     render() {
-        let name = this.state.username;
+        const name = this.props.username;
+        if (!name) return <Redirect to={'/login'} />;
         return (
             <Layout style={{ minHeight: '100vh' }}>
                 <Sider
@@ -61,7 +66,7 @@ class App extends Component {
                             title={<span><Icon type="user" /><span>课程制作</span></span>}
                         >
                             <Menu.Item key="3">课程管理
-                                <Link to={`${this.props.match.url}/editor`}/>
+                                <Link to={`${this.props.match.url}/course-manage`}/>
                             </Menu.Item>
 
                             {/*<Menu.Item key="4">已有课程</Menu.Item>*/}
@@ -83,7 +88,7 @@ class App extends Component {
                 <Layout style={{ marginLeft: 200 }}>
                     <Route path={`${this.props.match.url}/home`} component={Home} />
                     <Route path={`${this.props.match.url}/upload`} component={MediaGallery} />
-                    <Route path={`${this.props.match.url}/editor/`}
+                    <Route path={`${this.props.match.url}/course-manage/`}
                            render={() => (
                                <EditorControl
                                    username={name}
