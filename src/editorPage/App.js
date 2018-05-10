@@ -41,6 +41,14 @@ class App extends Component {
             && this.menuItemClickEvents[key]();
     }
 
+    getSubMenuAndItemKeyFromLocation({ pathname }) {
+        // TODO: 获取 SubMenu 的 Key，从而自动展开导航栏
+        return {
+            itemKey: pathname.split('/').pop(),
+            subMenuKey: ''
+        }
+    }
+
     render() {
         const { username: name, location }= this.props;
         if (!name) {
@@ -49,6 +57,8 @@ class App extends Component {
                 state: { from: location },
             }} />
         }
+        let { itemKey } = this.getSubMenuAndItemKeyFromLocation(this.props.location);
+        if (itemKey === "editor-page") itemKey = 'home';
 
         return (
             <Layout style={{ minHeight: '100vh' }}>
@@ -62,11 +72,11 @@ class App extends Component {
                     </div>
                     <Menu
                         theme="dark"
-                        defaultSelectedKeys={['1']}
+                        defaultSelectedKeys={[itemKey]}
                         mode="inline"
                         onClick={this.onMenuItemClick}
                     >
-                        <Menu.Item key="1">
+                        <Menu.Item key="home">
                             <Icon type="pie-chart" />
                             <span>首页</span>
                             <Link to={`${this.props.match.url}/home`}/>
@@ -75,7 +85,7 @@ class App extends Component {
                             key="sub1"
                             title={<span><Icon type="user" /><span>课程制作</span></span>}
                         >
-                            <Menu.Item key="3">课程管理
+                            <Menu.Item key="course-manage">课程管理
                                 <Link to={`${this.props.match.url}/course-manage`}/>
                             </Menu.Item>
 
@@ -87,13 +97,14 @@ class App extends Component {
                         >
                             <Menu.Item key="6">Team 1</Menu.Item>
                         </SubMenu>
-                        <Menu.Item key="9">
+                        <Menu.Item key="upload">
                             <Icon type="file" />
                             <span>资源管理</span>
                             <Link to={`${this.props.match.url}/upload`}/>
                         </Menu.Item>
                         <Menu.Item key="logout" >
-                            <Icon type="logout" /> 登出
+                            <Icon type="logout" />
+                            <span>登出</span>
                         </Menu.Item>
                     </Menu>
                 </Sider>

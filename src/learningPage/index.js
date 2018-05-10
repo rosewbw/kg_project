@@ -34,6 +34,14 @@ class LearningPage extends Component {
         && this.menuItemClickEvents[key]();
     }
 
+    getSubMenuAndItemKeyFromLocation({ pathname }) {
+        // TODO: 获取 SubMenu 的 Key，从而自动展开导航栏
+        return {
+            itemKey: pathname.split('/').pop(),
+            subMenuKey: ''
+        }
+    }
+
     render() {
         const { username, location }= this.props;
         if (!username) {
@@ -42,6 +50,9 @@ class LearningPage extends Component {
                 state: { from: location },
             }} />
         }
+
+        let { itemKey } = this.getSubMenuAndItemKeyFromLocation(this.props.location);
+        if (itemKey === "learning-page") itemKey = 'home';
 
         return (
             <Layout style={{ minHeight: '100vh' }}>
@@ -55,11 +66,11 @@ class LearningPage extends Component {
                     </div>
                     <Menu
                         theme="dark"
-                        defaultSelectedKeys={['1']}
+                        defaultSelectedKeys={[itemKey]}
                         mode="inline"
                         onClick={this.onMenuItemClick}
                     >
-                        <Menu.Item key="1">
+                        <Menu.Item key="home">
                             <Icon type="pie-chart" />
                             <span>首页</span>
                         </Menu.Item>
@@ -67,8 +78,8 @@ class LearningPage extends Component {
                             key="sub1"
                             title={<span><Icon type="user" /><span>课程管理</span></span>}
                         >
-                            <Menu.Item key="3">已学课程</Menu.Item>
-                            <Menu.Item key="4">当前课程</Menu.Item>
+                            <Menu.Item key="learned-course">已学课程</Menu.Item>
+                            <Menu.Item key="current-course">当前课程</Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="sub2"
