@@ -16,7 +16,8 @@ class EditorControl extends Component {
             projectData: [],
             visible: false,
             username: '',
-            currentProjectId:''
+            currentProjectId:'',
+            projectFetched: false,
         };
         this.getToken = this.getToken.bind(this);
         this.stateChange = this.stateChange.bind(this);
@@ -49,11 +50,11 @@ class EditorControl extends Component {
             body: JSON.stringify(data)
         }).then(res => res.json()).then(res => {
             if (res.status === 'success') {
-                let options = res.data;
+                const options = res.data;
                 callback(options);
             } else {
                 alert("验证失败，请重新登录");
-                this.props.history.push('login');
+                this.props.history.push('/login');
             }
 
         })
@@ -127,13 +128,14 @@ class EditorControl extends Component {
     }
 
     componentDidMount() {
-        let _this = this;
-        let username = this.props.username;
+        const _this = this;
+        const username = this.props.username;
         this.getProjectData(username, function (res) {
-            let projectData = res;
+            const projectData = res;
             _this.setState({
                 username: username,
-                projectData: projectData
+                projectData: projectData,
+                projectFetched: true,
             })
         });
     }
@@ -146,6 +148,7 @@ class EditorControl extends Component {
                 <Route path={`${match.url}/edit`} render={() => (
                     <Editor projectId={this.state.currentProjectId}
                             username={this.state.username}
+                            projectFetched={this.state.projectFetched}
                             onSaveClick={this.onSaveClick}
                             onBack={this.backToThisPage}
                     />)}

@@ -46,8 +46,6 @@ class IndexPage extends Component {
                 password: password,
             })
         }).then(res => res.json()).then(res => {
-            console.log(res);
-
             if (res.status === 'success') {
                 const options = res.data;
 
@@ -102,10 +100,16 @@ class IndexPage extends Component {
         return (
             <div>
                 <Route exact path="/"
-                       render={() => {
+                       render={(props) => {
                            const token = this.getToken();
                            const {usertype, loginChecked} = this.state;
+                           const { location } = props;
+
                            if (token && usertype) {
+                               if (location.state) return (
+                                   <Redirect to={location.state.from} />
+                               );
+
                                return usertype === 'student'
                                    ? <Redirect to={"/learning-page"}/>
                                    : <Redirect to={"/editor-page"}/>

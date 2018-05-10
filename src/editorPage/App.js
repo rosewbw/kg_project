@@ -31,8 +31,13 @@ class App extends Component {
     };
 
     render() {
-        const name = this.props.username;
-        if (!name) return <Redirect to={'/'} />;
+        const { username: name, location }= this.props;
+        if (!name) {
+            return <Redirect push to={{
+                pathname: '/',
+                state: { from: location },
+            }} />
+        }
 
         return (
             <Layout style={{ minHeight: '100vh' }}>

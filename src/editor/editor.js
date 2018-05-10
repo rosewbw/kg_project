@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import { withRouter } from 'react-router-dom';
+import queryString from 'query-string';
 import $ from 'jquery';
 import './editor.css';
 import {KnowledgeUnit, TeachUnit, Course, ButtonConstructor} from './componentConstructor';
@@ -19,7 +20,8 @@ class Editor extends Component {
             knowledgeUnitList: [],
             projectId: '',
             username: '',
-            projectName: ''
+            projectName: '',
+            projectDataFetched: false,
         };
         this.canvasConstructor = this.canvasConstructor.bind(this);
         this.getKnowledgeObjectById = this.getKnowledgeObjectById.bind(this);
@@ -1382,13 +1384,15 @@ class Editor extends Component {
 
     getProjectData() {
         const _this = this;
+        if (!this.state.projectId) return;
+
         _this.request('/getProjectData', {
-            projectId: _this.props.projectId,
+            projectId: _this.state.projectId,
             username: _this.props.username
         }, function (data) {
-            console.log(data[0]);
             _this.setState({
                 projectName: data[0].projectName,
+                projectDataFetched: true,
                 // knowledgeUnitList:data.data
             });
 
@@ -1396,20 +1400,30 @@ class Editor extends Component {
     }
 
     componentDidMount() {
-        this.getProjectData();
-        let options = {
-            'info': '',
-            'imgBoxClass': 'imgbox',
-            'arrowBottom': 3,
-            'arrowHeight': 6,
-            'pathBottomWidth': 0,
-            'pathAboveWidth': 1,
-            'pathAboveColor': '#ca910a'
-        };
-        this.canvasConstructor('#mainCanvas', '#dragBox', options, null);
+        const { location } = this.props;
+        const projectId = queryString.parse(location.search).courseid;
+
+        this.setState({ projectId, projectDataFetched: false });
     }
 
     render() {
+        const { projectFetched } = this.props;
+        const { projectDataFetched } = this.state;
+
+        if (projectFetched && !projectDataFetched) {
+            this.getProjectData();
+            const options = {
+                'info': '',
+                'imgBoxClass': 'imgbox',
+                'arrowBottom': 3,
+                'arrowHeight': 6,
+                'pathBottomWidth': 0,
+                'pathAboveWidth': 1,
+                'pathAboveColor': '#ca910a'
+            };
+            this.canvasConstructor('#mainCanvas', '#dragBox', options, null);
+        }
+
         return (
             <div id="editorArea">
                 <div id="toolBar">
