@@ -68,36 +68,42 @@ class IndexPage extends Component {
     }
     componentDidMount(){
         const token = this.getToken();
+        const confirmLoginChecked = () => {
+            this.setState({
+                loginChecked: true,
+            })
+        };
+
+        if (!token) { return confirmLoginChecked(); }
 
         // 根据 Token 获取用户信息并存入
-
         fetch('/fetchUserInfoWithToken', {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": token,
             },
-            // qs: { token }
-        }).then(res => res.json())
+        })
+            .then(res => res.json())
             .then(res => {
                 if (res && res.status === 'success') {
                     this.setState({
                         username: res.data.username,
                         usertype: res.data.usertype,
-                        loginChecked: true,
-                    });
+                    }, confirmLoginChecked);
                 }
-                this.setState({
-                    loginChecked: true,
-                });
-            });
+                else {
+                    confirmLoginChecked();
+                }
+            })
+            .catch(err => confirmLoginChecked());
     }
     render() {
         return (
             <div>
                 <Route exact path="/"
                        render={() => {
-                           const token = localStorage.getItem('token');
+                           const token = this.getToken();
                            const {usertype, loginChecked} = this.state;
                            if (token && usertype) {
                                return usertype === 'student'

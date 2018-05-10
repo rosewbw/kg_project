@@ -1295,7 +1295,6 @@ class Editor extends Component {
         return null
     }
 
-
     saveProject() {
         let _this = this;
         _this.request('/saveProjectData', {data:'data'}, function (e) {
@@ -1411,7 +1410,6 @@ class Editor extends Component {
     }
 
     render() {
-        console.log('q')
         return (
             <div id="editorArea">
                 <div id="toolBar">
@@ -1428,6 +1426,10 @@ class Editor extends Component {
                     <Button id="saveBtn"
                             onClick={this.saveProject}
                             className="saveBtn editorBtn">保存</Button>
+                    <Button id="backBtn"
+                            type="dashed"
+                            className="backBtn editorBtn"
+                            onClick={this.props.onBack}>后退</Button>
 
                     <div id="projectStatus" className="projectStatus">
                         <Input
