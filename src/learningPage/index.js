@@ -1,8 +1,12 @@
 import React, {Component} from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import {
-    Redirect
+    Redirect,
+    Link,
+    Route
 } from "react-router-dom";
+
+import { LearnerCourseRoute } from '../course-manage';
 
 const {Sider} = Layout;
 const SubMenu = Menu.SubMenu;
@@ -25,7 +29,6 @@ class LearningPage extends Component {
     }
 
     onCollapse = (collapsed) => {
-        console.log(collapsed);
         this.setState({ collapsed });
     };
 
@@ -79,7 +82,9 @@ class LearningPage extends Component {
                             title={<span><Icon type="user" /><span>课程管理</span></span>}
                         >
                             <Menu.Item key="list">
-                                已学课程
+                                <Link to={`${this.props.match.url}/course/list`}>
+                                    课程列表
+                                </Link>
                             </Menu.Item>
                             <Menu.Item key="learned">已学课程</Menu.Item>
                             <Menu.Item key="current">当前课程</Menu.Item>
@@ -97,6 +102,8 @@ class LearningPage extends Component {
                     </Menu>
                 </Sider>
                 <Layout style={{ marginLeft: 200 }}>
+
+                    <Route path={`${this.props.match.url}/course`} component={LearnerCourseRoute} />
 
                 </Layout>
             </Layout>
