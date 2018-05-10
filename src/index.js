@@ -5,7 +5,8 @@ import {
     BrowserRouter as Router,
     Route,
     Redirect,
-    withRouter
+    withRouter,
+    Switch
 } from "react-router-dom";
 import {App} from './editorPage';
 import registerServiceWorker from './registerServiceWorker';
@@ -24,6 +25,8 @@ class IndexPage extends Component {
 
         this.logIn = this.logIn.bind(this);
         this.getToken = this.getToken.bind(this);
+        this.logOut = this.logOut.bind(this);
+        this.removeToken = this.removeToken.bind(this);
 
 
     }
@@ -64,6 +67,22 @@ class IndexPage extends Component {
 
         })
     }
+
+    removeToken() {
+        localStorage.removeItem('token');
+    }
+
+    logOut() {
+        this.setState({
+            username: '',
+            usertype: '',
+        });
+
+        this.removeToken();
+
+        this.props.history.push('/login');
+    }
+
     componentDidMount(){
         const token = this.getToken();
         const confirmLoginChecked = () => {
@@ -98,7 +117,7 @@ class IndexPage extends Component {
     }
     render() {
         return (
-            <div>
+            <Switch>
                 <Route exact path="/"
                        render={(props) => {
                            const token = this.getToken();
@@ -131,12 +150,21 @@ class IndexPage extends Component {
                 <Route path="/editor-page"
                        render={(props) => (
                            <App username={this.state.username}
+                                onLogout={this.logOut}
                                 {...props}
                            />
                        )}
                 />
-                <Route path="/learning-page" component={LearningPage}/>
-            </div>
+                <Route path="/learning-page"
+                       render={(props) => (
+                           <LearningPage username={this.state.username}
+                                         {...props}
+                                         onLogout={this.logOut}
+                           />
+                       )}
+                />
+
+            </Switch>
         );
     }
 }

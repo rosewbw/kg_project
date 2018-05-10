@@ -23,12 +23,23 @@ class App extends Component {
             collapsed: false,
         };
 
+        this.menuItemClickEvents = {
+            "logout": props.onLogout,
+        };
+
         this.onCollapse = this.onCollapse.bind(this);
+        this.onMenuItemClick = this.onMenuItemClick.bind(this);
     }
+
     onCollapse = (collapsed) => {
         console.log(collapsed);
         this.setState({ collapsed });
     };
+
+    onMenuItemClick({key}) {
+        this.menuItemClickEvents && this.menuItemClickEvents[key]
+            && this.menuItemClickEvents[key]();
+    }
 
     render() {
         const { username: name, location }= this.props;
@@ -49,7 +60,12 @@ class App extends Component {
                 >
                     <div className="logo" >
                     </div>
-                    <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+                    <Menu
+                        theme="dark"
+                        defaultSelectedKeys={['1']}
+                        mode="inline"
+                        onClick={this.onMenuItemClick}
+                    >
                         <Menu.Item key="1">
                             <Icon type="pie-chart" />
                             <span>首页</span>
@@ -70,12 +86,14 @@ class App extends Component {
                             title={<span><Icon type="team" /><span>个人中心</span></span>}
                         >
                             <Menu.Item key="6">Team 1</Menu.Item>
-                            <Menu.Item key="8">Team 2</Menu.Item>
                         </SubMenu>
                         <Menu.Item key="9">
                             <Icon type="file" />
                             <span>资源管理</span>
                             <Link to={`${this.props.match.url}/upload`}/>
+                        </Menu.Item>
+                        <Menu.Item key="logout" >
+                            <Icon type="logout" /> 登出
                         </Menu.Item>
                     </Menu>
                 </Sider>
