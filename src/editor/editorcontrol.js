@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Editor from './editor'
 import { Route } from 'react-router-dom';
-import createHistory from 'history/createBrowserHistory';
 import defaultImg from './defaultImg.jpg'
 import './editor.css'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -9,7 +8,6 @@ import fetch from 'isomorphic-fetch';
 import {Button, Modal, Form, Input, Radio} from 'antd';
 
 const FormItem = Form.Item;
-const history = createHistory();
 
 class EditorControl extends Component {
     constructor(props) {
@@ -18,8 +16,10 @@ class EditorControl extends Component {
             projectData: [],
             visible: false,
             username: '',
-            currentProjectId:''
+            currentProjectId:'',
+            projectFetched: false,
         };
+        this.getToken = this.getToken.bind(this);
         this.stateChange = this.stateChange.bind(this);
         this.onCreateHandle = this.onCreateHandle.bind(this);
         this.getProjectData = this.getProjectData.bind(this);
@@ -28,14 +28,19 @@ class EditorControl extends Component {
         this.onEditClick = this.onEditClick.bind(this);
         this.onSaveClick = this.onSaveClick.bind(this);
         this.onDeleteClick = this.onDeleteClick.bind(this);
+        this.backToThisPage = this.backToThisPage.bind(this);
     }
 
     getProjectData(username, callback) {
         this.request('/getProject', {username: username}, callback);
     }
 
+    getToken() {
+        return localStorage.getItem('token');
+    }
+
     request(url, data, callback) {
-        let token = localStorage.getItem('token');
+        const token = this.getToken();
         fetch(url, {
             method: 'POST',
             headers: {
@@ -45,11 +50,11 @@ class EditorControl extends Component {
             body: JSON.stringify(data)
         }).then(res => res.json()).then(res => {
             if (res.status === 'success') {
-                let options = res.data;
+                const options = res.data;
                 callback(options);
             } else {
                 alert("验证失败，请重新登录");
-                history.push('login');
+                this.props.history.push('/login');
             }
 
         })
@@ -88,7 +93,7 @@ class EditorControl extends Component {
         const _this = this;
         _this.request('/getProject', {username: _this.state.username}, function (res) {
             const projectData = res;
-            const { history, match } = this.props;
+            const { history, match } = _this.props;
 
             history.push(`${match.url}`);
             _this.setState({
@@ -109,6 +114,12 @@ class EditorControl extends Component {
         })
     }
 
+    backToThisPage(){
+        const { history, match } = this.props;
+
+        history.push(`${match.url}`);
+    }
+
     stateChange(e) {
         const target = e.target;
         this.setState({
@@ -117,13 +128,14 @@ class EditorControl extends Component {
     }
 
     componentDidMount() {
-        let _this = this;
-        let username = this.props.username;
+        const _this = this;
+        const username = this.props.username;
         this.getProjectData(username, function (res) {
-            let projectData = res;
+            const projectData = res;
             _this.setState({
                 username: username,
-                projectData: projectData
+                projectData: projectData,
+                projectFetched: true,
             })
         });
     }
@@ -135,8 +147,10 @@ class EditorControl extends Component {
             <div style={{width: '100%', height: '100%'}}>
                 <Route path={`${match.url}/edit`} render={() => (
                     <Editor projectId={this.state.currentProjectId}
-                              username={this.state.username}
-                              onSaveClick={this.onSaveClick}
+                            username={this.state.username}
+                            projectFetched={this.state.projectFetched}
+                            onSaveClick={this.onSaveClick}
+                            onBack={this.backToThisPage}
                     />)}
                 />
                 <Route exact path={`${match.url}`} render={() => (

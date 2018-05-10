@@ -5,7 +5,8 @@ import {
     BrowserRouter as Router,
     Route,
     Redirect,
-    withRouter
+    withRouter,
+    Switch
 } from "react-router-dom";
 import {App} from './editorPage';
 import registerServiceWorker from './registerServiceWorker';
@@ -24,6 +25,8 @@ class IndexPage extends Component {
 
         this.logIn = this.logIn.bind(this);
         this.getToken = this.getToken.bind(this);
+        this.logOut = this.logOut.bind(this);
+        this.removeToken = this.removeToken.bind(this);
 
 
     }
@@ -46,8 +49,6 @@ class IndexPage extends Component {
                 password: password,
             })
         }).then(res => res.json()).then(res => {
-            console.log(res);
-
             if (res.status === 'success') {
                 const options = res.data;
 
@@ -66,40 +67,68 @@ class IndexPage extends Component {
 
         })
     }
+
+    removeToken() {
+        localStorage.removeItem('token');
+    }
+
+    logOut() {
+        this.setState({
+            username: '',
+            usertype: '',
+        });
+
+        this.removeToken();
+
+        this.props.history.push('/login');
+    }
+
     componentDidMount(){
         const token = this.getToken();
+        const confirmLoginChecked = () => {
+            this.setState({
+                loginChecked: true,
+            })
+        };
+
+        if (!token) { return confirmLoginChecked(); }
 
         // 根据 Token 获取用户信息并存入
-
         fetch('/fetchUserInfoWithToken', {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": token,
             },
-            // qs: { token }
-        }).then(res => res.json())
+        })
+            .then(res => res.json())
             .then(res => {
                 if (res && res.status === 'success') {
                     this.setState({
                         username: res.data.username,
                         usertype: res.data.usertype,
-                        loginChecked: true,
-                    });
+                    }, confirmLoginChecked);
                 }
-                this.setState({
-                    loginChecked: true,
-                });
-            });
+                else {
+                    confirmLoginChecked();
+                }
+            })
+            .catch(err => confirmLoginChecked());
     }
     render() {
         return (
-            <div>
+            <Switch>
                 <Route exact path="/"
-                       render={() => {
-                           const token = localStorage.getItem('token');
+                       render={(props) => {
+                           const token = this.getToken();
                            const {usertype, loginChecked} = this.state;
+                           const { location } = props;
+
                            if (token && usertype) {
+                               if (location.state) return (
+                                   <Redirect to={location.state.from} />
+                               );
+
                                return usertype === 'student'
                                    ? <Redirect to={"/learning-page"}/>
                                    : <Redirect to={"/editor-page"}/>
@@ -121,12 +150,21 @@ class IndexPage extends Component {
                 <Route path="/editor-page"
                        render={(props) => (
                            <App username={this.state.username}
+                                onLogout={this.logOut}
                                 {...props}
                            />
                        )}
                 />
-                <Route path="/learning-page" component={LearningPage}/>
-            </div>
+                <Route path="/learning-page"
+                       render={(props) => (
+                           <LearningPage username={this.state.username}
+                                         {...props}
+                                         onLogout={this.logOut}
+                           />
+                       )}
+                />
+
+            </Switch>
         );
     }
 }
