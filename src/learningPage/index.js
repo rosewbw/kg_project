@@ -3,7 +3,7 @@ import { Layout, Menu, Icon } from 'antd';
 import {
     Redirect,
     Link,
-    Route
+    Route,
 } from "react-router-dom";
 
 import { LearnerCourseRoute } from '../course-manage';
@@ -82,7 +82,8 @@ class LearningPage extends Component {
                             title={<span><Icon type="user" /><span>课程管理</span></span>}
                         >
                             <Menu.Item key="list">
-                                <Link to={`${this.props.match.url}/course/list`}>
+                                <Link to={`${this.props.match.url}/course/list`}
+                                        style={{textDecoration: 'none'}}>
                                     课程列表
                                 </Link>
                             </Menu.Item>
