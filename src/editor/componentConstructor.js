@@ -2,9 +2,9 @@ import uuid from '../utils/uuid'
 
 function KnowledgeUnit(name, id, x, y,thumbnailUrl) {
     //知识点基本信息
-    this.id = id;
-    this.user
-    this.name = name;
+    this.id = id||'';
+
+    this.name = name||'';
     this.thumbnailUrl = thumbnailUrl || '';
     this.root = false;
 
@@ -12,10 +12,12 @@ function KnowledgeUnit(name, id, x, y,thumbnailUrl) {
     this.demand = 0;
     this.achieve = 0;
 
+    this.synonym = [];
+
     //知识点在画布上的位置
     this.position = {
-        x: x,
-        y: y
+        x: x||'',
+        y: y||''
     };
 
     //是否是开始知识点
@@ -28,6 +30,15 @@ function KnowledgeUnit(name, id, x, y,thumbnailUrl) {
     this.brothers = [];
     this.contain = [];
     this.parallel = [];
+
+    //relationship
+    this.hasParentNode = [];
+    this.hasChildNode = [];
+    this.isRelatedTo = [];
+    this.isParallelWith = [];
+    this.isRelyOnTo = [];
+    this.isBeingRelyOnBy = [];
+
 
     //包含的教学单元
     this.teachUnit = new TeachUnit(this.id);
@@ -67,7 +78,7 @@ function Course(type, TeachUnitId) {
     this.difficulty = '';
     this.watchNum = 0;
 
-    this.material = [];
+    this.material = '';
     this.learningObjectType = '';
     this.averageRetentionRate = 0;
     this.semanticDensity = 0;

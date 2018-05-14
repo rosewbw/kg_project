@@ -1,4 +1,4 @@
 module.exports = {
-    upload:require('../graph/material'),
+    material:require('../graph/material'),
     updateTeacher:require('../graph/teacher')
 };

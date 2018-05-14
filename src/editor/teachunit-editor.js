@@ -1,13 +1,16 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './editor.css'
-import $ from 'jquery';
-import TabController from '../utils/tabcontrol';
-import {TeachUnit, Course} from './componentConstructor';
+
+import InfiniteScroll from 'react-infinite-scroller';
+import fetch from 'isomorphic-fetch';
+
+import {Course} from './componentConstructor';
 
 import {Row, Col} from 'antd';
-import {Tabs, Icon, Tag} from 'antd';
-import {Input, Select, InputNumber, DatePicker, AutoComplete, Cascader} from 'antd';
+import {Tabs, Icon} from 'antd';
+import {Input, Select, Button} from 'antd';
+import {List, Avatar, Spin} from 'antd';
 
 const TabPane = Tabs.TabPane;
 const InputGroup = Input.Group;
@@ -19,6 +22,7 @@ class TeachUnitEditor extends Component {
         super(props);
         this.state = {
             tUnit: this.props.kUnitData,
+            username: this.props.username
         };
         this.cancelEditor = this.cancelEditor.bind(this);
         this.onTeachUnitChanged = this.onTeachUnitChanged.bind(this);
@@ -54,6 +58,7 @@ class TeachUnitEditor extends Component {
                             // tMaterialList={this.state.tMaterialList}
                             onTeachUnitChanged={this.onTeachUnitChanged}
                             onCourseUnitChanged={this.onCourseUnitChanged}
+                            username={this.state.username}
                         />
                     </div>
                 </div>
@@ -63,13 +68,16 @@ class TeachUnitEditor extends Component {
 }
 
 class CourseEdit extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            tUnit:this.props.tUnitData,
-            mCUnit:this.props.tUnitData.mCourseUnit,
-            aCUnit:this.props.tUnitData.aCourseUnit,
-            tMList:[],
+            tUnit: this.props.tUnitData,
+            mCUnit: this.props.tUnitData.mCourseUnit,
+            aCUnit: this.props.tUnitData.aCourseUnit,
+            tMList: [],
+            viewHeight: '',
+            conditionChanged: false,
+            conditionUpdate: false,
         };
         this.onBasicInfoChanged = this.onBasicInfoChanged.bind(this);
         this.onMainCourseInfoChanged = this.onMainCourseInfoChanged.bind(this);
@@ -82,7 +90,7 @@ class CourseEdit extends Component {
 
     onMainCourseInfoChanged = (data) => {
         this.setState({
-            mCUnit:data
+            mCUnit: data
         })
     };
 
@@ -90,17 +98,19 @@ class CourseEdit extends Component {
         let materialId = data;
         let mCUnit = this.state.mCUnit;
         let tMList = this.state.tMList;
-        for(let index in tMList){
-            if(tMList[index].id === materialId){
-                mCUnit.material.push(tMList[index]);
+        for (let index in tMList) {
+            if (tMList[index]._id === materialId) {
+                mCUnit.material = tMList[index];
                 this.setState({
-                    mCUnit:mCUnit
+                    mCUnit: mCUnit,
                 })
             }
         }
     };
-    componentDidMount(){
+
+    componentDidMount() {
         let _this = this;
+
         // let kUnitData = this.props.kUnitData;
         // let tUnitData;
         // if (kUnitData) {
@@ -118,67 +128,66 @@ class CourseEdit extends Component {
         //     })
         //
         // }
-        $.ajax('/getMediaList',{
-            type:"POST",
-            dataType:'json',
-            data:{
-                username:_this.state.tUnit.username || 'debug-user'
+        const token = localStorage.getItem('token');
+        fetch('/getMediaList', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token,
             },
-            success:(res) => {
-                _this.setState({
-                    tMList:[]
-                });
-                console.log(res);
-            },
-            error:(err) => {
-                console.log(err)
-            }
-
-        })
-    }
-    /*
-    componentWillReceiveProps() {
-        let kUnitData = this.props.kUnitData;
-        let mCUnit, aCUnit = [];
-        console.log(kUnitData);
-        if (kUnitData) {
-            if (kUnitData.mCourseUnit.length === 0) {
-                mCUnit = new Course('main', kUnitData.id);
-            } else {
-                mCUnit = kUnitData.mCourseUnit[0];
-            }
-            if (kUnitData.mCourseUnit.length !== 0) {
-                aCUnit = kUnitData.mCourseUnit;
-            }
-            this.setState({
-                tUnit: kUnitData,
-                mCUnit:mCUnit,
-                aCUnit:aCUnit
-            }, function () {
-                console.log(this.state);
+            body: JSON.stringify({
+                username: _this.props.username
             })
-        }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res && res.status === 'success') {
+                    this.setState({
+                        tMList: res.data
+                    });
+                }
+            })
+            .catch(err => console.log(err));
+
     }
-    */
-    render(){
+
+    updateViewHeight = (data) => {
+        this.setState({
+            viewHeight: data
+        })
+    };
+
+    updateTUnit = (data) => {
+        let aCUnit = this.state.aCUnit;
+        aCUnit.push(data);
+        this.setState({
+            aCUnit:aCUnit
+        })
+    };
+
+    render() {
         return (
             <div id="teachunit" className="teachunit">
                 <Row gutter={16}>
-                    <Col className="gutter-row" span={18}>
-                        <Row gutter={2}>
-                            <Col className="gutter-row" span={18}>
+                    <Col className="gutter-row" span={24}>
+                        <Row gutter={2} style={{marginBottom: '1px'}}>
+                            <Col className="gutter-row" span={16} ref="view">
                                 <section>
                                     <MainVideoArea
                                         materialData={this.state.mCUnit.material}
+                                        updateViewHeight={this.updateViewHeight}
+                                        ref="mainVideoArea"
                                     />
                                 </section>
                             </Col>
-                            <Col className="gutter-row" span={6}>
-                                <div className="gutter-box">辅课时列表</div>
+                            <Col className="gutter-row" span={8}>
+                                <AidList
+                                    aCUnit={this.state.aCUnit}
+                                />
                             </Col>
                         </Row>
                         <Row gutter={2}>
-                            <Col span={18}>
+                            <Col span={24}>
                                 <section id="teachUnitInfo" className="teachUnitInfo">
                                     <Tabs defaultActiveKey="1">
                                         <TabPane tab={<span><Icon type="edit"/>基础设置</span>} key="1">
@@ -196,7 +205,12 @@ class CourseEdit extends Component {
                                             />
                                         </TabPane>
                                         <TabPane tab={<span><Icon type="file-text"/>辅课时设置</span>} key="3">
-                                            Tab 3
+                                            <AidCourseInfo
+                                                tMaterialList={this.state.tMList}
+                                                mCourseUnit={this.state.mCUnit}
+                                                tUnit={this.state.tUnit}
+                                                updateTUnit={this.updateTUnit}
+                                            />
                                         </TabPane>
                                     </Tabs>
                                 </section>
@@ -204,10 +218,44 @@ class CourseEdit extends Component {
                         </Row>
 
                     </Col>
-                    <Col className="gutter-row" span={6}>
-                        <div className="gutter-box">素材列表</div>
-                    </Col>
                 </Row>
+            </div>
+        )
+    }
+
+}
+
+
+class AidList extends Component {
+    state = {
+        aCUnit: this.props.aCUnit,
+        loading: false,
+        hasMore: true
+    };
+    handleInfiniteOnLoad = () =>{
+
+    };
+    render() {
+        let data = [];
+        for (let index in this.state.aCUnit) {
+            data.push(this.state.aCUnit[index].title)
+        }
+        return (
+            <div className="infinite-container">
+                <InfiniteScroll
+                    initialLoad={false}
+                    pageStart={0}
+                    loadMore={this.handleInfiniteOnLoad}
+                    hasMore={!this.state.loading && this.state.hasMore}
+                    useWindow={false}
+                >
+                    <List
+                        dataSource={data}
+                        renderItem={item => (
+                            <List.Item >{item}</List.Item>
+                        )}
+                    />
+                </InfiniteScroll>
             </div>
         )
     }
@@ -223,54 +271,43 @@ const EditorHeader = ({closeBtn}) => {
 };
 
 
-const MainVideoArea = (props) => {
-    let materialData = props.materialData;
-    let url = materialData.url;
-    let type = materialData.type;
-    let playArea;
-    if(type === 'video'){
-        playArea = <video id="editor-video" src={url} controls="controls"/>
-    }else if(type === 'image'){
-        playArea = <img id="editor-video" src={url} />;
-    }else{
-        playArea = <video id="editor-video" src={url} controls="controls"/>
+class MainVideoArea extends Component {
+    state = {
+        update: true
+    };
+
+    componentDidMount() {
+        this.props.updateViewHeight(this.refs.viewArea.offsetHeight)
     }
-    return (
-        <div id="editor-video-area">
-            {playArea}
-            <div id="editor-butn-layer"/>
-        </div>
-    )
-};
 
-const MediaList = ({mediaListInfo}) => {
-    let mediaNodes = mediaListInfo.map((item, index) => {
+    render() {
+        const materialData = this.props.materialData;
+        if (!materialData) {
+            return (
+                <div id="editor-view-area" ref="viewArea">
+                    <video id="editor-video" controls="controls"/>
+                    <div id="editor-butn-layer"/>
+                </div>
+            )
+        }
+        let url = materialData.url;
+        let type = materialData.type;
+        let playArea;
+        if (type === '视频') {
+            playArea = <video id="editor-video" src={url} controls="controls" ref="view"/>
+        } else if (type === '图片') {
+            playArea = <img id="editor-video" src={url} ref="view"/>;
+        } else {
+            playArea = <video id="editor-video" src={url} controls="controls" ref="view"/>
+        }
         return (
-            <Media imgUrl={item}/>
-        );
-    });
-    return (
-        <div id="mediaListContent" className="mediaListContent">
-            {mediaNodes}
-            <div className="clear-float"/>
-        </div>
-    )
-};
-
-const Media = ({imgUrl}) => {
-    return (
-        <div className="imgbox">
-            <img src={imgUrl}/>
-            <span className="video-url-span">{this.props.media.videoUrl}</span>
-        </div>
-    )
-};
-
-const AuxVideoArea = ({}) => {
-    return (
-        <div/>
-    )
-};
+            <div id="editor-view-area" ref="viewArea">
+                {playArea}
+                <div id="editor-butn-layer"/>
+            </div>
+        )
+    }
+}
 
 const BasicInfo = (props) => {
     let basicInfoChanged = props.onBasicInfoChanged;
@@ -361,10 +398,10 @@ const MainCourseInfo = (props) => {
     let mCInfoChanged = props.onMainCourseInfoChanged;
     let tMaterialList = props.tMaterialList;
     const mainCourseInfoChanged = (e, option) => {
-        console.log(e, option);
     };
 
     const mainCourseMaterialInfoChanged = (data) => {
+        console.log(data)
         props.onMainCourseMaterialInfoChanged(data);
     };
 
@@ -392,12 +429,15 @@ const MainCourseInfo = (props) => {
         mCInfo.learningObjectType = value;
         mCInfoChanged(mCInfo);
     };
-    const children = [];
+    let children = {};
     let type;
-    for(let index in tMaterialList){
-        if(tMaterialList[index]){
+    for (let index in tMaterialList) {
+        if (tMaterialList[index]) {
             type = tMaterialList[index].type;
-            children[type].push(<Option key={tMaterialList[index].id}>{tMaterialList[index].name}</Option>);
+            if (children[type] === undefined) {
+                children[type] = [];
+            }
+            children[type].push(<Option key={tMaterialList[index]._id}>{tMaterialList[index].name}</Option>);
         }
     }
     return (
@@ -488,40 +528,37 @@ const MainCourseInfo = (props) => {
                 </Col>
                 <Col className="gutter-row" span={8}>
                     <section id="mainCourseMaterialInfo" className="mainCourseMaterialInfo">
-                        <div >
+                        <div>
                             <label>请选择主课时素材</label>
                             <br/>
                             <Select
                                 defalt
-                                style={{ width: 200 }}
-                                defaultValue={mCInfo.material[0]||''}
+                                style={{width: 200}}
+                                defaultValue={mCInfo.material[0] === undefined ? '请选择素材' : mCInfo.material[0].name}
                                 id="material"
                                 onChange={mainCourseMaterialInfoChanged}
                             >
-                                {children}
                                 <OptGroup label="图片">
-                                    {/*{children.image}*/}
-                                    <Option key="1" >Jack</Option>
-                                    <Option key="2" >Lucy</Option>
+                                    {children['图片'] !== undefined ? children['图片'] : ''}
                                 </OptGroup>
-                                {/*<OptGroup label="文字">*/}
-                                    {/*{children.word}*/}
-                                {/*</OptGroup>*/}
-                                {/*<OptGroup label="音频">*/}
-                                    {/*{children.audio}*/}
-                                {/*</OptGroup>*/}
-                                {/*<OptGroup label="视频">*/}
-                                    {/*{children.video}*/}
-                                {/*</OptGroup>*/}
-                                {/*<OptGroup label="动画">*/}
-                                    {/*{children.flash}*/}
-                                {/*</OptGroup>*/}
-                                {/*<OptGroup label="链接">*/}
-                                    {/*{children.webpage}*/}
-                                {/*</OptGroup>*/}
-                                {/*<OptGroup label="富媒体">*/}
-                                    {/*{children.richmedia}*/}
-                                {/*</OptGroup>*/}
+                                <OptGroup label="文字">
+                                    {children['文字'] !== undefined ? children['文字'] : ''}
+                                </OptGroup>
+                                <OptGroup label="音频">
+                                    {children['音频'] !== undefined ? children['音频'] : ''}
+                                </OptGroup>
+                                <OptGroup label="视频">
+                                    {children['视频'] !== undefined ? children['视频'] : ''}
+                                </OptGroup>
+                                <OptGroup label="动画">
+                                    {children['动画'] !== undefined ? children['动画'] : ''}
+                                </OptGroup>
+                                <OptGroup label="链接">
+                                    {children['链接'] !== undefined ? children['链接'] : ''}
+                                </OptGroup>
+                                <OptGroup label="富媒体">
+                                    {children['富媒体'] !== undefined ? children['富媒体'] : ''}
+                                </OptGroup>
                             </Select>
                         </div>
                     </section>
@@ -532,7 +569,7 @@ const MainCourseInfo = (props) => {
                             <InputGroup label="title" size="middle">
                                 <Col>
                                     <section>
-                                        <div >
+                                        <div>
                                             <span>点击人数：</span>{mCInfo.clickNum}
                                         </div>
                                     </section>
@@ -541,7 +578,7 @@ const MainCourseInfo = (props) => {
                             <InputGroup label="difficulty" size="middle">
                                 <Col>
                                     <section>
-                                        <div >
+                                        <div>
                                             <span>观看人数：</span>{mCInfo.watchNum}
                                         </div>
                                     </section>
@@ -550,7 +587,7 @@ const MainCourseInfo = (props) => {
                             <InputGroup label="averageRetentionRate" size="middle">
                                 <Col>
                                     <section>
-                                        <div >
+                                        <div>
                                             <span>平均滞留率：</span>{mCInfo.averageRetentionRate}
                                         </div>
                                     </section>
@@ -559,7 +596,7 @@ const MainCourseInfo = (props) => {
                             <InputGroup label="semanticDensity" size="middle">
                                 <Col>
                                     <section>
-                                        <div >
+                                        <div>
                                             <span>典型学习时间：</span>{mCInfo.semanticDensity}
                                         </div>
                                     </section>
@@ -575,11 +612,223 @@ const MainCourseInfo = (props) => {
     )
 };
 
-const ListItem = ({itemId}, {itemName}) => {
-    return (
-        <div id={itemId} className="item">{itemName}</div>
-    )
-};
+
+class AidCourseInfo extends Component {
+    state = {
+        aCUnit: new Course('aid', this.props.tUnit.id)
+    };
+    aCInfoChange = (e) => {
+        const type = e.target.id;
+        let aCUnit = this.state.aCUnit;
+        aCUnit[type] = e.target.value;
+        this.setState({
+            aCUnit: aCUnit
+        })
+    };
+
+    saveACUnit = () => {
+        this.props.updateTUnit(this.state.aCUnit);
+        this.setState({
+            aCUnit: new Course('aid', this.props.tUnit.id)
+        })
+    };
+
+    dHandleChange = (value) => {
+        let aCUnit = this.state.aCUnit;
+        aCUnit.difficulty = value;
+        this.setState({
+            aCUnit: aCUnit
+        })
+    };
+
+    iDHandleChange = (value) => {
+        let aCUnit = this.state.aCUnit;
+        aCUnit.interactionDegree = value;
+        this.setState({
+            aCUnit: aCUnit
+        })
+    };
+    iTHandleChange = (value) => {
+        let aCUnit = this.state.aCUnit;
+        aCUnit.interactionType = value;
+        this.setState({
+            aCUnit: aCUnit
+        })
+    };
+    lOTHandleChange = (value) => {
+        let aCUnit = this.state.aCUnit;
+        aCUnit.learningObjectType = value;
+        this.setState({
+            aCUnit: aCUnit
+        })
+    };
+
+    aidCourseMaterialInfoChanged = (data) => {
+        let materialId = data;
+        let aCUnit = this.state.aCUnit;
+        let tMList = this.props.tMaterialList;
+        for (let index in tMList) {
+            if (tMList[index]._id === materialId) {
+                aCUnit.material = (tMList[index]);
+                this.setState({
+                    mCUnit: aCUnit,
+                })
+            }
+        }
+    };
+
+
+    render() {
+        const tMaterialList = this.props.tMaterialList
+        let children = {};
+        let type;
+        for (let index in tMaterialList) {
+            if (tMaterialList[index]) {
+                type = tMaterialList[index].type;
+                if (children[type] === undefined) {
+                    children[type] = [];
+                }
+                children[type].push(<Option key={tMaterialList[index]._id}>{tMaterialList[index].name}</Option>);
+            }
+        }
+
+
+        return (
+            <div>
+                <Row>
+                    <Col className="gutter-row" span={8}>
+                        <section id="aidCourseBasicInfo" className="aidCourseBasicInfo">
+                            <div onChange={this.aCInfoChange}>
+                                <InputGroup label="title" size="middle">
+                                    <Col>
+                                        <label>辅课时名称</label>
+                                        <Input
+                                            id="title"
+                                        />
+                                    </Col>
+                                </InputGroup>
+                                <InputGroup label="difficulty" size="middle">
+                                    <Col>
+                                        <label>课时难度</label>
+                                        <Select
+                                            defaultValue={'请选择课时难度'}
+                                            style={{width: '100%'}}
+                                            id="difficulty"
+                                            onChange={this.dHandleChange}
+                                        >
+                                            <Option value="veryhigh">很高</Option>
+                                            <Option value="high">高</Option>
+                                            <Option value="middle">中</Option>
+                                            <Option value="low">低</Option>
+                                            <Option value="verylow">很低</Option>
+                                        </Select>
+                                    </Col>
+                                </InputGroup>
+                                <InputGroup label="interactionDegree" size="middle">
+                                    <Col>
+                                        <label>交互程度</label>
+                                        <Select
+                                            defaultValue={'请选择交互程度'}
+                                            style={{width: '100%'}}
+                                            id="status"
+                                            onChange={this.iDHandleChange}
+                                        >
+                                            <Option value="veryhigh">很高</Option>
+                                            <Option value="high">高</Option>
+                                            <Option value="middle">中</Option>
+                                            <Option value="low">低</Option>
+                                            <Option value="verylow">很低</Option>
+                                        </Select>
+                                    </Col>
+                                </InputGroup>
+                                <InputGroup label="interactionType" size="middle">
+                                    <Col>
+                                        <label>交互类型</label>
+                                        <Select
+                                            defaultValue={'请选择交互类型'}
+                                            style={{width: '100%'}}
+                                            id="status"
+                                            onChange={this.iTHandleChange}
+                                        >
+                                            <Option value="active">主动型</Option>
+                                            <Option value="commentary">解说型</Option>
+                                            <Option value="mixing">混合型</Option>
+                                            <Option value="undefined">未定义</Option>
+                                        </Select>
+                                    </Col>
+                                </InputGroup>
+                                <InputGroup label="learningObjectType" size="middle">
+                                    <Col>
+                                        <label>学习对象类型</label>
+                                        <Select
+                                            defaultValue={'请选择学习对象类型'}
+                                            style={{width: '100%'}}
+                                            id="status"
+                                            onChange={this.lOTHandleChange}
+                                        >
+                                            <Option value="video">视频</Option>
+                                            <Option value="audio">音频</Option>
+                                            <Option value="image">图片</Option>
+                                            <Option value="word">文字</Option>
+                                            <Option value="webpage">网页链接</Option>
+                                            <Option value="richmedia">富媒体作品</Option>
+                                        </Select>
+                                    </Col>
+                                </InputGroup>
+                            </div>
+                        </section>
+                    </Col>
+                    <Col className="gutter-row" span={8}>
+                        <section id="aidCourseMaterialInfo" className="aidCourseMaterialInfo">
+                            <div>
+                                <label>请选择辅课时素材</label>
+                                <br/>
+                                <Select
+                                    defalt
+                                    style={{width: 200}}
+                                    defaultValue={'请选择素材'}
+                                    id="material"
+                                    onChange={this.aidCourseMaterialInfoChanged}
+                                >
+                                    <OptGroup label="图片">
+                                        {children['图片'] !== undefined ? children['图片'] : ''}
+                                    </OptGroup>
+                                    <OptGroup label="文字">
+                                        {children['文字'] !== undefined ? children['文字'] : ''}
+                                    </OptGroup>
+                                    <OptGroup label="音频">
+                                        {children['音频'] !== undefined ? children['音频'] : ''}
+                                    </OptGroup>
+                                    <OptGroup label="视频">
+                                        {children['视频'] !== undefined ? children['视频'] : ''}
+                                    </OptGroup>
+                                    <OptGroup label="动画">
+                                        {children['动画'] !== undefined ? children['动画'] : ''}
+                                    </OptGroup>
+                                    <OptGroup label="链接">
+                                        {children['链接'] !== undefined ? children['链接'] : ''}
+                                    </OptGroup>
+                                    <OptGroup label="富媒体">
+                                        {children['富媒体'] !== undefined ? children['富媒体'] : ''}
+                                    </OptGroup>
+                                </Select>
+                            </div>
+                            <div>
+                                <InputGroup label="title" size="middle">
+                                    <Col>
+                                        <Button type="primary" style={{margin: '5px 0'}} onClick={this.saveACUnit}>保存辅课时设置</Button>
+                                    </Col>
+                                </InputGroup>
+                            </div>
+                        </section>
+                    </Col>
+
+                </Row>
+
+            </div>
+        )
+    }
+}
 
 
 export default TeachUnitEditor;

@@ -25,6 +25,7 @@ module.exports = {
         thumbnailUrl: {type: String},
         data: {type: Object, required: true},
         publishStatus: {type: String, required: true},
+        startPosition: {type: Object},
         createDate: {type: String},
         updateDate: {type: String},
         description: {type: String}

@@ -141,54 +141,92 @@ let WriteToDB = function (options, callback) {
         }
     );
 };
-module.exports = function (req, res, next) {
-    let files = [];
-    let upfile = req.files.upfile;
-    // let username = req.session.user ? req.session.user : req.body.username;
-    // let userId = req.session.userId ? req.session.userId : req.body.userId;
-    let userId = 'debug-user';
-    let materialInfo = {};
-    let uploadInfo = req.body;
 
-    for (let index in uploadInfo) {
-        materialInfo[index] = uploadInfo[index]
-    }
+module.exports = {
+    uploadMaterial: function (req, res, next) {
+        let files = [];
+        let upfile = req.files.upfile;
+        // let username = req.session.user ? req.session.user : req.body.username;
+        // let userId = req.session.userId ? req.session.userId : req.body.userId;
+        let userId = 'debug-user';
+        let materialInfo = {};
+        let uploadInfo = req.body;
 
-    materialInfo.userId = userId;
+        for (let index in uploadInfo) {
+            materialInfo[index] = uploadInfo[index]
+        }
 
-    if (upfile instanceof Array) {
-        files = upfile;
-    } else {
-        files.push(upfile);
-    }
+        materialInfo.userId = userId;
+
+        if (upfile instanceof Array) {
+            files = upfile;
+        } else {
+            files.push(upfile);
+        }
 
 
-    for (let i = 0; i < files.length; i++) {
-        let file = files[i];//上传的文件对象
-        Process(file, materialInfo, function (opt) {
-            UpdateGraph(opt,'material',function (opts) {
-                WriteToDB(opts, function (doc) {
-                    res.write(JSON.stringify({
-                            material: {
-                                duration: doc.duration,
-                                source: doc.url,
-                                thumbnail: doc.thumbnailUrl,
-                                title: doc.name,
-                                type: doc.type,
-                                id: doc._id,
-                                keyword: doc.keyword,
-                                size: doc.size,
-                                description: doc.description
-                            }
-                        })
-                    );
-                    res.end();
-                });
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];//上传的文件对象
+            Process(file, materialInfo, function (opt) {
+                UpdateGraph(opt, 'material', function (opts) {
+                    WriteToDB(opts, function (doc) {
+                        res.write(JSON.stringify({
+                                material: {
+                                    duration: doc.duration,
+                                    source: doc.url,
+                                    thumbnail: doc.thumbnailUrl,
+                                    title: doc.name,
+                                    type: doc.type,
+                                    id: doc._id,
+                                    keyword: doc.keyword,
+                                    size: doc.size,
+                                    description: doc.description
+                                }
+                            })
+                        );
+                        res.end();
+                    });
+                })
+
             })
+        }
 
+
+    },
+    getMaterialList: function (req, res, next) {
+        const tMaterial = global.dbHandel.getModel('tMaterial');
+        const tUser = global.dbHandel.getModel('tUser');
+        let tokenKey = req.api_user;
+        let username = req.body.username;
+        if (tokenKey.param !== username) {
+            return res.json({
+                status: false,
+                message: "验证失败"
+            });
+        }
+        //写的真烂
+        tUser.findOne({name:username},function (err, doc) {
+            if(err){
+                return res.json({
+                    status: false,
+                    message: "没有此用户"
+                });
+            }
+            tMaterial.find({userId:doc._id},function (err, docs) {
+                if(err){
+                    return res.json({
+                        status: false,
+                        message: "素材查找失败"
+                    });
+                }
+                res.json({
+                    status: 'success',
+                    data: docs
+                })
+            })
         })
+
     }
-
-
 
 };
+

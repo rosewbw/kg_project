@@ -16,8 +16,9 @@ router.get('/', function (req, res, next) {
 router.post('/login', user.login);
 router.post('/register', user.register);
 router.get('/fetchUserInfoWithToken', tokenObj.checkToken, user.fetchUserInfo);
-router.post('/upload', tokenObj.checkToken, graph.upload);
-router.post('/upload', tokenObj.checkToken, graph.updateTeacher);
+router.post('/upload', tokenObj.checkToken, graph.material.uploadMaterial);
+router.post('/getMediaList', tokenObj.checkToken, graph.material.getMaterialList);
+// router.post('/upload', tokenObj.checkToken, graph.updateTeacher);
 router.post('/addProject', tokenObj.checkToken, project.addProject);
 router.post('/getProject', tokenObj.checkToken, project.getProject);
 router.post('/getProjectData', tokenObj.checkToken, project.getProjectData);

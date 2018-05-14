@@ -23,7 +23,11 @@ module.exports = function (req, res, next) {
             publishStatus: projectData.publishStatus||'unPublish',
             createDate: date,
             updateDate: date,
-            description: projectData.description || ''
+            description: projectData.description || '',
+            startPosition:{
+                x:250,
+                y:300
+            }
         };
         tProject.create(data, function (err, doc) {
             if (doc) {
