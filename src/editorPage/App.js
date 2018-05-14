@@ -10,7 +10,7 @@ import {
 import Home from '../homepage/homepage'
 // import FileUpload from '../upload/fileupload'
 import EditorControl from '../editor/editorcontrol'
-import MediaGallery from '../media-gallery/media-gallery'
+import MaterialManage from '../material'
 
 const {Sider} = Layout;
 const SubMenu = Menu.SubMenu;
@@ -57,6 +57,8 @@ class App extends Component {
                 state: { from: location },
             }} />
         }
+
+        // 利用 itemKey 实现左侧导航栏高亮
         let { itemKey } = this.getSubMenuAndItemKeyFromLocation(this.props.location);
         if (itemKey === "editor-page") itemKey = 'home';
 
@@ -100,7 +102,7 @@ class App extends Component {
                         <Menu.Item key="upload">
                             <Icon type="file" />
                             <span>资源管理</span>
-                            <Link to={`${this.props.match.url}/upload`}/>
+                            <Link to={`${this.props.match.url}/material`}/>
                         </Menu.Item>
                         <Menu.Item key="logout" >
                             <Icon type="logout" />
@@ -110,7 +112,7 @@ class App extends Component {
                 </Sider>
                 <Layout style={{ marginLeft: 200 }}>
                     <Route path={`${this.props.match.url}/home`} component={Home} />
-                    <Route path={`${this.props.match.url}/upload`} component={MediaGallery} />
+                    <Route path={`${this.props.match.url}/material`} component={MaterialManage} />
                     <Route path={`${this.props.match.url}/course-manage/`}
                            render={(props) => (
                                <EditorControl

@@ -1,8 +1,12 @@
 import React, {Component} from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import {
-    Redirect
+    Redirect,
+    Link,
+    Route
 } from "react-router-dom";
+
+import { LearnerCourseRoute } from '../course-manage';
 
 const {Sider} = Layout;
 const SubMenu = Menu.SubMenu;
@@ -25,7 +29,6 @@ class LearningPage extends Component {
     }
 
     onCollapse = (collapsed) => {
-        console.log(collapsed);
         this.setState({ collapsed });
     };
 
@@ -75,11 +78,16 @@ class LearningPage extends Component {
                             <span>首页</span>
                         </Menu.Item>
                         <SubMenu
-                            key="sub1"
+                            key="course"
                             title={<span><Icon type="user" /><span>课程管理</span></span>}
                         >
-                            <Menu.Item key="learned-course">已学课程</Menu.Item>
-                            <Menu.Item key="current-course">当前课程</Menu.Item>
+                            <Menu.Item key="list">
+                                <Link to={`${this.props.match.url}/course/list`}>
+                                    课程列表
+                                </Link>
+                            </Menu.Item>
+                            <Menu.Item key="learned">已学课程</Menu.Item>
+                            <Menu.Item key="current">当前课程</Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="sub2"
@@ -88,11 +96,14 @@ class LearningPage extends Component {
                             <Menu.Item key="6">Team 1</Menu.Item>
                         </SubMenu>
                         <Menu.Item key="logout" >
-                            <Icon type="logout" />登出
+                            <Icon type="logout" />
+                            <span>登出</span>
                         </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout style={{ marginLeft: 200 }}>
+
+                    <Route path={`${this.props.match.url}/course`} component={LearnerCourseRoute} />
 
                 </Layout>
             </Layout>
