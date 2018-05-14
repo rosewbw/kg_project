@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import $ from 'jquery';
-import fetch from 'isomorphic-fetch';
 
 import {Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete} from 'antd';
 import {Upload, message} from 'antd';
@@ -33,10 +32,24 @@ class FileUpload extends Component {
         // });
     };
 
+    getToken = () => ( localStorage.getItem('token') );
 
+    handleStartUpload = () => {
+        this.props.onStart();
+    };
+
+    handleFinishUpload = (res) => {
+        res.status === 'error'
+            ? message.error(res.message)
+            : message.success('上传成功！');
+
+        this.props.onFinish();
+    };
 
     handleSubmit = (e) => {
         e.preventDefault();
+        this.handleStartUpload();
+
         //文件上传
         const {fileList} = this.state;
         let formData = new FormData();
@@ -49,17 +62,20 @@ class FileUpload extends Component {
 
         //校验表单信息
         this.props.form.validateFieldsAndScroll((err, values) => {
+            const token = this.getToken();
+
             for(let index in values){
                 formData.append(index, values[index]);
             }
 
-
-            console.log(values);
             if (!err) {
                 $.ajax({
                     url: '/upload',
                     data: formData,
                     type:"POST",
+                    headers: {
+                        'Authorization': token,
+                    },
                     contentType: false,
                     processData: false,
                     cache: false,
@@ -68,7 +84,6 @@ class FileUpload extends Component {
                             fileList: [],
                             uploading: false
                         });
-                        alert('文件上传成功');
                         this.props.form.setFieldsValue({
                             materialName: '',
                             description:'',
@@ -76,9 +91,11 @@ class FileUpload extends Component {
                             language:'',
                             materialType:''
                         });
+
+                        this.handleFinishUpload(res);
                     },
-                    error: function (res) {
-                        console.log(JSON.stringify(res));
+                    error: (res) => {
+                        this.handleFinishUpload(res);
                     }
                 })
                 // fetch('/upload', {
@@ -192,9 +209,7 @@ class FileUpload extends Component {
         //     );
         // };
         return (
-            <Form onSubmit={this.handleSubmit}
-                  style={{width: '20%', textAlign: 'center', height: '100%', margin: '2%'}}>
-                <h1>资源上传</h1>
+            <Form onSubmit={this.handleSubmit}>
                 <FormItem
                     {...formItemLayout}
                     label="资源名称"
@@ -291,7 +306,6 @@ class FileUpload extends Component {
                     <Button type="primary"
                             htmlType="submit"
                             className="uploadStart"
-                            onClick={this.handleUpload}
                             disabled={this.state.fileList.length === 0}
                             loading={uploading}
                     >

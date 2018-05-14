@@ -1,5 +1,7 @@
-let request = require('request');
-let UpdateGraph = function (data, type, callback) {
+const request = require('request');
+const config = require('config');
+
+const UpdateGraph = function (data, type, callback) {
     let options = {
         graphType:type,
         data:data
@@ -12,14 +14,17 @@ let UpdateGraph = function (data, type, callback) {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     };
-    request(option, function (err, res, body) {
+
+    config.get('debug') && config.get('debugConfig').noGraphServer
+    ? callback(data)
+    : request(option, function (err, res, body) {
         if (err) {
             console.log(err);
         } else {
             callback(data);
             console.log('update Success');
         }
-    })
+    });
 
 };
 module.exports = UpdateGraph;
