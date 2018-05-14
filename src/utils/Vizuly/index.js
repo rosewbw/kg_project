@@ -17,20 +17,14 @@ class VizulyWeightedTree extends Component {
         this.viz_container = d3.selectAll("#viz_container");
         this.viz = undefined;
         this.theme = undefined;
-        this.data = {};
+        // this.data = {
+        //     values: props.data,
+        // };
+        this.data = props.data;
         // stores the currently selected value field
         this.valueField = "Federal";
         this.valueFields = ["Federal", "State", "Local"];
 
-        // this.datatip='<div class="tooltip" style="width: 250px; background-opacity:.5">' +
-        //     '<div class="header1">HEADER1</div>' +
-        //     '<div class="header-rule"></div>' +
-        //     '<div class="header2"> HEADER2 </div>' +
-        //     '<div class="header-rule"></div>' +
-        //     '<div class="header3"> HEADER3 </div>' +
-        //     '</div>';
-
-        this.formatCurrency = this.formatCurrency.bind(this);
         this.loadData = this.loadData.bind(this);
         this.prepData = this.prepData.bind(this);
         this.initialize = this.initialize.bind(this);
@@ -44,14 +38,12 @@ class VizulyWeightedTree extends Component {
         this.changeData = this.changeData.bind(this);
     }
 
-    formatCurrency(d) { if (isNaN(d)) d = 0; return "$" + d3.format(",.2f")(d) + " Billion"; };
-
     loadData() {
         let { data, initialize, prepData } = this;
 
         d3.csv(CSVFILE, function (csv) {
             data.values=prepData(csv);
-            // blob = JSON.stringify(data);
+            console.log(data.values);
             initialize();
         });
     }
@@ -133,14 +125,16 @@ class VizulyWeightedTree extends Component {
         _this.viz.data(_this.data)                                                      // Expects hierarchical array of objects.
             .width(1000)                                                     // Width of component
             // .height(600)                                                    // Height of component
-            .children(function (d) { return d.values })                     // Denotes the property that holds child object array
-            .key(function (d) { return d.id })                              // Unique key
-            .value(function (d) {
-                return Number(d["agg_" + _this.valueField]) })                    // The property of the datum that will be used for the branch and node size
+            // .children(d => d.values)
+            .children(function (d) { return d.children })                     // 指定哪个属性是子节点
+            .key(function (d) { return d.id })                              // 唯一值
+            // .key(d => d.name)
+            // .value(d => d.agg_Local)
+            .value(function (d) { return d.value;})// 指定粗细的属性
             .fixedSpan(-1)                                                  // fixedSpan > 0 will use this pixel value for horizontal spread versus auto size based on viz width
             .branchPadding(.07)
-            .label(function (d) {                                           // returns label for each node.
-                return trimLabel(d.key || (d['Level' + d.depth]))})
+            // .label(function (d) { return trimLabel(d.key || (d['Level' + d.depth]))}) // returns label for each node.
+            .label(d => d.name) // 指定显示的浮动标签
             .on("measure",onMeasure)                                        // Make any measurement changes
             .on("mouseover",onMouseOver)                                    // mouseover callback - all viz components issue these events
             .on("mouseout",onMouseOut)                                      // mouseout callback - all viz components issue these events
@@ -153,9 +147,9 @@ class VizulyWeightedTree extends Component {
         _this.viz.update();
 
         // Open up some of the tree branches.
-        _this.viz.toggleNode(_this.data.values[2]);
-        _this.viz.toggleNode(_this.data.values[2].values[0]);
-        _this.viz.toggleNode(_this.data.values[3]);
+        // _this.viz.toggleNode(_this.data.values[2]);
+        // _this.viz.toggleNode(_this.data.values[2].values[0]);
+        // _this.viz.toggleNode(_this.data.values[3]);
     }
 
 
@@ -172,9 +166,9 @@ class VizulyWeightedTree extends Component {
         let { data, viz, valueField } = this;
 
         console.log("mouse over");
-        if (d == data) return;
-        let rect = e.getBoundingClientRect();
-        if (d.target) d = d.target; //This if for link elements
+        // if (d == data) return;
+        // let rect = e.getBoundingClientRect();
+        // if (d.target) d = d.target; //This if for link elements
     }
 
     onMouseOut(e,d,i) {
@@ -212,14 +206,13 @@ class VizulyWeightedTree extends Component {
 
     //This sets the same value for each radial progress
     changeData(val) {
-        let { viz, valueFields } = this;
-
-        this.valueField=valueFields[Number(val)];
-        viz.update();
+        this.valueField=this.valueFields[Number(val)];
+        this.viz.update();
     }
 
     componentDidMount() {
-        this.loadData();
+        // this.loadData();
+        this.initialize();
     }
 
     render() {
