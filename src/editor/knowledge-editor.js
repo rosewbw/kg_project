@@ -4,7 +4,7 @@ import './editor.css'
 
 import TeachUnitEditor from './teachunit-editor';
 
-import {TeachUnit, Course} from './componentConstructor';
+// import {TeachUnit, Course} from './componentConstructor';
 
 import {Input, Select} from 'antd';
 import {Row, Col} from 'antd';
@@ -17,14 +17,34 @@ class KnowledgeEditor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            kUnit: this.props.kUnitData
+            kUnit: this.props.kUnitData,
+            username:this.props.username
         };
         this.cancelHandler = this.cancelHandler.bind(this);
         this.saveHandler = this.saveHandler.bind(this);
         this.kUnitInfoChange = this.kUnitInfoChange.bind(this);
-        this.relationChange = this.relationChange.bind(this);
         this.tUnitEdit = this.tUnitEdit.bind(this);
         this.onTeachUnitChanged = this.onTeachUnitChanged.bind(this);
+
+        //不知道有没有什么好方法
+        this.parentRelationAdd = this.parentRelationAdd.bind(this);
+        this.childRelationAdd = this.childRelationAdd.bind(this);
+        this.relyRelationAdd = this.relyRelationAdd.bind(this);
+        this.relateRelationAdd = this.relateRelationAdd.bind(this);
+        this.broRelationAdd = this.broRelationAdd.bind(this);
+        this.paraRelationAdd = this.paraRelationAdd.bind(this);
+
+        this.parentRelationDel = this.parentRelationDel.bind(this);
+        this.childRelationDel = this.childRelationDel.bind(this);
+        this.relyRelationDel = this.relyRelationDel.bind(this);
+        this.relateRelationDel = this.relateRelationDel.bind(this);
+        this.broRelationDel = this.broRelationDel.bind(this);
+        this.paraRelationDel = this.paraRelationDel.bind(this);
+
+        this.getkUnitObjectById = this.getkUnitObjectById.bind(this);
+        this.kUnitAdd = this.kUnitAdd.bind(this);
+        this.kUnitDel = this.kUnitDel.bind(this);
+
     }
 
     cancelHandler() {
@@ -47,55 +67,17 @@ class KnowledgeEditor extends Component {
 
     tUnitEdit(e) {
         ReactDOM.render(
-            <TeachUnitEditor kUnitData={this.state.kUnit.teachUnit} teachUnitChanged={this.onTeachUnitChanged}/>
+            <TeachUnitEditor
+                kUnitData={this.state.kUnit.teachUnit}
+                teachUnitChanged={this.onTeachUnitChanged}
+                username={this.state.username}
+            />
             , document.getElementById('tUnitEdit')
         )
-        // let _this = this;
-        // let tempkUnit = _this.state.kUnit;
-        // if (tempkUnit.teachUnit.length === 0) {
-        //     tempkUnit.teachUnit = new TeachUnit(tempkUnit.id);
-        //     this.setState({
-        //         kUnit:tempkUnit
-        //     },function () {
-        //
-        //     })
-        // }else{
-        //     ReactDOM.render(
-        //         <TeachUnitEditor kUnitData={_this.state.kUnit.teachUnit} teachUnitChanged={_this.onTeachUnitChanged}/>
-        //         , document.getElementById('tUnitEdit')
-        //     )
-        // }
-
-
-        // ReactDOM.render(
-        //     <KnowledgeEditor
-        //         kUnitData={kUnitData}
-        //         onUpdatekUnit={this.updateKnowledgeUnit}
-        //         knowledgeUnitList={this.state.knowledgeUnitList}
-        //         onUpdateUrlAndName={this.onUpdateUrlAndName}
-        //
-        //     />
-        //     , document.getElementById('unitEdit')
-        // )
     }
 
 
     onTeachUnitChanged(tUnit) {
-        // let kUnitId, tempkUnit;
-        // if (!tUnit) {
-        //     return
-        // }
-        // kUnitId = tUnit.knowledgeUnitId;
-        // if (kUnitId === this.state.kUnit.id) {
-        //     tempkUnit = this.state.kUnit;
-        // }
-        // tempkUnit.teachUnit.push(tUnit);
-        // this.setState({
-        //     kUnit: tempkUnit
-        // })
-        //     ,function (e) {
-        //     this.props.onUpdatekUnit(this.state.kUnit);
-        // }
     }
 
 
@@ -114,23 +96,115 @@ class KnowledgeEditor extends Component {
         }
     }
 
-    relationChange(e) {
+    parentRelationAdd(value) {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitAdd(kUnit, addNode, 'related');
+        this.kUnitAdd(addNode, kUnit, 'related');
     }
+
+    childRelationAdd(value) {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitAdd(kUnit, addNode, 'contain');
+        this.kUnitAdd(addNode, kUnit, 'parent');
+    }
+
+    relyRelationAdd(value) {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitAdd(kUnit, addNode, 'rely');
+        this.kUnitAdd(addNode, kUnit, 'rely');
+    }
+
+    relateRelationAdd(value) {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitAdd(kUnit, addNode, 'rely');
+        this.kUnitAdd(addNode, kUnit, 'rely');
+    }
+
+    broRelationAdd(value) {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitAdd(kUnit, addNode, 'brothers');
+        this.kUnitAdd(addNode, kUnit, 'brothers');
+    }
+
+    paraRelationAdd(value) {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitAdd(kUnit, addNode, 'parent');
+        this.kUnitAdd(addNode, kUnit, 'contain');
+    }
+
+    parentRelationDel(value) {
+        console.log(value)
+    }
+
+    childRelationDel(value) {
+        console.log(value)
+    }
+
+    relyRelationDel(value) {
+        console.log(value)
+    }
+
+    relateRelationDel(value) {
+        console.log(value)
+    }
+
+    broRelationDel(value) {
+        console.log(value)
+    }
+
+    paraRelationDel(value) {
+        console.log(value)
+    }
+
+    getkUnitObjectById = (id) => {
+        const kUnits = this.props.knowledgeUnitList;
+        for (let index in kUnits) {
+            if (kUnits[index].id === id) {
+                return kUnits[index]
+            }
+        }
+    };
+
+    kUnitAdd = (targetNode, addUnit, type) => {
+        targetNode[type].push(addUnit);
+    };
+
+    kUnitDel = () => {
+
+    };
+
+
+    onSelect = (value) => {
+        console.log(value);
+        // const kUnit = this.state.kUnit;
+        // const knowledgeUnitList = this.props.knowledgeUnitList;
+        // let unitSelected;
+        // for (let index in knowledgeUnitList) {
+        //     if (knowledgeUnitList[index].name === value) {
+        //         unitSelected = knowledgeUnitList[index]
+        //     }
+        // }
+    };
 
     componentDidMount() {
 
     }
 
     render() {
-        let kUnit = this.state.kUnit;
-        let knowledgeUnitList = this.props.knowledgeUnitList;
+        const kUnit = this.state.kUnit;
+        const knowledgeUnitList = this.props.knowledgeUnitList;
         const children = [];
         for (let index in knowledgeUnitList) {
             if (knowledgeUnitList[index].id !== kUnit.id) {
-                children.push(<Option key={knowledgeUnitList[index].name}>{knowledgeUnitList[index].name}</Option>);
+                children.push(<Option key={knowledgeUnitList[index].id}>{knowledgeUnitList[index].name}</Option>);
             }
         }
-
         let defaultChildren = {
             parent: [],
             rely: [],
@@ -144,7 +218,6 @@ class KnowledgeEditor extends Component {
                 kUnit[item].map((object) => {
                     defaultChildren[item].push(object.name);
                 })
-
             }
         }
         return (
@@ -208,7 +281,8 @@ class KnowledgeEditor extends Component {
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
                                                 defaultValue={defaultChildren.parent}
-                                                onChange={this.relationChange}
+                                                onSelect={this.parentRelationAdd}
+                                                onDeselect={this.parentRelationDel}
                                             >
                                                 {children}
                                             </Select>
@@ -220,7 +294,8 @@ class KnowledgeEditor extends Component {
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
                                                 defaultValue={defaultChildren.contain}
-                                                onChange={this.relationChange}
+                                                onSelect={this.childRelationAdd}
+                                                onDeselect={this.childRelationDel}
                                             >
                                                 {children}
                                             </Select>
@@ -232,7 +307,8 @@ class KnowledgeEditor extends Component {
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
                                                 defaultValue={defaultChildren.rely}
-                                                onChange={this.relationChange}
+                                                onSelect={this.relyRelationAdd}
+                                                onDeselect={this.relyRelationDel}
                                             >
                                                 {children}
                                             </Select>
@@ -244,7 +320,8 @@ class KnowledgeEditor extends Component {
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
                                                 defaultValue={defaultChildren.related}
-                                                onChange={this.relationChange}
+                                                onSelect={this.relateRelationAdd}
+                                                onDeselect={this.relateRelationDel}
                                             >
                                                 {children}
                                             </Select>
@@ -256,7 +333,8 @@ class KnowledgeEditor extends Component {
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
                                                 defaultValue={defaultChildren.brothers}
-                                                onChange={this.relationChange}
+                                                onSelect={this.broRelationAdd}
+                                                onDeselect={this.broRelationDel}
                                             >
                                                 {children}
                                             </Select>
@@ -268,7 +346,8 @@ class KnowledgeEditor extends Component {
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
                                                 defaultValue={defaultChildren.parallel}
-                                                onChange={this.relationChange}
+                                                onSelect={this.paraRelationAdd}
+                                                onDeselect={this.paraRelationDel}
                                             >
                                                 {children}
                                             </Select>
