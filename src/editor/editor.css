@@ -1,0 +1,372 @@
+#editorArea {
+    width: 100%;
+    height: 100%;
+}
+
+#toolBar {
+    height: 70px;
+    width: 100%;
+}
+
+#mainCanvas {
+    width: 100%;
+    height: calc(100% - 70px);
+    background: white;
+}
+
+.dragBox {
+    width: 86px;
+    height: 56px;
+    margin: 7px 14px 7px 14px;
+    -webkit-box-shadow: 0 0 3px #000;
+    box-shadow: 0 0 3px #000;
+    border-radius: 4px;
+    float: left;
+    cursor: pointer;
+    text-align: center;
+    line-height: 56px;
+    /* pointer-events: none; */
+    /* background: transparent; */
+    /* overflow: hidden; */
+}
+
+.canvasTransform {
+    width: 0;
+    height: 0;
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: scale(1);
+    transform-origin: 450px 240px 0;
+}
+
+.canvas-api-start {
+    width: 50px;
+    height: 20px;
+    position: absolute;
+    color: white;
+    text-align: center;
+    background: #000;
+    border-radius: 5px;
+    cursor: pointer;
+    top: 300px;
+    left: 250px;
+    line-height: 21px;
+}
+
+.img-box-circle-cover {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    /*	top: 20px;
+        left: 76px;*/
+    z-index: 800;
+    /*pointer-events:auto;*/
+}
+
+.canvas-api-circle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    /*	top: 20px;
+        left: 76px;*/
+    z-index: 800;
+    /*pointer-events:auto;*/
+}
+
+.projectStatus {
+    float: right;
+    height: 30px;
+    border-radius: 3px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 30px;
+    margin: 20px 60px;
+    display: flex;
+}
+
+/*.canvas-api-remove-butn {*/
+/*width: 60px;*/
+/*height: 30px;*/
+/*border-radius: 3px;*/
+/*!*background: #23df67;*!*/
+/*background: #ccc;*/
+/*text-align: center;*/
+/*font-size: 15px;*/
+/*font-weight: bold;*/
+/*line-height: 30px;*/
+/*cursor: pointer;*/
+/*position: absolute;*/
+/*left: 7px;*/
+/*bottom: 108px;*/
+/*}*/
+
+.canvas-api-floatImg {
+    /*	width: 86px;
+        height:56px;*/
+    opacity: 0.7;
+    position: absolute;
+    z-index: 100;
+    background-size: 100% 100%;
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.imgbox {
+    width: 86px;
+    height: 56px;
+    margin: 7px;
+    /*	padding: 2px;*/
+    box-shadow: 0 0 3px #000;
+    border-radius: 4px;
+    float: left;
+    cursor: pointer;
+    /*pointer-events:none;*/
+    z-index: 10;
+    /*background: transparent;*/
+    /*overflow: hidden;*/
+    background-color: gainsboro;
+}
+
+.imgbox img {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    border-radius: 4px;
+    background-color: white;
+}
+
+.canvas-api-img-title {
+    position: absolute;
+    pointer-events: auto;
+    left: 0;
+    top: -20px;
+    font-size: 12px;
+}
+
+.canvas-api-path-collect {
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
+    position: absolute;
+    left: -16px;
+    top: 12px;
+    cursor: pointer;
+    display: none;
+}
+
+.no-border-input {
+    border-style: none;
+    background: transparent;
+}
+
+.editorBtn {
+    /*width: 60px;*/
+    /*height: 30px;*/
+    /*border-radius: 3px;*/
+    /* background: #23df67; */
+    /*background: #ccc;*/
+    /*text-align: center;*/
+    font-size: 15px;
+    /*font-weight: bold;*/
+    line-height: 30px;
+    cursor: pointer;
+    float: left;
+    margin: 20px 2px;
+    /*display:inline-block;*/
+}
+
+#toolBar .selected {
+    background: #1890ff;
+    color: white;
+}
+
+#toolBar .selected:hover {
+    color: #fff;
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+}
+
+/*teachunit-editor*/
+.editorContainerArea {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.editorContainer {
+    width: 90%;
+    /*height: 100%;*/
+    position: absolute;
+    left: 50%;
+    margin-left: -45%;
+    background: rgba(34, 34, 34, 0.5);
+}
+
+.editorHeader {
+    height: 24px;
+    border-radius: 5px 5px 0 0;
+    background: white;
+    position: relative;
+}
+
+.editorHeader span {
+    height: 100%;
+    position: absolute;
+    cursor: pointer;
+    right: 10px;
+    font-size: 25px;
+    color: #000;
+    line-height: 24px
+}
+
+.editorBody {
+    width: 100%;
+    height: calc(100% - 24px);
+}
+
+.teachunit {
+    width: 100%;
+    height: 100%;
+}
+
+.teachunit .gutter-box {
+    background-color: #00a2d4;
+}
+
+.teachunit video {
+    width: 100%;
+}
+
+/*knowledge-editor*/
+
+.kEditorContainerArea {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.kEditorContainer {
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -25%;
+    margin-top: -12.5%;
+    /*background: rgba(34, 34, 34, 0.5);*/
+}
+
+.kEditorBody {
+    width: 100%;
+
+    position: relative;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.kEditorBody .kUnitUrl img {
+    width: 100%;
+    height: 100%;
+}
+
+.kEditorBody .kUnitInfo section label {
+
+}
+
+.kUnitInfo .ant-input {
+    width: 100%;
+}
+
+.kEditorBody .skUnitInfo {
+    width: 100%;
+    /*border-bottom: 1px solid #ebedf0;*/
+    /*border-right: 1px solid #ebedf0;*/
+    padding: 5px 20px 10px;
+    color: rgba(0, 0, 0, 0.65);
+}
+
+.kEditorBody .skUnitUrl, .kEditorBody .skUnitRelation, .kEditorBody .skUnitBtn {
+    padding: 5px 20px 10px;
+}
+
+.gutter-box {
+    padding: 5px 0;
+}
+
+/*teachunit-editor*/
+.teachUnitInfo {
+    background-color: white;
+}
+
+.basicInfo, .mainCourseBasicInfo, .mainCourseStatInfo, .mainCourseMaterialInfo {
+    padding: 10px 20px 10px;
+}
+
+.basicInfo span {
+    margin-bottom: 10px;
+}
+
+.mainCourseInfo {
+
+}
+
+.mainCourseStatInfo section {
+    font-size: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+/*editorcontrol*/
+.pBox {
+    width: 200px;
+    height: 180px;
+    border: 2px solid gray;
+    border-radius: 3px;
+}
+
+.pBox .pThumbnail {
+    width: 100%;
+    height: 100%;
+}
+
+.pBox .pThumbnail img {
+    width: 100%;
+    height: 100%;
+}
+
+.jumbotron-heading {
+    font-weight: 300
+}
+
+.galleryWrapper .card-text {
+    height: 6rem;
+    border-bottom: 1px solid #ebedf0;
+    border-top: 1px solid #ebedf0;
+}
+
+.galleryWrapper .card-text p {
+    overflow: hidden;
+}
+
+.buttonGroup {
+    margin-bottom: 10px;
+}
+
+.btn-group .delete {
+    color: #ff4d4f;
+}
+
+.btn-group .delete:hover {
+    color: #fff;
+    background-color: #ff4d4f;
+    border-color: #ff4d4f;
+}
