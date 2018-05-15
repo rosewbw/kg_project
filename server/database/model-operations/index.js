@@ -5,5 +5,6 @@
  * @author Dai
  */
 const findOperations = require('./find');
+const deleteOperations = require('./delete');
 
-module.exports = Object.assign({}, findOperations);
+module.exports = Object.assign({}, findOperations, deleteOperations);

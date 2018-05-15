@@ -29,5 +29,6 @@ router.post('/deleteProject', tokenObj.checkToken, project.deleteProject);
 
 /* 资源 */
 router.get('/materials', tokenObj.checkToken, material.getMaterial);
+router.delete('/deleteMaterial', tokenObj.checkToken, material.deleteMaterial);
 
 module.exports = router;

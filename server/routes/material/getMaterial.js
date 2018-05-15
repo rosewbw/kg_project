@@ -1,4 +1,4 @@
-const { findInModel } = require('../../database/model-operations');
+const { findInModel, findOneInModel } = require('../../database/model-operations');
 
 const getMaterial = function (req, res, next) {
     const username = req.api_user.param;
@@ -13,9 +13,8 @@ const getMaterial = function (req, res, next) {
         message: err,
     });
 
-    findInModel('tUser', { name: username })
-        .then(users => users[0]) // 只会有一个匹配用户
-        .then(user => findInModel('tMaterial', { userid: user.userid}))
+    findOneInModel('tUser', { name: username })
+        .then(user => findInModel('tMaterial', { userid: user.userid }))
         .then(onSuccess)
         .catch(onError);
 

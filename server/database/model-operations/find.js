@@ -1,16 +1,30 @@
 const { getModel } = require('../dbhandle');
 
 const operations = {
-    findInModel : (modalname, options) => {
-        const modal = getModel(modalname);
+    findInModel: (modelname, ...options) => {
+        const model = getModel(modelname);
 
         return new Promise((resolve, reject) => {
-            modal.find(options, function(err, docs) {
+            model.find.apply(model, options)
+                .exec(function(err, docs) {
                 if (err) return reject(err);
-                if (!docs) return reject('查询 ' + modalname + '无返回结果');
+                if (!docs) return reject('查询 ' + modelname + ' 无返回结果');
 
                 resolve(docs);
             })
+        });
+    },
+    findOneInModel: (modelname, ...options) => {
+        const model = getModel(modelname);
+
+        return new Promise((resolve, reject) => {
+            model.findOne.apply(model, options)
+                .exec(function(err, docs) {
+                    if (err) return reject(err);
+                    if (!docs) return reject('查询 ' + modelname + ' 无返回结果');
+
+                    resolve(docs);
+                })
         });
     },
 };
