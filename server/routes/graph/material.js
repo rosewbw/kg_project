@@ -71,13 +71,14 @@ let Process = function (file, originOptions, callback) {
     newOptions.uniqueData = {};
 
     if (supportedExtensions.contains(originalExtension, 'video')) {
-        ffmpeg(originalPath)
+        thumbnailPath = "/media/" + fileId + ".png" ;
+        ffmpeg(targetPath)
             .ffprobe(function (err, data) {
                 duration = data.format.duration.toString();
                 newOptions.duration = duration;
             });
 
-        var getthumbnail = new ffmpeg({source: originalPath})
+        var getthumbnail = new ffmpeg({source: targetPath})
             .takeScreenshots({//生成缩略图
                 count: 1,
                 timemarks: ['0.5'],
@@ -103,7 +104,7 @@ let Process = function (file, originOptions, callback) {
     }
     else if (supportedExtensions.contains(originalExtension, 'audio')) {
         newOptions.thumbnailUrl = "/resources/icons/audio-logo.png";
-        ffmpeg(originalPath)
+        ffmpeg(targetPath)
             .ffprobe(function (err, data) {
                 duration = data.format.duration.toString();
                 newOptions.duration = duration;
@@ -148,7 +149,7 @@ module.exports = {
         let upfile = req.files.upfile;
         // let username = req.session.user ? req.session.user : req.body.username;
         // let userId = req.session.userId ? req.session.userId : req.body.userId;
-        let userId = 'debug-user';
+        let userId = req.body.userId;
         let materialInfo = {};
         let uploadInfo = req.body;
 

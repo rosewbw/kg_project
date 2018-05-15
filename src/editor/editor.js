@@ -432,7 +432,7 @@ class Editor extends Component {
             circle_comewith_ele(fun.start);
 
             info.map(function (elm) {
-                let div = createNewElement(fun, elm.id, elm.imgUrl, elm.videoUrl);
+                let div = createNewElement(fun, elm.id, elm.thumbnailUrl, elm.videoUrl);
                 div.css({
                     'left': elm.position.x + 'px',
                     'top': elm.position.y + 'px'
@@ -1334,7 +1334,7 @@ class Editor extends Component {
         } else {
             startPosition = _this.state.startPosition;
         }
-
+        console.log(_this.state.knowledgeUnitList)
         let data = {
             _id: _this.state.projectId,
             projectName: _this.state.projectName,
@@ -1514,6 +1514,7 @@ class Editor extends Component {
             projectId: _this.state.projectId,
             username: _this.props.username
         }, function (data) {
+            console.log(data[0].data)
             _this.setState({
                 projectName: data[0].projectName,
                 projectDataFetched: true,

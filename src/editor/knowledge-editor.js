@@ -113,8 +113,8 @@ class KnowledgeEditor extends Component {
     relyRelationAdd(value) {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
-        this.kUnitAdd(kUnit, addNode, 'rely');
-        this.kUnitAdd(addNode, kUnit, 'rely');
+        this.kUnitAdd(kUnit, addNode, 'isBeingRelyOnBy');
+        this.kUnitAdd(addNode, kUnit, 'isRelyOnTo');
     }
 
     relateRelationAdd(value) {
@@ -172,7 +172,9 @@ class KnowledgeEditor extends Component {
     };
 
     kUnitAdd = (targetNode, addUnit, type) => {
+        console.log()
         targetNode[type].push(addUnit);
+        console.log( targetNode[type])
     };
 
     kUnitDel = () => {
@@ -197,6 +199,7 @@ class KnowledgeEditor extends Component {
     }
 
     render() {
+        console.log()
         const kUnit = this.state.kUnit;
         const knowledgeUnitList = this.props.knowledgeUnitList;
         const children = [];
@@ -207,7 +210,7 @@ class KnowledgeEditor extends Component {
         }
         let defaultChildren = {
             parent: [],
-            rely: [],
+            isBeingRelyOnBy: [],
             related: [],
             brothers: [],
             contain: [],
@@ -301,12 +304,12 @@ class KnowledgeEditor extends Component {
                                             </Select>
                                         </div>
                                         <div id="relyNode" className="relyNode">
-                                            <label>依赖关系</label>
+                                            <label>下一个课程</label>
                                             <Select
                                                 mode="multiple"
                                                 style={{width: '100%'}}
                                                 placeholder="Please select"
-                                                defaultValue={defaultChildren.rely}
+                                                defaultValue={defaultChildren.isBeingRelyOnBy}
                                                 onSelect={this.relyRelationAdd}
                                                 onDeselect={this.relyRelationDel}
                                             >
@@ -326,32 +329,32 @@ class KnowledgeEditor extends Component {
                                                 {children}
                                             </Select>
                                         </div>
-                                        <div id="brothersNode" className="brothersNode">
-                                            <label>兄弟关系</label>
-                                            <Select
-                                                mode="multiple"
-                                                style={{width: '100%'}}
-                                                placeholder="Please select"
-                                                defaultValue={defaultChildren.brothers}
-                                                onSelect={this.broRelationAdd}
-                                                onDeselect={this.broRelationDel}
-                                            >
-                                                {children}
-                                            </Select>
-                                        </div>
-                                        <div id="parallelNode" className="parallelNode">
-                                            <label>平行关系</label>
-                                            <Select
-                                                mode="multiple"
-                                                style={{width: '100%'}}
-                                                placeholder="Please select"
-                                                defaultValue={defaultChildren.parallel}
-                                                onSelect={this.paraRelationAdd}
-                                                onDeselect={this.paraRelationDel}
-                                            >
-                                                {children}
-                                            </Select>
-                                        </div>
+                                        {/*<div id="brothersNode" className="brothersNode">*/}
+                                            {/*<label>兄弟关系</label>*/}
+                                            {/*<Select*/}
+                                                {/*mode="multiple"*/}
+                                                {/*style={{width: '100%'}}*/}
+                                                {/*placeholder="Please select"*/}
+                                                {/*defaultValue={defaultChildren.brothers}*/}
+                                                {/*onSelect={this.broRelationAdd}*/}
+                                                {/*onDeselect={this.broRelationDel}*/}
+                                            {/*>*/}
+                                                {/*{children}*/}
+                                            {/*</Select>*/}
+                                        {/*</div>*/}
+                                        {/*<div id="parallelNode" className="parallelNode">*/}
+                                            {/*<label>平行关系</label>*/}
+                                            {/*<Select*/}
+                                                {/*mode="multiple"*/}
+                                                {/*style={{width: '100%'}}*/}
+                                                {/*placeholder="Please select"*/}
+                                                {/*defaultValue={defaultChildren.parallel}*/}
+                                                {/*onSelect={this.paraRelationAdd}*/}
+                                                {/*onDeselect={this.paraRelationDel}*/}
+                                            {/*>*/}
+                                                {/*{children}*/}
+                                            {/*</Select>*/}
+                                        {/*</div>*/}
 
                                     </div>
                                 </section>

@@ -1,0 +1,15 @@
+{
+  "database": {
+    "protocol": "mongodb",
+    "userName": "",
+    "passWord":"",
+    "host": "localhost",
+    "port":"27017",
+    "dataset":"kgprojectDB"
+  },
+  "secret": "1234567",
+  "debug":true,
+  "debugConfig":{
+    "noGraphServer":true
+  }
+}

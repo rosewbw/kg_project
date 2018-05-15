@@ -82,12 +82,18 @@ class LearningPage extends Component {
                             title={<span><Icon type="user" /><span>课程管理</span></span>}
                         >
                             <Menu.Item key="list">
-                                <Link to={`${this.props.match.url}/course/list`}>
+                                <Link to={`${this.props.match.url}/course/list`}
+                                      style={{textDecoration: 'none'}}>
                                     课程列表
                                 </Link>
                             </Menu.Item>
                             <Menu.Item key="learned">已学课程</Menu.Item>
-                            <Menu.Item key="current">当前课程</Menu.Item>
+                            <Menu.Item key="current">
+                                <Link to={`${this.props.match.url}/course/view`}
+                                      style={{textDecoration: 'none'}}>
+                                    当前课程
+                                </Link>
+                                </Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="sub2"
@@ -102,7 +108,6 @@ class LearningPage extends Component {
                     </Menu>
                 </Sider>
                 <Layout style={{ marginLeft: 200 }}>
-
                     <Route path={`${this.props.match.url}/course`} component={LearnerCourseRoute} />
 
                 </Layout>
