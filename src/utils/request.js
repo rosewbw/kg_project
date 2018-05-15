@@ -29,8 +29,8 @@ const singletonRequest = function () {
                         resolve(res.data);
                     } else {
                         reject(res.message);
-                        alert("验证失败，请重新登录");
-                        this.props.history.push('/login');
+                        // alert("验证失败，请重新登录");
+                        // this.props.history.push('/login');
                     }
                 })
         });
