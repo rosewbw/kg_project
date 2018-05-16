@@ -1,7 +1,7 @@
-import FormatParser from './format-parser';
+import formatParser from './format-parser';
 import request from './request';
 
 export {
-    FormatParser,
+    formatParser,
     request,
 }

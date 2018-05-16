@@ -1,59 +1,22 @@
+const { findInModel, findOneInModel } = require('../../database/model-operations');
 
 const getMaterial = function (req, res, next) {
-    const materials = [
-        {
-            id: '9d365990-54c7-11e8-894b-076bddf849cd',
-            name: '后台的假数据',
-            description: 'test',
-            format: 'png',
-            url: '../../server/public/media/9d365990-54c7-11e8-894b-076bddf849cd.png',
-            thumbnail: '../defaultImg.jpg',
-        },
-        {
-            id: 'c841a311-54c7-11e8-894b-076bddf849cd',
-            name: '测试',
-            description: 'test',
-            format: 'png',
-            url: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-            thumbnail: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-        },
-        {
-            id: 'c841o310-54c7-11e8-894b-076bddf849cd',
-            name: '测试',
-            description: 'test',
-            format: 'png',
-            url: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-            thumbnail: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-        },
-        {
-            id: 'c841a310-53c7-11e8-894b-076bddf849cd',
-            name: '测试',
-            description: 'test',
-            format: 'png',
-            url: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-            thumbnail: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-        },
-        {
-            id: 'c841a310-54c7-11e8-894b-0761ddf849cd',
-            name: '测试',
-            description: 'test',
-            format: 'png',
-            url: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-            thumbnail: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-        },
-        {
-            id: 'c841a310-54c7-11e8-894b-076b1df849cd',
-            name: '测试',
-            description: 'test',
-            format: 'png',
-            url: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-            thumbnail: '../../server/public/media/c841a310-54c7-11e8-894b-076bddf849cd.png',
-        },
-    ];
-    res.json({
+    const username = req.api_user.param;
+
+    const onSuccess = materials => res.json({
         status: 'success',
         data: materials,
     });
+
+    const onError = err => res.json({
+        status: 'error',
+        message: err,
+    });
+
+    findOneInModel('tUser', { name: username })
+        .then(user => findInModel('tMaterial', { userid: user.userid }))
+        .then(onSuccess)
+        .catch(onError);
 
 };
 

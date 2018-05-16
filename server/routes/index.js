@@ -20,7 +20,7 @@ router.get('/fetchUserInfoWithToken', tokenObj.checkToken, user.fetchUserInfo);
 
 /* 课程 */
 router.post('/upload', tokenObj.checkToken, graph.upload);
-router.post('/upload', tokenObj.checkToken, graph.updateTeacher);
+// router.post('/upload', tokenObj.checkToken, graph.updateTeacher);
 router.post('/addProject', tokenObj.checkToken, project.addProject);
 router.post('/getProject', tokenObj.checkToken, project.getProject);
 router.post('/getProjectData', tokenObj.checkToken, project.getProjectData);
@@ -29,5 +29,7 @@ router.post('/deleteProject', tokenObj.checkToken, project.deleteProject);
 
 /* 资源 */
 router.get('/materials', tokenObj.checkToken, material.getMaterial);
+router.delete('/deleteMaterial', tokenObj.checkToken, material.deleteMaterial);
+router.put('/updateMaterial', tokenObj.checkToken, material.updateMaterial);
 
 module.exports = router;

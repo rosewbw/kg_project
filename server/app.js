@@ -9,7 +9,7 @@ var mongoose = require('mongoose');
 var session = require('express-session');
 
 global.dbHandel = require('./database/dbhandle');
-var index = require('./routes/index');
+var index = require('./routes');
 const config = require('config');
 
 

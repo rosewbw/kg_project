@@ -10,6 +10,14 @@ class FormatParser {
             "bulb": ["rich-media"] // 富媒体
         };
 
+        this.TYPE_EXTENSITONS_TABLE = {
+            'image': ["jpg", "png", "bmp", "gif", "svg"],
+            'video': ["3gp", "flv", "mp4", "mov", "avi", "mpg", "m4v"],
+            'audio': ["mp3", "wma", "ogg", "wav", "aac", "m4a"],
+            'flash': ["swf"],
+            'attachment': ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx"],
+        };
+
         this.toIcon = this.toIcon.bind(this);
     }
 
@@ -25,6 +33,10 @@ class FormatParser {
 
     toIcon(format) {
         return this._parser(this.ICONTYPE_TABLE, format);
+    }
+
+    toType(ext) {
+        return this._parser(this.TYPE_EXTENSITONS_TABLE, ext);
     }
 
 }

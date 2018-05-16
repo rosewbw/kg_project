@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Button, Modal } from 'antd';
+import { Layout, Button, Modal, message } from 'antd';
 
 import {FileUploaderModal} from '../upload';
 import MaterialList from './MaterialList';
@@ -16,22 +16,38 @@ class MaterialManage extends Component {
         };
 
         this.deleteMaterial = this.deleteMaterial.bind(this);
+        this.updateMaterial = this.updateMaterial.bind(this);
     }
 
     componentDidMount() {
         request.get('/materials')
-            .then(materials => {
-                console.log(materials);
-                this.setState({materials});
-            });
+            .then(materials => this.setState({materials}));
     }
 
     deleteMaterial(materialId) {
-        const originMaterials = this.state.materials;
-        let materials = originMaterials.filter(({id}) => id !== materialId);
-        this.setState({ materials });
+        const onSuccess = () => {
+            const originMaterials = this.state.materials;
+            let materials = originMaterials.filter(({id}) => id !== materialId);
+            this.setState({ materials });
+            message.success('删除资源成功');
+        };
 
-        // 发送到后端
+        const onError = err => message.error(err.toString());
+
+        request.delete('/deleteMaterial', { query: { materialId: materialId } })
+            .then(onSuccess)
+            .catch(onError);
+    }
+
+    updateMaterial(materialId, newMaterial, callback) {
+        const newMaterials = this.state.materials && this.state.materials.map(material => {
+            if (material._id === materialId) {
+                return Object.assign(material, newMaterial);
+            }
+            return material;
+        });
+        message.success('MaterialManage.updateMaterial');
+        this.setState({ materials: newMaterials }, callback);
     }
 
     render(){
@@ -44,6 +60,7 @@ class MaterialManage extends Component {
                 </Header>
                 <Content style={{ padding: '16px'}}>
                     <MaterialList materials={materials}
+                                  updateMaterial={this.updateMaterial}
                                   deleteMaterial={this.deleteMaterial}/>
                 </Content>
             </Layout>
