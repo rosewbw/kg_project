@@ -15,10 +15,9 @@ const singletonRequest = function () {
         return new Promise((resolve, reject) => {
             options = options || {};
             options.method = method || options.method || 'GET'; // 传入的 method 优先
-            options.headers = options.headers || {
-                "Content-Type": "application/json",
+            options.headers = Object.assign({
                 "Authorization": _getToken(),
-            };
+            }, options.headers);
             if (options.query && Object.keys(options.query).length !== 0) {
                 url= _urlWithParams(url, options.query);
             }
@@ -37,6 +36,7 @@ const singletonRequest = function () {
                         // this.props.history.push('/login');
                     }
                 })
+                .catch(err => reject(err));
         });
     };
 

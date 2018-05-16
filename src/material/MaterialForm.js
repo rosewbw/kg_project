@@ -1,113 +1,113 @@
-import React, {Component} from 'react';
-import $ from 'jquery';
+import React, { Component } from 'react';
+import { request } from '../utils';
 
-import {Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete} from 'antd';
-import {Upload, message} from 'antd';
+import {Form, Input, Icon, Select, Button, Upload, message} from 'antd';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
-const AutoCompleteOption = AutoComplete.Option;
 
-let uuid = 0;
+const INIT_FORM_VALUES = {
+    materialName: '',
+    materialType: '视频',
+    description: '',
+    keyword: '',
+    language: '中文',
+}; // 默认初始化的值，会被传入的 props.initValues 覆盖
 
-
-class FileUpload extends Component {
+/**
+ * @props {function} onStart - 表单上传前执行的函数
+ * @props {function} onFinish - 传输完成后执行的函数（无论成功与否均会执行），返回 { success: true/false, data }
+ * @props {string} materialId - 修改资源时的资源 ID
+ * @props {object} initValues - 初始化表单项
+ * @props {function} onCancel - 点击取消按钮时的事件
+ */
+class MaterialForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
             fileList: [],
             uploading: false,
             inputValue:''
-        }
+        };
+
     }
 
-    getToken = () => ( localStorage.getItem('token') );
+    resetForm = (newValues) => {
+        this.setState({
+            fileList: [],
+            uploading: false
+        });
 
-    handleStartUpload = () => {
-        this.props.onStart();
+        this.props.form.setFieldsValue(newValues || this.initValues);
     };
 
-    handleFinishUpload = (res) => {
-        res.status === 'error'
-            ? message.error(res.message)
-            : message.success('上传成功！');
+    resetBtnStatus = () => {
+        this.setState({
+            uploading: false
+        });
+    };
 
-        this.props.onFinish();
+    handleStartUpload = res => {
+        this.props.onStart && this.props.onStart(res);
+    };
+
+    handleFinishUpload = res => {
+        this.props.onFinish && this.props.onFinish(res);
     };
 
     handleSubmit = (e) => {
         e.preventDefault();
         this.handleStartUpload();
 
-        //文件上传
-        const {fileList} = this.state;
+        // 往表单中存入文件上传信息
+        const { fileList } = this.state;
         let formData = new FormData();
-        fileList.forEach((file) => {
-            formData.append('upfile', file);
-        });
+        fileList.forEach(file => formData.append('upfile', file));
         this.setState({
             uploading: true,
         });
 
-        //校验表单信息
+        // 校验表单信息
         this.props.form.validateFieldsAndScroll((err, values) => {
-            const token = this.getToken();
+            if (err) { return message.error(err.toString()); }
 
             for(let index in values){
                 formData.append(index, values[index]);
             }
 
-            if (!err) {
-                $.ajax({
-                    url: '/upload',
-                    data: formData,
-                    type:"POST",
-                    headers: {
-                        'Authorization': token,
-                    },
-                    contentType: false,
-                    processData: false,
-                    cache: false,
-                    success: (res) => {
-                        this.setState({
-                            fileList: [],
-                            uploading: false
-                        });
-                        this.props.form.setFieldsValue({
-                            materialName: '',
-                            description:'',
-                            keyword:'',
-                            language:'',
-                            materialType:''
-                        });
+            const onSuccess = data => {
+                this.resetForm(data);
+                this.handleFinishUpload({ success: true, data });
+            };
 
-                        this.handleFinishUpload(res);
-                    },
-                    error: (res) => {
-                        this.handleFinishUpload(res);
-                    }
+            const onError = err => {
+                this.resetBtnStatus();
+                message.error(err.toString());
+                this.handleFinishUpload({ success: false, data: err });
+            };
+
+            /* 根据是否传入 materialId 判断是更新资源还是上传资源 */
+            const { materialId } = this.props;
+            let job;
+            if (materialId) {
+                formData.append('materialId', materialId);
+                job = request.put('/updateMaterial', {
+                    body: formData
                 })
-                // fetch('/upload', {
-                //     method: 'POST',
-                //     headers: {
-                //         "Content-Type": "multipart/form-data",
-                //     },
-                //     body: formData
-                // }).then(res => {
-                //     this.setState({
-                //         fileList: [],
-                //         uploading: false
-                //     });
-                //     alert('文件上传成功');
-                //     console.log(this.state.fileList)
-                // })
             }
+            else {
+                job = request.post('/upload', {
+                    body: formData
+                })
+            }
+
+            job.then(onSuccess)
+                .catch(onError);
         });
     };
 
     render() {
-        const { getFieldDecorator, getFieldValue } = this.props.form;
-        const {autoCompleteResult} = this.state;
+        const { getFieldDecorator } = this.props.form;
         const {uploading} = this.state;
 
         const formItemLayout = {
@@ -120,24 +120,14 @@ class FileUpload extends Component {
                 sm: {span: 16},
             },
         };
-        const formItemLayoutWithOutLabel = {
+        const controlBtnLayout = {
             wrapperCol: {
-                xs: { span: 24, offset: 0 },
-                sm: { span: 20, offset: 4 },
+                span: 19,
+                offset: 5,
             },
         };
-        const tailFormItemLayout = {
-            wrapperCol: {
-                xs: {
-                    span: 24,
-                    offset: 0,
-                },
-                sm: {
-                    span: 16,
-                    offset: 8,
-                },
-            },
-        };
+
+        this.initValues = Object.assign(INIT_FORM_VALUES, this.props.initValues);
         const props = {
             onRemove: (file) => {
                 this.setState(({fileList}) => {
@@ -160,29 +150,6 @@ class FileUpload extends Component {
             className: 'upload-list-inline',
         };
 
-        // getFieldDecorator('keys', { initialValue: [] });
-        // const keys = getFieldValue('keys');
-        // console.log(keys);
-        // const formItems = (keys) => {
-        //     return (
-        //         <FormItem
-        //             {...formItemLayout}
-        //             label={index === 0 ? 'Passengers' : ''}
-        //             required={false}
-        //         >
-        //             {getFieldDecorator(`names[${k}]`, {
-        //                 validateTrigger: ['onChange', 'onBlur'],
-        //                 rules: [{
-        //                     required: true,
-        //                     whitespace: true,
-        //                     message: "Please input passenger's name or delete this field.",
-        //                 }],
-        //             })(
-        //                 <Input placeholder="passenger name" style={{ width: '60%', marginRight: 8 }} />
-        //             )}
-        //         </FormItem>
-        //     );
-        // };
         return (
             <Form onSubmit={this.handleSubmit}>
                 <FormItem
@@ -191,10 +158,11 @@ class FileUpload extends Component {
                 >
                     {getFieldDecorator('materialName', {
                         rules: [{
-                            type: 'string', message: '请输入上传的素材的名称',
+                            type: 'string', message: '请输入资源的名称',
                         }, {
-                            required: true, message: '请输入上传的素材的名称',
+                            required: true, message: '请输入资源的名称',
                         }],
+                        initialValue: this.initValues.materialName,
                     })(
                         <Input/>
                     )}
@@ -205,11 +173,12 @@ class FileUpload extends Component {
                 >
                     {getFieldDecorator('materialType', {
                         rules: [{
-                            type: 'string', message: '请输入上传的素材的类别',
+                            type: 'string', message: '请输入资源的类别',
                         }, {
-                            required: true, message: '请输入上传的素材的类别' +
+                            required: true, message: '请输入资源的类别' +
                             '',
                         }],
+                        initialValue: this.initValues.materialType,
                     })(
                         <Select
                             onChange={this.handleSelectChange}
@@ -235,6 +204,7 @@ class FileUpload extends Component {
                         }, {
                             required: true, message: '请输入资源的描述信息',
                         }],
+                        initialValue: this.initValues.description,
                     })(
                         <Input type="string"/>
                     )}
@@ -249,6 +219,7 @@ class FileUpload extends Component {
                         }, {
                             required: true, message: '请输入资源的关键字',
                         }],
+                        initialValue: this.initValues.keyword,
                     })(
                         <Input type="string"/>
                     )}
@@ -263,6 +234,7 @@ class FileUpload extends Component {
                         }, {
                             required: true, message: '请输入资源的语种',
                         }],
+                        initialValue: this.initValues.language,
                     })(
                         <Input type="string"/>
                     )}
@@ -277,14 +249,21 @@ class FileUpload extends Component {
                         </Button>
                     </Upload>
                 </FormItem>
-                <FormItem {...tailFormItemLayout}>
+                <FormItem {...controlBtnLayout}>
                     <Button type="primary"
                             htmlType="submit"
                             className="uploadStart"
-                            disabled={this.state.fileList.length === 0}
+                            disabled={uploading}
                             loading={uploading}
                     >
-                        {uploading ? '等待上传' : '开始上传'}
+                        {uploading ? '上传中' : '保存'}
+                    </Button>
+                    <Button
+                        style={{ marginLeft: 8 }}
+                        disabled={uploading}
+                        onClick={this.props.onCancel}
+                    >
+                        取消
                     </Button>
                 </FormItem>
             </Form>
@@ -292,7 +271,7 @@ class FileUpload extends Component {
     }
 }
 
-const WrappedRegistrationForm = Form.create()(FileUpload);
-export default WrappedRegistrationForm
+const WrappedMaterialForm = Form.create()(MaterialForm); // 增加表单校验
+export default WrappedMaterialForm;
 
 

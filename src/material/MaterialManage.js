@@ -16,6 +16,7 @@ class MaterialManage extends Component {
         };
 
         this.deleteMaterial = this.deleteMaterial.bind(this);
+        this.updateMaterial = this.updateMaterial.bind(this);
     }
 
     componentDidMount() {
@@ -33,11 +34,20 @@ class MaterialManage extends Component {
 
         const onError = err => message.error(err.toString());
 
-        console.log(materialId);
-
         request.delete('/deleteMaterial', { query: { materialId: materialId } })
             .then(onSuccess)
             .catch(onError);
+    }
+
+    updateMaterial(materialId, newMaterial, callback) {
+        const newMaterials = this.state.materials && this.state.materials.map(material => {
+            if (material._id === materialId) {
+                return Object.assign(material, newMaterial);
+            }
+            return material;
+        });
+        message.success('MaterialManage.updateMaterial');
+        this.setState({ materials: newMaterials }, callback);
     }
 
     render(){
@@ -50,6 +60,7 @@ class MaterialManage extends Component {
                 </Header>
                 <Content style={{ padding: '16px'}}>
                     <MaterialList materials={materials}
+                                  updateMaterial={this.updateMaterial}
                                   deleteMaterial={this.deleteMaterial}/>
                 </Content>
             </Layout>
