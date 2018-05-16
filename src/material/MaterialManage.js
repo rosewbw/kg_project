@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Button, Modal } from 'antd';
+import { Layout, Button, Modal, message } from 'antd';
 
 import {FileUploaderModal} from '../upload';
 import MaterialList from './MaterialList';
@@ -20,18 +20,24 @@ class MaterialManage extends Component {
 
     componentDidMount() {
         request.get('/materials')
-            .then(materials => {
-                console.log(materials);
-                this.setState({materials});
-            });
+            .then(materials => this.setState({materials}));
     }
 
     deleteMaterial(materialId) {
-        const originMaterials = this.state.materials;
-        let materials = originMaterials.filter(({id}) => id !== materialId);
-        this.setState({ materials });
+        const onSuccess = () => {
+            const originMaterials = this.state.materials;
+            let materials = originMaterials.filter(({id}) => id !== materialId);
+            this.setState({ materials });
+            message.success('删除资源成功');
+        };
 
-        // 发送到后端
+        const onError = err => message.error(err.toString());
+
+        console.log(materialId);
+
+        request.delete('/deleteMaterial', { query: { materialId: materialId } })
+            .then(onSuccess)
+            .catch(onError);
     }
 
     render(){

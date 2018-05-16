@@ -24,6 +24,7 @@ class MaterialList extends Component {
     }
 
     handleDelete(id) {
+        console.log('MaterialList.handleDelete', id);
         this.props.deleteMaterial(id);
     }
 
@@ -40,17 +41,17 @@ class MaterialList extends Component {
                 <MaterialEditModal visiable={editing}/>
                 <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} >
                     {
-                        materials.map((value) => (
-                            <Col key={value.id} span={6} style={{ marginBottom: "15px" }}>
+                        materials.map(({ _id: id, name, description, format, url, thumbnail }) => (
+                            <Col key={id} span={6} style={{ marginBottom: "15px" }}>
                                 <MaterialCard
-                                    id={value.id}
-                                    name={value.name}
-                                    description={value.description}
-                                    format={value.format}
-                                    url={value.url}
-                                    thumbnail={value.thumbnail}
-                                    onDelete={() => this.handleDelete(value.id)}
-                                    onEdit={()=>this.handleEdit(value.id)}
+                                    id={id}
+                                    name={name}
+                                    description={description}
+                                    format={format}
+                                    url={url}
+                                    thumbnail={thumbnail}
+                                    onDelete={() => this.handleDelete(id)}
+                                    onEdit={()=>this.handleEdit(id)}
                                 />
                             </Col>
                         ))
