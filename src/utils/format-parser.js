@@ -4,8 +4,8 @@
 class FormatParser {
     constructor() {
         this.ICONTYPE_TABLE = {
-            "picture" : ["png"], // 图片
-            "video-camera": ["mp4"], // 视频
+            "picture" : ["png", "jpg"], // 图片
+            "video-camera": ["mp4", "avi"], // 视频
             "file": ["doc", "docx", "pdf", "ppt", "pptx"], // 文档
             "bulb": ["rich-media"] // 富媒体
         };

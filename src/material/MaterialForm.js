@@ -32,13 +32,11 @@ class MaterialForm extends Component {
 
     }
 
-    resetForm = (newValues) => {
+    resetForm = newValues => {
         this.setState({
             fileList: [],
             uploading: false
         });
-
-        this.props.form.setFieldsValue(newValues || this.initValues);
     };
 
     resetBtnStatus = () => {

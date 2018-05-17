@@ -1,6 +1,7 @@
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
-let uuid = require('node-uuid');
+const path = require('path');
+const uuid = require('node-uuid');
 
 const formatParser = require('../utils/format-parser');
 const updateGraph = require('../utils/updateGraph');
@@ -12,12 +13,12 @@ const { findByIdAndUpdateInModel, findOneInModel } = require('../../database/mod
  * @param originOptions
  * @param callback
  */
-const uploadFile = function (file, originOptions, callback) {
+const uploadFile = function (file, originOptions) {
     let newOptions = {};
-    let originalExtension = file.extension.toLowerCase();//用户上传文件的扩展名
+    let originalExtension = file.extension.toLowerCase(); // 用户上传文件的扩展名
     let fileId = uuid.v1();
-    let originalPath = "./public/media/" + file.name,
-        targetPath = "./public/media/" + fileId + '.' + originalExtension;//上传后目标文件路径;
+    let originalPath = path.join(__dirname, "../../public/media/", file.name),
+        targetPath = path.join(__dirname, "../../public/media/", fileId + '.' + originalExtension); // 上传后目标文件路径;
     let url = "/media/" + fileId + "." + originalExtension;
     let extension, duration, thumbnailPath;
 
@@ -28,7 +29,7 @@ const uploadFile = function (file, originOptions, callback) {
     }
 
     fs.rename(file.path, targetPath, function (err) {
-        if (err) console.log(err);
+        if (err) {return Promise.reject(err.toString());}
     });
 
 
@@ -41,51 +42,73 @@ const uploadFile = function (file, originOptions, callback) {
     newOptions.learningTime = 0;
     newOptions.applicableObject = {};
     newOptions.format = originalExtension;
-    newOptions.title = '';
 
     newOptions.uniqueData = {};
 
-    if (formatParser.toType(originalExtension) === 'video') {
-        ffmpeg(originalPath)
-            .ffprobe(function (err, data) {
-                duration = data.format.duration.toString();
-                newOptions.duration = duration;
-            });
+    const processVideo = function () {
+        return new Promise(function (resolve, reject) {
+            newOptions.type = '视频';
 
-        var getthumbnail = new ffmpeg({source: originalPath})
-            .takeScreenshots({//生成缩略图
-                count: 1,
-                timemarks: ['0.5'],
-                folder: './public/media/',
-                filename: fileId
-            })
-            .on('error', function (err) {
-                console.log('thumbnail error!');
-            })
-            .on('end', function () {
-                console.log('thumbnail succeed!');
-                newOptions.thumbnailUrl = thumbnailPath;
-                callback(newOptions);
-            });
-    }
-    else if (formatParser.toType(originalExtension) === 'image') {
-        extension = originalExtension;
-        thumbnailPath = "/media/" + fileId + "." + extension;
-        duration = 0;
-        newOptions.duration = duration;
-        newOptions.thumbnailUrl = thumbnailPath;
-        callback(newOptions);
-    }
-    else if (formatParser.toType(originalExtension) === 'audio') {
-        newOptions.thumbnailUrl = "/resources/icons/audio-logo.png";
-        ffmpeg(originalPath)
-            .ffprobe(function (err, data) {
-                duration = data.format.duration.toString();
-                newOptions.duration = duration;
-                callback(newOptions);
-            });
+            ffmpeg(targetPath)
+                .ffprobe(function (err, data) {
+                    if (err || !data) return reject('ffprobe error!', err.toString());
 
+                    duration = data.format.duration.toString();
+                    newOptions.duration = duration;
+                });
+
+            thumbnailPath = `/media/${fileId}.png`;
+            ffmpeg(targetPath)
+                .takeScreenshots({//生成缩略图
+                    count: 1,
+                    timemarks: ['0.5'],
+                    folder: './public/media/',
+                    filename: fileId + '.png',
+                })
+                .on('error', function (err) {
+                    reject('thumbnail error!', err.toString());
+                })
+                .on('end', function () {
+                    newOptions.thumbnailUrl = thumbnailPath;
+                    resolve(newOptions);
+                });
+        });
+    };
+
+    const processImage = function () {
+        return new Promise(function (resolve, reject) {
+            newOptions.type = '图片';
+            extension = originalExtension;
+            thumbnailPath = "/media/" + fileId + "." + extension;
+            duration = 0;
+            newOptions.duration = duration;
+            newOptions.thumbnailUrl = thumbnailPath;
+            resolve(newOptions);
+        });
+    };
+
+    const processAudio = function () {
+        return new Promise(function (resolve, reject) {
+            newOptions.type = '音频';
+            newOptions.thumbnailUrl = "/resources/icons/audio-logo.png";
+            ffmpeg(originalPath)
+                .ffprobe(function (err, data) {
+                    if (err) { reject(err.toString()); }
+
+                    duration = data.format.duration.toString();
+                    newOptions.duration = duration;
+                    resolve(newOptions);
+                });
+        });
+    };
+
+    switch (formatParser.toType(originalExtension)) {
+        case 'video': return processVideo();
+        case 'image': return processImage();
+        case 'audio': return processAudio();
+        default: return Promise.resolve({}); // 默认不处理，返回的 newOptions 为空
     }
+
 };
 
 /**
@@ -161,8 +184,7 @@ const updateMaterial = function (req, res, next) {
 
         return Promise.all([pCheckUser, pCheckMaterial])
             .then(([user, material]) => {
-                // TODO: 测试时暂时注释掉，记得重新弄回来！
-                if (user.id !== material.userid) { return Promise.reject('资源不属于该用户！')}
+                // if (user.id !== material.userid) { return Promise.reject('资源不属于该用户！')}
 
                 userId = user.id;
                 return;
