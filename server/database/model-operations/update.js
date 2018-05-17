@@ -6,10 +6,10 @@ const operations = {
 
         return new Promise((resolve, reject) => {
             model.update.apply(model, options)
-                .exec(function(err) {
+                .exec(function(err, raw) {
                     if (err) return reject(err);
 
-                    resolve();
+                    resolve(raw);
                 })
         });
     },
@@ -18,10 +18,10 @@ const operations = {
 
         return new Promise((resolve, reject) => {
             model.findByIdAndUpdate.apply(model, options)
-                .exec(function(err) {
+                .exec(function(err, doc) {
                     if (err) return reject(err);
 
-                    resolve();
+                    resolve(doc);
                 })
         });
     },

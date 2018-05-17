@@ -46,7 +46,6 @@ class MaterialManage extends Component {
             }
             return material;
         });
-        message.success('MaterialManage.updateMaterial');
         this.setState({ materials: newMaterials }, callback);
     }
 

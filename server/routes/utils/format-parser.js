@@ -41,4 +41,4 @@ class FormatParser {
 
 }
 
-export default new FormatParser();
+module.exports = new FormatParser();

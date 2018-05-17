@@ -1,16 +1,24 @@
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
+const path = require('path');
+const uuid = require('node-uuid');
 
 const formatParser = require('../utils/format-parser');
-const UpdateGraph = require('../utils/updataGraph');
+const updateGraph = require('../utils/updateGraph');
 const { findByIdAndUpdateInModel, findOneInModel } = require('../../database/model-operations');
 
-const Process = function (file, originOptions, callback) {
+/**
+ * 上传文件并返回文件相关属性
+ * @param file
+ * @param originOptions
+ * @param callback
+ */
+const uploadFile = function (file, originOptions) {
     let newOptions = {};
-    let originalExtension = file.extension.toLowerCase();//用户上传文件的扩展名
+    let originalExtension = file.extension.toLowerCase(); // 用户上传文件的扩展名
     let fileId = uuid.v1();
-    let originalPath = "./public/media/" + file.name,
-        targetPath = "./public/media/" + fileId + '.' + originalExtension;//上传后目标文件路径;
+    let originalPath = path.join(__dirname, "../../public/media/", file.name),
+        targetPath = path.join(__dirname, "../../public/media/", fileId + '.' + originalExtension); // 上传后目标文件路径;
     let url = "/media/" + fileId + "." + originalExtension;
     let extension, duration, thumbnailPath;
 
@@ -21,7 +29,7 @@ const Process = function (file, originOptions, callback) {
     }
 
     fs.rename(file.path, targetPath, function (err) {
-        if (err) console.log(err);
+        if (err) {return Promise.reject(err.toString());}
     });
 
 
@@ -34,175 +42,162 @@ const Process = function (file, originOptions, callback) {
     newOptions.learningTime = 0;
     newOptions.applicableObject = {};
     newOptions.format = originalExtension;
-    newOptions.title = '';
 
     newOptions.uniqueData = {};
 
-    if (formatParser.toType(originalExtension) === 'video') {
-        ffmpeg(originalPath)
-            .ffprobe(function (err, data) {
-                duration = data.format.duration.toString();
-                newOptions.duration = duration;
-            });
+    const processVideo = function () {
+        return new Promise(function (resolve, reject) {
+            newOptions.type = '视频';
 
-        var getthumbnail = new ffmpeg({source: originalPath})
-            .takeScreenshots({//生成缩略图
-                count: 1,
-                timemarks: ['0.5'],
-                folder: './public/media/',
-                filename: fileId
-            })
-            .on('error', function (err) {
-                console.log('thumbnail error!');
-            })
-            .on('end', function () {
-                console.log('thumbnail succeed!');
-                newOptions.thumbnailUrl = thumbnailPath;
-                callback(newOptions);
-            });
-    }
-    else if (formatParser.toType(originalExtension) === 'image') {
-        extension = originalExtension;
-        thumbnailPath = "/media/" + fileId + "." + extension;
-        duration = 0;
-        newOptions.duration = duration;
-        newOptions.thumbnailUrl = thumbnailPath;
-        callback(newOptions);
-    }
-    else if (formatParser.toType(originalExtension) === 'audio') {
-        newOptions.thumbnailUrl = "/resources/icons/audio-logo.png";
-        ffmpeg(originalPath)
-            .ffprobe(function (err, data) {
-                duration = data.format.duration.toString();
-                newOptions.duration = duration;
-                callback(newOptions);
-            });
+            ffmpeg(targetPath)
+                .ffprobe(function (err, data) {
+                    if (err || !data) return reject('ffprobe error!', err.toString());
 
+                    duration = data.format.duration.toString();
+                    newOptions.duration = duration;
+                });
+
+            thumbnailPath = `/media/${fileId}.png`;
+            ffmpeg(targetPath)
+                .takeScreenshots({//生成缩略图
+                    count: 1,
+                    timemarks: ['0.5'],
+                    folder: './public/media/',
+                    filename: fileId + '.png',
+                })
+                .on('error', function (err) {
+                    reject('thumbnail error!', err.toString());
+                })
+                .on('end', function () {
+                    newOptions.thumbnailUrl = thumbnailPath;
+                    resolve(newOptions);
+                });
+        });
+    };
+
+    const processImage = function () {
+        return new Promise(function (resolve, reject) {
+            newOptions.type = '图片';
+            extension = originalExtension;
+            thumbnailPath = "/media/" + fileId + "." + extension;
+            duration = 0;
+            newOptions.duration = duration;
+            newOptions.thumbnailUrl = thumbnailPath;
+            resolve(newOptions);
+        });
+    };
+
+    const processAudio = function () {
+        return new Promise(function (resolve, reject) {
+            newOptions.type = '音频';
+            newOptions.thumbnailUrl = "/resources/icons/audio-logo.png";
+            ffmpeg(originalPath)
+                .ffprobe(function (err, data) {
+                    if (err) { reject(err.toString()); }
+
+                    duration = data.format.duration.toString();
+                    newOptions.duration = duration;
+                    resolve(newOptions);
+                });
+        });
+    };
+
+    switch (formatParser.toType(originalExtension)) {
+        case 'video': return processVideo();
+        case 'image': return processImage();
+        case 'audio': return processAudio();
+        default: return Promise.resolve({}); // 默认不处理，返回的 newOptions 为空
     }
+
 };
 
-const WriteToDB = function (options, callback) {
+/**
+ * 从 request 中获取信息，上传文件，并返回 Promise
+ * @param req
+ * @return {Promise}
+ */
+const getInfoFromReq = function (req) {
+    const {
+        materialName,
+        materialType,
+        description,
+        keyword,
+        language,
+    } = req.body;
 
-    var tMaterial = global.dbHandel.getModel('tMaterial');
-    tMaterial.create({
-            _id: options.fileId,
-            userId: options.userId,
-            name: options.materialName,
-            type: options.materialType,
-            keyword: options.keyword,
-            url: options.url,
-            size: options.size,
-            description: options.description,
-            thumbnailUrl: options.thumbnailUrl,
-            uniqueData: options.uniqueData,
-            learningTime: options.learningTime,
-            title: options.title,
-            format: options.format,
-            comments: options.comments,
-            language: options.language,
-            applicableObject: options.applicableObject
-        }, function (err, doc) {
-            if (err) {
-                console.log(err);
-            } else {
-                callback(doc);
-            }
-        }
-    );
-};
-
-const updateMaterial = function (req, res, next) {
-    // const username = req.api_user.param;
-    //
-    // const onSuccess = () => res.json({
-    //     status: 'success',
-    // });
-    //
-    // const onError = err => {console.log(err);res.json({
-    //     status: 'error',
-    //     message: err.toString(),
-    // })};
-    //
-    // // 判断用户 id 和 Material 对应
-    // const pCheckUser = findOneInModel('tUser', { name: username });
-    // const pCheckMaterial = findOneInModel('tMaterial', { _id: req.query.materialId });
-    //
-    // Promise.all([pCheckUser, pCheckMaterial])
-    //     .then(([user, material]) => {
-    //         if (user.id !== material.userid) { return Promise.reject('资源不属于该用户！')}
-    //
-    //         return material;
-    //     })
-    //     .then(material => removeInModel('tMaterial', { _id: material._id }))
-    //     .then(onSuccess)
-    //     .catch(onError);
+    let materialInfo = {
+        _id: req.query.materialId,
+        title: materialName,
+        type: materialType,
+        description,
+        keyword,
+        language,
+    };
 
     let files = [];
     let upfile = req.files.upfile;
-    let userId = 'debug-user';
-    let materialInfo = {};
-    let uploadInfo = req.body;
-
-    for (let index in uploadInfo) {
-        materialInfo[index] = uploadInfo[index]
-    }
-
-    materialInfo.userId = userId;
 
     if (upfile instanceof Array) {
         files = upfile;
     } else {
-        files.push(upfile);
+        upfile && files.push(upfile); // 防止 upfile=undefined 的情况
     }
 
-
-    for (let i = 0; i < files.length; i++) {
-        let file = files[i];//上传的文件对象
-        Process(file, materialInfo, function (opt) {
-            UpdateGraph(opt,'material',function (opts) {
-                WriteToDB(opts, function (doc) {
-                    res.write(JSON.stringify({
-                            material: {
-                                duration: doc.duration,
-                                source: doc.url,
-                                thumbnail: doc.thumbnailUrl,
-                                title: doc.name,
-                                type: doc.type,
-                                id: doc._id,
-                                keyword: doc.keyword,
-                                size: doc.size,
-                                description: doc.description
-                            }
-                        })
-                    );
-                    res.end();
-                });
-            })
-
-        })
+    // 认为一次只能上传一个文件
+    if (files.length === 1) {
+        return uploadFile(files[0])
+            .then(fileInfo => Object.assign(materialInfo, fileInfo))
     }
+    else {
+        return Promise.resolve(materialInfo);
+    }
+};
 
+const updateMaterial = function (req, res, next) {
+    const username = req.api_user.param;
+    let userId = 'debug-user'; // 暂时认为默认名为 debug-user
 
-    console.log(req.body);
-    res.json({
+    // 成功返回新素材
+    const onSuccess = data => res.json({
         status: 'success',
-        data: {
-            _id: 'f2628c90-54c7-11e8-894b-076bddf849cd',
-            name: '新名字'
-        }
+        data
     });
 
-    // material: {
-    //     duration: doc.duration,
-    //         source: doc.url,
-    //         thumbnail: doc.thumbnailUrl,
-    //         title: doc.name,
-    //         type: doc.type,
-    //         id: doc._id,
-    //         keyword: doc.keyword,
-    //         size: doc.size,
-    //         description: doc.description
-    // }
+    // 失败返回错误信息
+    const onError = err => {console.log(err);res.json({
+        status: 'error',
+        message: err.toString(),
+    })};
+
+    const updateDatabaseAndGraph = function(materialInfo) {
+        const pUpdateDatabase = findByIdAndUpdateInModel('tMaterial', materialInfo._id, materialInfo, { new: true });
+        const pUpdateGraph = Promise.resolve(updateGraph(materialInfo, 'material'));
+
+        return Promise.all([pUpdateDatabase, pUpdateGraph]);
+    };
+
+    // 判断用户 id 和 Material 对应
+    const chechUserMatchMaterial = function() {
+        // 判断用户 id 和 Material 对应
+        const pCheckUser = findOneInModel('tUser', { name: username });
+        const pCheckMaterial = findOneInModel('tMaterial', { _id: req.query.materialId });
+
+        return Promise.all([pCheckUser, pCheckMaterial])
+            .then(([user, material]) => {
+                // if (user.id !== material.userid) { return Promise.reject('资源不属于该用户！')}
+
+                userId = user.id;
+                return;
+            })
+    };
+
+    chechUserMatchMaterial()
+        .then(() => getInfoFromReq(req))
+        .then(updateDatabaseAndGraph)
+        .then(([newMaterial, resOfGraph]) => newMaterial) // 只需要新的 Material 数据
+        .then(onSuccess)
+        .catch(onError);
+
 };
 
 module.exports = updateMaterial;

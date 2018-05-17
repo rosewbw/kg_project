@@ -32,13 +32,11 @@ class MaterialForm extends Component {
 
     }
 
-    resetForm = (newValues) => {
+    resetForm = newValues => {
         this.setState({
             fileList: [],
             uploading: false
         });
-
-        this.props.form.setFieldsValue(newValues || this.initValues);
     };
 
     resetBtnStatus = () => {
@@ -90,8 +88,7 @@ class MaterialForm extends Component {
             const { materialId } = this.props;
             let job;
             if (materialId) {
-                formData.append('materialId', materialId);
-                job = request.put('/updateMaterial', {
+                job = request.put('/updateMaterial' + '?materialId=' + materialId, {
                     body: formData
                 })
             }
