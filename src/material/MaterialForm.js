@@ -90,8 +90,7 @@ class MaterialForm extends Component {
             const { materialId } = this.props;
             let job;
             if (materialId) {
-                formData.append('materialId', materialId);
-                job = request.put('/updateMaterial', {
+                job = request.put('/updateMaterial' + '?materialId=' + materialId, {
                     body: formData
                 })
             }

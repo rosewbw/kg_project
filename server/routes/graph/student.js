@@ -1,4 +1,4 @@
-let updateGraph = require('../utils/updataGraph');
+let updateGraph = require('../utils/updateGraph');
 
 let WriteToDB = function (options, callback) {
     var tStudent = global.dbHandel.getModel('tStudent');

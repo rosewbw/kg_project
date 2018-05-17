@@ -59,11 +59,11 @@ class MaterialList extends Component {
                 />
                 <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} >
                     {
-                        materials.map(({ _id: id, name, description, format, url, thumbnail }) => (
+                        materials.map(({ _id: id, title, description, format, url, thumbnail }) => (
                             <Col key={id} span={6} style={{ marginBottom: "15px" }}>
                                 <MaterialCard
                                     id={id}
-                                    name={name}
+                                    title={title}
                                     description={description}
                                     format={format}
                                     url={url}
@@ -80,7 +80,7 @@ class MaterialList extends Component {
     }
 }
 
-const MaterialCard = ({ name: title, description, format, url, thumbnail, onDelete, onEdit }) => {
+const MaterialCard = ({ title, description, format, url, thumbnail, onDelete, onEdit }) => {
     const type = formatParser.toIcon(format);
 
     return (
