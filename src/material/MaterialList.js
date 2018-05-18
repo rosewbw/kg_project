@@ -60,7 +60,7 @@ class MaterialList extends Component {
                 <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} >
                     {
                         materials.map(({ _id: id, title, description, format, url, thumbnailUrl: thumbnail }) => (
-                            <Col key={id} span={6} style={{ marginBottom: "15px" }}>
+                            <Col key={id} span={4} style={{ marginBottom: "15px" }}>
                                 <MaterialCard
                                     id={id}
                                     title={title}
