@@ -1,9 +1,11 @@
 const getMaterial = require('./getMaterial');
-const deleteMaterial = require('./deleteMaterial');
+const uploadMaterial = require('./uploadMaterial');
 const updateMaterial = require('./updateMaterial');
+const deleteMaterial = require('./deleteMaterial');
 
 module.exports = {
     getMaterial,
-    deleteMaterial,
+    uploadMaterial,
     updateMaterial,
+    deleteMaterial,
 };

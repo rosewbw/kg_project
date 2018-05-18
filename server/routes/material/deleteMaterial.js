@@ -18,7 +18,7 @@ const deleteMaterial = function (req, res, next) {
     
     Promise.all([pCheckUser, pCheckMaterial])
         .then(([user, material]) => {
-            if (user.id !== material.userid) { return Promise.reject('资源不属于该用户！')}
+            if (user._id !== material.userId) { return Promise.reject('资源不属于该用户！')}
 
             return material;
         })

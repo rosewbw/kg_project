@@ -5,7 +5,7 @@ const uuid = require('node-uuid');
 
 const formatParser = require('../utils/format-parser');
 const updateGraph = require('../utils/updateGraph');
-const { findByIdAndUpdateInModel, findOneInModel } = require('../../database/model-operations');
+const { createInModel, findOneInModel } = require('../../database/model-operations');
 
 /**
  * 上传文件并返回文件相关属性
@@ -16,13 +16,17 @@ const { findByIdAndUpdateInModel, findOneInModel } = require('../../database/mod
 const uploadFile = function (file, originOptions) {
     let newOptions = {};
     let originalExtension = file.extension.toLowerCase(); // 用户上传文件的扩展名
-    let fileId = originOptions.fileId || uuid.v1();
+    let fileId = uuid.v1();
     let originalPath = path.join(__dirname, "../../public/media/", file.name),
         targetPath = path.join(__dirname, "../../public/media/", fileId + '.' + originalExtension); // 上传后目标文件路径;
     let url = "/media/" + fileId + "." + originalExtension;
     let extension, duration, thumbnailPath;
 
-    newOptions = JSON.parse(JSON.stringify(originOptions)); // 深拷贝
+    for (let item in originOptions) {
+        if (originOptions.hasOwnProperty(item)) {
+            newOptions[item] = originOptions[item];
+        }
+    }
 
     fs.rename(file.path, targetPath, function (err) {
         if (err) {return Promise.reject(err.toString());}
@@ -31,6 +35,7 @@ const uploadFile = function (file, originOptions) {
 
     //通用属性
     newOptions.originalPath = originalPath;
+    newOptions.fileId = fileId;
     newOptions.targetPath = targetPath;
     newOptions.size = file.size;
     newOptions.url = url;
@@ -144,58 +149,65 @@ const getInfoFromReq = function (req) {
             .then(fileInfo => Object.assign(materialInfo, fileInfo))
     }
     else if (files.length === 0) {
-        return Promise.resolve(materialInfo);
+        return Promise.reject('请上传文件！');
     }
     else {
         return Promise.reject('一次只能上传一个文件！');
     }
 };
 
-const updateMaterial = function (req, res, next) {
+const uploadMaterial = function (req, res, next) {
     const username = req.api_user.param;
-    let userId = 'debug-user'; // 暂时认为默认名为 debug-user
+    let materialInfo = {};
 
-    // 成功返回新素材
-    const onSuccess = data => res.json({
-        status: 'success',
-        data
-    });
+    // 成功返回素材信息
+    const onSuccess = data =>
+        res.json({
+            material: {
+                duration: data.duration,
+                source: data.url,
+                thumbnail: data.thumbnailUrl,
+                title: data.name,
+                type: data.type,
+                id: data._id,
+                keyword: data.keyword,
+                size: data.size,
+                description: data.description
+            }
+        });
+        // res.json({
+        //     status: 'success',
+        //     data
+        // });
 
     // 失败返回错误信息
-    const onError = err => {console.log(err);res.json({
-        status: 'error',
-        message: err.toString(),
-    })};
-
-    const updateDatabaseAndGraph = function(materialInfo) {
-        const pUpdateDatabase = findByIdAndUpdateInModel('tMaterial', materialInfo._id, materialInfo, { new: true });
-        const pUpdateGraph = Promise.resolve(updateGraph(materialInfo, 'material'));
-
-        return Promise.all([pUpdateDatabase, pUpdateGraph]);
+    const onError = err => {
+        console.log(err);
+        res.json({
+            status: 'error',
+            message: err.toString(),
+        });
     };
 
-    // 判断用户 id 和 Material 对应
-    const checkUserMatchMaterial = function() {
-        // 判断用户 id 和 Material 对应
-        const pCheckUser = findOneInModel('tUser', { name: username });
-        const pCheckMaterial = findOneInModel('tMaterial', { _id: req.query.materialId });
+    const uploadToDatabaseAndGraph= function() {
+        const pUploadToDatabase = createInModel('tMaterial', materialInfo);
+        const pUploadToGraph = Promise.resolve(updateGraph(materialInfo, 'material'));
 
-        return Promise.all([pCheckUser, pCheckMaterial])
-            .then(([user, material]) => {
-                if (user._id !== material.userId) { return Promise.reject('资源不属于该用户！')}
-
-                userId = user.id;
-                return;
-            })
+        return Promise.all([pUploadToDatabase, pUploadToGraph]);
     };
 
-    checkUserMatchMaterial()
-        .then(() => getInfoFromReq(req))
-        .then(updateDatabaseAndGraph)
-        .then(([newMaterial, resOfGraph]) => newMaterial) // 只需要新的 Material 数据
+    const getUserId = function(username) {
+        return findOneInModel('tUser', { name: username });
+    };
+
+    getInfoFromReq(req)
+        .then(info => { materialInfo = info; return getUserId(username); })
+        .then(user => { materialInfo.userId = user._id; })
+        .then(uploadToDatabaseAndGraph)
+        .then(([resOfDatabase, resOfGraph]) => resOfDatabase) // 一次只上传一个 Material
         .then(onSuccess)
         .catch(onError);
 
 };
 
-module.exports = updateMaterial;
+module.exports = uploadMaterial;
