@@ -184,7 +184,7 @@ const updateMaterial = function (req, res, next) {
 
         return Promise.all([pCheckUser, pCheckMaterial])
             .then(([user, material]) => {
-                // if (user.id !== material.userid) { return Promise.reject('资源不属于该用户！')}
+                if (user.id !== material.userid) { return Promise.reject('资源不属于该用户！')}
 
                 userId = user.id;
                 return;
