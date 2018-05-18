@@ -10,10 +10,8 @@ const { createInModel, findOneInModel } = require('../../database/model-operatio
 /**
  * 上传文件并返回文件相关属性
  * @param file
- * @param originOptions
- * @param callback
  */
-const uploadFile = function (file, originOptions) {
+const uploadFile = function (file) {
     let newOptions = {};
     let originalExtension = file.extension.toLowerCase(); // 用户上传文件的扩展名
     let fileId = uuid.v1();
@@ -21,12 +19,6 @@ const uploadFile = function (file, originOptions) {
         targetPath = path.join(__dirname, "../../public/media/", fileId + '.' + originalExtension); // 上传后目标文件路径;
     let url = "/media/" + fileId + "." + originalExtension;
     let extension, duration, thumbnailPath;
-
-    for (let item in originOptions) {
-        if (originOptions.hasOwnProperty(item)) {
-            newOptions[item] = originOptions[item];
-        }
-    }
 
     fs.rename(file.path, targetPath, function (err) {
         if (err) {return Promise.reject(err.toString());}

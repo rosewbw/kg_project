@@ -10,19 +10,15 @@ const { findByIdAndUpdateInModel, findOneInModel } = require('../../database/mod
 /**
  * 上传文件并返回文件相关属性
  * @param file
- * @param originOptions
- * @param callback
  */
-const uploadFile = function (file, originOptions) {
+const uploadFile = function (file) {
     let newOptions = {};
     let originalExtension = file.extension.toLowerCase(); // 用户上传文件的扩展名
-    let fileId = originOptions.fileId || uuid.v1();
+    let fileId = uuid.v1();
     let originalPath = path.join(__dirname, "../../public/media/", file.name),
         targetPath = path.join(__dirname, "../../public/media/", fileId + '.' + originalExtension); // 上传后目标文件路径;
     let url = "/media/" + fileId + "." + originalExtension;
     let extension, duration, thumbnailPath;
-
-    newOptions = JSON.parse(JSON.stringify(originOptions)); // 深拷贝
 
     fs.rename(file.path, targetPath, function (err) {
         if (err) {return Promise.reject(err.toString());}

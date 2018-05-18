@@ -27,7 +27,7 @@ class MaterialManage extends Component {
     deleteMaterial(materialId) {
         const onSuccess = () => {
             const originMaterials = this.state.materials;
-            let materials = originMaterials.filter(({id}) => id !== materialId);
+            let materials = originMaterials.filter(({_id}) => _id !== materialId);
             this.setState({ materials });
             message.success('删除资源成功');
         };
