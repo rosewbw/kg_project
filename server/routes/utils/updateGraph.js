@@ -16,13 +16,13 @@ const UpdateGraph = function (data, type, callback) {
     };
 
     config.get('debug') && config.get('debugConfig').noGraphServer
-    ? callback(data)
+    ? callback && callback(data)
     : request(option, function (err, res, body) {
         if (err) {
-            console.log(err);
+            return console.log(err);
         } else {
-            callback(data);
             console.log('update Success');
+            return callback && callback(data);
         }
     });
 

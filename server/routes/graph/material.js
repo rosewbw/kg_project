@@ -3,7 +3,7 @@ let fs = require('fs');
 let uuid = require('node-uuid');
 let path = require('path');
 
-let UpdateGraph = require('../utils/updataGraph');
+let UpdateGraph = require('../utils/updateGraph');
 let supportedExtensions = (function () {
     let s = { // 可支持的扩展名列表
         'image': ["jpg", "png", "bmp", "gif", "svg"],
