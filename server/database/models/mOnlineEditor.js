@@ -1,9 +1,9 @@
 module.exports = {
     tMaterial: {
         // 暂时使用默认 _id
-        _id: {type: String, required: true},
+        // _id: {type: String, required: true}, // MongoDB 默认生成 _id
         userId: {type: String, required: true},
-        title: {type: String, required: true},
+        // name: {type: String, required: true}, // 使用 title
         type: {type: String, required: true},
         keyword: {type: String, required: true},
         url: {type: String, required: true},
@@ -12,10 +12,12 @@ module.exports = {
         thumbnailUrl: {type: String, required: true},
         uniqueData: {type: Object},
         learningTime: {type: String},
+        title: {type: String},
         format: {type: String},
         comments: {type: Object},
         language: {type: String},
-        applicableObject: {type: Object}
+        applicableObject: {type: Object},
+        duration: {type: Number},
     },
     tProject: {
         _id: {type: String, required: true},

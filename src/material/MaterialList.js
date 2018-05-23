@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { Row, Col, Card, Icon, Modal } from 'antd';
 import { Link } from 'react-router-dom';
 
-import { FormatParser } from '../utils';
+import MaterialForm from './MaterialForm';
+import { formatParser } from '../utils';
+
 import DEFAULT_IMAGE from "../defaultImg.jpg";
 const DEFAULT_TYPE = "question-circle-o"; // 默认资源类型对应的图标
 const DEFAULT_URL = "#";
@@ -16,41 +18,58 @@ class MaterialList extends Component {
         super(props);
 
         this.state = {
-            editing: false,
+            edit:{
+                enable: false,
+                materialId: '',
+            }
         };
 
         this.handleDelete = this.handleDelete.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
+        this.showEditModal = this.showEditModal.bind(this);
+        this.closeEditModal = this.closeEditModal.bind(this);
     }
 
     handleDelete(id) {
         this.props.deleteMaterial(id);
     }
 
-    handleEdit(id) {
-        console.log(id);
+    handleEdit(id, newMaterial) {
+        this.props.updateMaterial(id, newMaterial, this.closeEditModal);
+    }
+
+    showEditModal(id) {
+        this.setState({ edit: { enable: true, materialId: id } });
+    }
+
+    closeEditModal() {
+        this.setState({ edit: { enable: false, materialId: '' } });
     }
 
     render() {
-        const { editing } = this.state;
+        const { edit } = this.state;
         const { materials } = this.props;
 
         return (
             <div>
-                <MaterialEditModal visiable={editing}/>
+                {edit.enable && <MaterialEditModal visible={ edit.enable }
+                                                   material={ materials.filter(material => material._id === edit.materialId)[0] }
+                                                   onClose={this.closeEditModal}
+                                                   onEdit={newMaterial => this.handleEdit(edit.materialId, newMaterial)}
+                />}
                 <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} >
                     {
-                        materials.map((value) => (
-                            <Col key={value.id} span={6} style={{ marginBottom: "15px" }}>
+                        materials.map(({ _id: id, title, description, format, url, thumbnailUrl: thumbnail }) => (
+                            <Col key={id} span={4} style={{ marginBottom: "15px" }}>
                                 <MaterialCard
-                                    id={value.id}
-                                    name={value.name}
-                                    description={value.description}
-                                    format={value.format}
-                                    url={value.url}
-                                    thumbnail={value.thumbnail}
-                                    onDelete={() => this.handleDelete(value.id)}
-                                    onEdit={()=>this.handleEdit(value.id)}
+                                    id={id}
+                                    title={title}
+                                    description={description}
+                                    format={format}
+                                    url={url}
+                                    thumbnail={thumbnail}
+                                    onDelete={() => this.handleDelete(id)}
+                                    onEdit={() => this.showEditModal(id)}
                                 />
                             </Col>
                         ))
@@ -61,8 +80,7 @@ class MaterialList extends Component {
     }
 }
 
-const MaterialCard = ({ name: title, description, format, url, thumbnail, onDelete, onEdit }) => {
-    const formatParser = new FormatParser();
+const MaterialCard = ({ title, description, format, url, thumbnail, onDelete, onEdit }) => {
     const type = formatParser.toIcon(format);
 
     return (
@@ -86,9 +104,7 @@ class MaterialEditModal extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            visible: false,
-        }
+        this.title = "修改资源";
     }
 
     handleClose = () => {
@@ -96,18 +112,45 @@ class MaterialEditModal extends Component {
         onClose();
     };
 
+    handleSave = res => {
+        if (!res.success) return;
+
+        const { onClose, onEdit } = this.props;
+        onClose();
+        onEdit(res.data);
+    };
+
     render () {
+        const {
+            _id: materialId,
+            title: materialName,
+            type: materialType,
+            description,
+            keyword,
+            language,
+
+        } = this.props.material;
+
         return (
             <Modal
                 visible={this.props.visible}
-                title="上传资源"
+                title={this.title}
                 closable={false}
-                okText={"保存"}
-                cancelText={"取消"}
-                onOK={this.handleSave}
-                onCancel={this.handleClose}
+                // onCancel={this.handleClose}
+                footer={null}
             >
-                <p>在此编辑资源信息</p>
+                <MaterialForm
+                    initValues={{
+                        materialName,
+                        materialType,
+                        description,
+                        keyword,
+                        language,
+                    }}
+                    materialId={materialId}
+                    onFinish={this.handleSave}
+                    onCancel={this.handleClose}
+                />
             </Modal>
         )
     }
