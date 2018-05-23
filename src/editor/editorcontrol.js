@@ -5,7 +5,7 @@ import defaultImg from './defaultImg.jpg'
 import './editor.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import fetch from 'isomorphic-fetch';
-import {Button, Modal, Form, Input, Radio} from 'antd';
+import {Button, Modal, Form, Input} from 'antd';
 
 const FormItem = Form.Item;
 
@@ -305,20 +305,20 @@ const CollectionCreateForm = Form.create()(
             return (
                 <Modal
                     visible={visible}
-                    title="Create a new collection"
+                    title="请输入课程的信息"
                     okText="Create"
                     onCancel={onCancel}
                     onOk={onCreate}
                 >
                     <Form layout="vertical">
-                        <FormItem label="Title">
+                        <FormItem label="课程名称">
                             {getFieldDecorator('title', {
                                 rules: [{required: true, message: 'Please input the title of collection!'}],
                             })(
                                 <Input/>
                             )}
                         </FormItem>
-                        <FormItem label="description">
+                        <FormItem label="描述信息">
                             {getFieldDecorator('description')(<Input type="textarea"/>)}
                         </FormItem>
                     </Form>

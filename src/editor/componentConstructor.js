@@ -1,10 +1,10 @@
 import uuid from '../utils/uuid'
 
-function KnowledgeUnit(name, id, x, y,thumbnailUrl) {
+function KnowledgeUnit(title, _id, x, y,thumbnailUrl) {
     //知识点基本信息
-    this.id = id||'';
+    this._id = _id||'';
 
-    this.name = name||'';
+    this.title = title||'';
     this.thumbnailUrl = thumbnailUrl || '';
     this.root = false;
 
@@ -24,30 +24,29 @@ function KnowledgeUnit(name, id, x, y,thumbnailUrl) {
     this.isStart = false;
 
     //relationship
-    this.parent = [];
-    this.rely = [];
-    this.related = [];
-    this.brothers = [];
-    this.contain = [];
-    this.parallel = [];
-
-    //relationship
     this.hasParentNode = [];
     this.hasChildNode = [];
-    this.isRelatedTo = [];
-    this.isParallelWith = [];
-    this.isRelyOnTo = [];
-    this.isBeingRelyOnBy = [];
 
+    this.hasRelyOnNode = [];
+    this.hasBeRelyByNode = [];
+
+    this.hasBrotherNode = [];
+    this.hasParallelNode = [];
+    this.hasSynonymNode = [];
+    this.hasRelateNode = [];
+
+    this.hasNextNode = undefined;
+    this.hasPrevNode = undefined;
 
     //包含的教学单元
-    this.teachUnit = new TeachUnit(this.id);
+    this.teachUnit = new TeachUnit(this._id);
+    // this.teachUnit = new TeachUnit(this.id);
 }
 
 
 function TeachUnit(kUnitId) {
     //教学单元基本信息
-    this.id = uuid();
+    this._id = uuid();
     this.keyword = [];
     this.status = '';
     this.description = '';
@@ -55,7 +54,7 @@ function TeachUnit(kUnitId) {
     this.knowledgeUnitId = kUnitId || '';
 
     //课时信息
-    this.mCourseUnit = new Course('main',this.id);
+    this.mCourseUnit = new Course('main',this._id);
     this.aCourseUnit = [];
 
     //学生信息
@@ -65,8 +64,8 @@ function TeachUnit(kUnitId) {
     this.comments = [];
 }
 
-function Course(type, TeachUnitId) {
-    this.id = uuid();
+function Course(type, teachUnitId) {
+    this._id = uuid();
     this.type = type;
     this.title = '';
     this.duration = 0;
@@ -83,39 +82,7 @@ function Course(type, TeachUnitId) {
     this.averageRetentionRate = 0;
     this.semanticDensity = 0;
 
-    this.TeachUnitId = TeachUnitId;
+    this.teachUnitId = teachUnitId;
 }
 
-
-function ButtonConstructor(_TargetId, _Name) {
-    this.targetId = _TargetId;
-    // this.buttonOptions = new ButtonOptions(_Name);
-}
-
-/*
-function ButtonOptions(_Name) {
-    this.name = _Name;
-    this.hideAnimationSpeed = 500;
-    this.backgroundImage = null;
-    this.position = {
-        x: null,
-        y: null
-    };
-    this.color = 'rgba(100,149,237,0.7)';
-    this.size = {
-        x: null,
-        y: 40
-    };
-    this.fontSize = 18;
-    this.radius = 5;
-    this.borderWidth = '0';
-    this.borderColor = '#ffffff';
-    this.borderStyle = 'solid';
-    // this.ButtonType = null ;
-    this.fontColor = '#ffffff';
-    this.start = 0;
-    this.end = 0;
-}
-*/
-
-export {KnowledgeUnit, TeachUnit, Course, ButtonConstructor}
+export {KnowledgeUnit, TeachUnit, Course}

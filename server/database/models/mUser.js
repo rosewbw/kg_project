@@ -4,7 +4,7 @@ module.exports = {
         name:{type:String,require:true},
         studentNum:{type:Number,require:true},
         age:{type:Number,require:true},
-        course:{type:Array,require:true},
+        course:{type:Array},
         sex:{type:String,require:true}
     },
     tStudent:{
@@ -18,7 +18,7 @@ module.exports = {
         sex:{type:String,require:true},
         age:{type:Number,require:true},
         school:{type:String,require:true},
-        LearningStyle:{type:Object,require:true},
-        cognitiveLevel:{type:String,require:true}
+        LearningStyle:{type:Object},
+        cognitiveLevel:{type:String}
     }
 };

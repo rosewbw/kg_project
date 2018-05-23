@@ -4,8 +4,7 @@ import {withRouter} from 'react-router-dom';
 import queryString from 'query-string';
 import $ from 'jquery';
 import './editor.css';
-import {KnowledgeUnit, TeachUnit, Course, ButtonConstructor} from './componentConstructor';
-import animation from './animation';
+import {KnowledgeUnit} from './componentConstructor';
 import {createElement} from '../utils/utils';
 
 import KnowledgeEditor from './knowledge-editor';
@@ -90,7 +89,7 @@ class Editor extends Component {
 
         function initCanvas(canvas, dragBox) {
             let transform = createElement('div').addClass('canvasTransform').attr('id', 'canvasTransform');
-            let start = createElement('div').addClass(basicOptions.startClass).attr('id', 'transStart').text('Start');
+            let start = createElement('div').addClass(basicOptions.startClass).attr('id', 'transStart').text('Thing');
             let imgContainer = createElement('div').addClass('canvasTransform').attr('id', 'trans-img-cont');
             let svgContainer = createElement('div').addClass('canvasTransform').attr('id', 'trans-svg-cont');
 
@@ -183,13 +182,12 @@ class Editor extends Component {
                                 //No.2 发送元素移动信息，发送元素移动后的新位置信息 position{x: , y: };
                                 let newPositionInfo = fn.canvas_input_abled(control.imgCont, ele);
                                 if (ele.attr('id') === control.start.attr('id')) {
-                                    console.log(newPositionInfo.position)
                                     _this.setState({
                                         startPosition: newPositionInfo.position
                                     })
                                 } else {
                                     console.log(newPositionInfo);
-                                    let kUnit = _this.getKnowledgeObjectById(newPositionInfo.id)
+                                    let kUnit = _this.getKnowledgeObjectById(newPositionInfo._id)
                                     kUnit.position = newPositionInfo.position;
                                     //callback ? callback('pushNewPosition', newPositionInfo) : '';
                                 }
@@ -314,8 +312,8 @@ class Editor extends Component {
             pathFrom = _this.getKnowledgeObjectById(pathObject.from.id);
             pathTo = _this.getKnowledgeObjectById(pathObject.to.id);
 
-            unlink(pathFrom, pathObject.to.id, 'contain');
-            unlink(pathTo, pathObject.from.id, 'parent');
+            unlink(pathFrom, pathObject.to.id, 'hasChildNode');
+            unlink(pathTo, pathObject.from.id, 'hasParentNode');
             _this.updateKnowledgeUnit(pathFrom);
             _this.updateKnowledgeUnit(pathTo);
 
@@ -323,7 +321,7 @@ class Editor extends Component {
 
         function unlink(kUnit, targetId, type) {
             for (let idx in kUnit[type]) {
-                if (kUnit[type][idx].id === targetId) {
+                if (kUnit[type][idx]._id === targetId) {
                     kUnit[type].splice(idx, 1);
                 }
             }
@@ -333,49 +331,20 @@ class Editor extends Component {
         function deleteKnowledgeUnit(kUnit) {
             let tempUnit;
             let KnowledgeObjects = _this.state.knowledgeUnitList;
-            if (kUnit.parent.length !== 0) {
-                for (let index in kUnit.parent) {
-                    tempUnit = _this.getKnowledgeObjectById(kUnit.parent[index].id);
-                    _this.updateKnowledgeUnit(unlink(tempUnit, kUnit.id, 'contain'))
+            if (kUnit.hasParentNode.length !== 0) {
+                for (let index in kUnit.hasParentNode) {
+                    tempUnit = _this.getKnowledgeObjectById(kUnit.hasParentNode[index]._id);
+                    _this.updateKnowledgeUnit(unlink(tempUnit, kUnit._id, 'hasChildNode'))
                 }
             }
-            if (kUnit.contain.length !== 0) {
-                for (let index in kUnit.contain) {
-                    tempUnit = _this.getKnowledgeObjectById(kUnit.contain[index].id);
-                    _this.updateKnowledgeUnit(unlink(tempUnit, kUnit.id, 'parent'))
+            if (kUnit.hasChildNode.length !== 0) {
+                for (let index in kUnit.hasChildNode) {
+                    tempUnit = _this.getKnowledgeObjectById(kUnit.hasChildNode[index]._id);
+                    _this.updateKnowledgeUnit(unlink(tempUnit, kUnit._id, 'hasParentNode'))
                 }
             }
-
-
-            /*
-            if (kUnit.parent.length !== 0) {
-                for (let index in kUnit.parent) {
-                    tempUnit = getKnowledgeObjectById(kUnit.parent[index]);
-                    for (let idx in tempUnit.contain) {
-                        if (tempUnit.contain[idx] === kUnit.id) {
-                            tempUnit.contain.splice(idx, 1);
-                            updateKnowledgeUnit(tempUnit)
-                        }
-                    }
-                }
-
-            }
-            if (kUnit.contain.length !== 0) {
-                for (let index in kUnit.contain) {
-                    tempUnit = getKnowledgeObjectById(kUnit.contain[index]);
-                    for (let idx in tempUnit.parent) {
-                        if (tempUnit.parent[idx] === kUnit.id) {
-                            tempUnit.parent.splice(idx, 1);
-                            console.log(tempUnit)
-                            updateKnowledgeUnit(tempUnit)
-                        }
-                    }
-                }
-
-            }
-            */
             for (let index in KnowledgeObjects) {
-                if (KnowledgeObjects[index].id === kUnit.id) {
+                if (KnowledgeObjects[index]._id === kUnit._id) {
                     KnowledgeObjects.splice(parseInt(index), 1);
                     _this.setState({
                         knowledgeUnitList: KnowledgeObjects
@@ -446,7 +415,7 @@ class Editor extends Component {
                         add_path($('#transStart'), fun);
                         static_path($('#' + elm.id), $('#transStart'), fun, 'init');
                     }
-                    if (item === 'contain') {
+                    if (item === 'hasChildNode') {
                         for (let idx in elm[item]) {
                             add_path($('#' + elm.id), fun);
                             static_path($('#' + elm[item][idx].id), $('#' + elm.id), fun, 'init');
@@ -454,11 +423,6 @@ class Editor extends Component {
 
                     }
                 }
-
-                // elm.buttons.map(function (butn) {
-                //     var svg = add_path($('#' + elm.id), fun);
-                //     static_path($('#' + butn.targetId), $('#' + elm.id), fun);
-                // });
                 // if (elm.isStart) {
                 //     var svg = add_path(fun.start, fun);
                 //     static_path($('#' + elm.id), fun.start, fun);
@@ -631,7 +595,7 @@ class Editor extends Component {
             input_abled(_this);
             if (ele) {
                 return {
-                    id: ele.attr('id'),
+                    _id: ele.attr('id'),
                     position: {
                         x: parseInt(ele.css('left').match(/[^px]+/)),
                         y: parseInt(ele.css('top').match(/[^px]+/))
@@ -1061,47 +1025,20 @@ class Editor extends Component {
         }
 
         function connectObjects(kUnitA, kUnitB, relation) {
-            let _relation = relation || 'contain';
+            let _relation = relation || 'hasChildNode';
             if (relation === 'start') {
                 kUnitB.root = true;
                 _this.updateKnowledgeUnit(kUnitB);
             }
             if (kUnitA && kUnitB) {
-                if (_relation === 'contain') {
-                    console.log(kUnitA)
-                    kUnitA.contain.push(kUnitB);//id好还是对象好???
-                    kUnitB.parent.push(kUnitA);
+                if (_relation === 'hasChildNode') {
+                    kUnitA.hasChildNode.push(kUnitB);//id好还是对象好???
+                    kUnitB.hasParentNode.push(kUnitA);
                 }
                 _this.updateKnowledgeUnit(kUnitA);
                 _this.updateKnowledgeUnit(kUnitB);
             }
         }
-
-        /*
-        function updateKnowledgeUnit(kUnit) {
-            let KnowledgeObjects = _this.state.knowledgeUnitList;
-            for (let index in KnowledgeObjects) {
-                if (KnowledgeObjects[index].id === kUnit.id) {
-                    KnowledgeObjects.splice(parseInt(index), 1, kUnit);
-                    _this.setState({
-                        knowledgeUnitList: KnowledgeObjects
-                    });
-                }
-            }
-        }
-        */
-
-        /*
-        function getKnowledgeObjectById(kUnitId) {
-            let KnowledgeObjects = _this.state.knowledgeUnitList;
-            for (let index in KnowledgeObjects) {
-                if (KnowledgeObjects[index].id === kUnitId) {
-                    return KnowledgeObjects[index];
-                }
-            }
-            return null
-        }
-        */
 
         function path_move_with_img(from, to, path) {
             let path_from_position = get_path_from_position(from);
@@ -1316,7 +1253,7 @@ class Editor extends Component {
     getKnowledgeObjectById(kUnitId) {
         let KnowledgeObjects = this.state.knowledgeUnitList;
         for (let index in KnowledgeObjects) {
-            if (KnowledgeObjects[index].id === kUnitId) {
+            if (KnowledgeObjects[index]._id === kUnitId) {
                 return KnowledgeObjects[index];
             }
         }
@@ -1334,7 +1271,6 @@ class Editor extends Component {
         } else {
             startPosition = _this.state.startPosition;
         }
-        console.log(_this.state.knowledgeUnitList)
         let data = {
             _id: _this.state.projectId,
             projectName: _this.state.projectName,
@@ -1373,7 +1309,7 @@ class Editor extends Component {
                     for (let j in kUnit[i]) {
                         let id = kUnit[i][j];
                         for (let index in result) {
-                            if (result[index].id === id) {
+                            if (result[index]._id === id) {
                                 result[idx][i].push(result[index])
                             }
                         }
@@ -1381,7 +1317,6 @@ class Editor extends Component {
                 }
             }
         }
-        console.log(result)
         return result
     };
 
@@ -1399,7 +1334,7 @@ class Editor extends Component {
                         temp[i] = []
                     }
                     for (let j in kUnit[i]) {
-                        temp[i].push(kUnit[i][j].id)
+                        temp[i].push(kUnit[i][j]._id)
                     }
                 }
             }
@@ -1418,7 +1353,7 @@ class Editor extends Component {
     updateKnowledgeUnit(kUnit) {
         let KnowledgeObjects = this.state.knowledgeUnitList;
         for (let index in KnowledgeObjects) {
-            if (KnowledgeObjects[index].id === kUnit.id) {
+            if (KnowledgeObjects[index]._id === kUnit._id) {
                 KnowledgeObjects.splice(parseInt(index), 1, kUnit);
                 this.setState({
                     knowledgeUnitList: KnowledgeObjects
@@ -1483,29 +1418,6 @@ class Editor extends Component {
         })
     }
 
-
-    // requestForProjectData =(url, data, callback) =>{
-    //     let token = localStorage.getItem('token');
-    //     fetch(url, {
-    //         method: 'POST',
-    //         headers: {
-    //             "Content-Type": "application/x-www-form-urlencoded",
-    //             "Authorization": token
-    //         },
-    //         body: data
-    //     }).then(res => res.json()).then(res => {
-    //         if (res.status === 'success') {
-    //             let options = res.data;
-    //             callback(options);
-    //         } else {
-    //             alert("验证失败，请重新登录");
-    //             this.props.history.push('/login');
-    //         }
-    //
-    //     })
-    // }
-
-
     getProjectData(callback) {
         const _this = this;
         if (!this.state.projectId) return;
@@ -1514,7 +1426,6 @@ class Editor extends Component {
             projectId: _this.state.projectId,
             username: _this.props.username
         }, function (data) {
-            console.log(data[0].data)
             _this.setState({
                 projectName: data[0].projectName,
                 projectDataFetched: true,
@@ -1559,7 +1470,7 @@ class Editor extends Component {
         return (
             <div id="editorArea">
                 <div id="toolBar">
-                    <div id="dragBox" className="dragBox">Dragbox</div>
+                    <div id="dragBox" className="dragBox">知识单元</div>
                     <Button onClick={this.buttonEdit}
                             id="editBtn"
                             className="editBtn editorBtn ant-btn-primary"

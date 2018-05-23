@@ -10,7 +10,7 @@ import {Course} from './componentConstructor';
 import {Row, Col} from 'antd';
 import {Tabs, Icon} from 'antd';
 import {Input, Select, Button} from 'antd';
-import {List, Avatar, Spin} from 'antd';
+import {List} from 'antd';
 
 const TabPane = Tabs.TabPane;
 const InputGroup = Input.Group;
@@ -110,24 +110,6 @@ class CourseEdit extends Component {
 
     componentDidMount() {
         let _this = this;
-
-        // let kUnitData = this.props.kUnitData;
-        // let tUnitData;
-        // if (kUnitData) {
-        //     if (kUnitData.teachUnit.length === 0) {
-        //         tUnitData = new TeachUnit(kUnitData.id);
-        //     } else {
-        //         tUnitData = kUnitData.teachUnit[0]
-        //     }
-        //     console.log(tUnitData);
-        //     this.setState({
-        //         tUnit: tUnitData
-        //     }, function () {
-        //         console.log(this.state.tUnit);
-        //         console.log('2222');
-        //     })
-        //
-        // }
         const token = localStorage.getItem('token');
         fetch('/getMediaList', {
             method: 'POST',

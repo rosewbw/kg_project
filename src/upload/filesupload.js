@@ -6,7 +6,6 @@ import {Upload, message} from 'antd';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
-const AutoCompleteOption = AutoComplete.Option;
 
 let uuid = 0;
 
@@ -159,30 +158,6 @@ class FileUpload extends Component {
             listType: 'picture',
             className: 'upload-list-inline',
         };
-
-        // getFieldDecorator('keys', { initialValue: [] });
-        // const keys = getFieldValue('keys');
-        // console.log(keys);
-        // const formItems = (keys) => {
-        //     return (
-        //         <FormItem
-        //             {...formItemLayout}
-        //             label={index === 0 ? 'Passengers' : ''}
-        //             required={false}
-        //         >
-        //             {getFieldDecorator(`names[${k}]`, {
-        //                 validateTrigger: ['onChange', 'onBlur'],
-        //                 rules: [{
-        //                     required: true,
-        //                     whitespace: true,
-        //                     message: "Please input passenger's name or delete this field.",
-        //                 }],
-        //             })(
-        //                 <Input placeholder="passenger name" style={{ width: '60%', marginRight: 8 }} />
-        //             )}
-        //         </FormItem>
-        //     );
-        // };
         return (
             <Form onSubmit={this.handleSubmit}>
                 <FormItem

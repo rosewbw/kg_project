@@ -4,7 +4,6 @@ module.exports = {
         _id:{type:String,required:true},
         name:{type:String,required:true},
         password:{type:String,required:true},
-        // token:{type:String,required:true},
         usertype:{type:String,required:true},
         email:{type:String,required:true},//密码、邮箱、等
         registrationDate:{type:Date,required:false,default:Date.now},

@@ -24,7 +24,7 @@ import CSVFILE from './weightedtree/data/weightedtree_federal_budget.csv';
 class VizulyWeightedTree extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {};
         this.viz_container = d3.selectAll("#viz_container");
         this.viz = undefined;
         this.theme = undefined;
@@ -204,7 +204,7 @@ class VizulyWeightedTree extends Component {
     onDBClick(e, d, i) {
         let data = this.props.odata;
         for (let index in data) {
-            if (data[index].id === d.vz_tree_id) {
+            if (data[index]._id === d.vz_tree_id) {
                 if (data[index].teachUnit.mCourseUnit.material.url) {
                     let temp = [];
                     for (let i in data[index].teachUnit.aCourseUnit) {
@@ -218,7 +218,7 @@ class VizulyWeightedTree extends Component {
                             aCUnit={temp}
                             onNextCourse={this.onNextCourse}
                             onPrevCourse={this.onPrevCourse}
-                            tUnitId={data[index].id}
+                            tUnitId={data[index]._id}
                             tUnit={data[index]}
                         />
                         , document.getElementById('videoArea')
@@ -233,11 +233,11 @@ class VizulyWeightedTree extends Component {
     onNextCourse = (id) => {
         let data = this.props.odata;
         for (let index in data) {
-            if (data[index].id === id) {
-                if(data[index].isBeingRelyOnBy.length === 1){
-                    let nextid = data[index].isBeingRelyOnBy[0];
+            if (data[index]._id === id) {
+                if(data[index].hasNextNode){
+                    let nextid = data[index].hasNextNode;
                     for (let k in data) {
-                        if (data[k].id === nextid) {
+                        if (data[k]._id === nextid) {
                             if (data[k].teachUnit.mCourseUnit.material.url) {
                                 let temp = [];
                                 for (let i in data[k].teachUnit.aCourseUnit) {
@@ -251,7 +251,7 @@ class VizulyWeightedTree extends Component {
                                         aCUnit={temp}
                                         onNextCourse={this.onNextCourse}
                                         onPrevCourse={this.onPrevCourse}
-                                        tUnitId={data[k].id}
+                                        tUnitId={data[k]._id}
                                     />
                                     , document.getElementById('videoArea')
                                 )
@@ -267,11 +267,11 @@ class VizulyWeightedTree extends Component {
     onPrevCourse = (id) => {
         let data = this.props.odata;
         for (let index in data) {
-            if (data[index].id === id) {
-                if(data[index].isRelyOnTo.length === 1){
-                    let nextid = data[index].isRelyOnTo[0];
+            if (data[index]._id === id) {
+                if(data[index].hasPrevNode ){
+                    let nextid = data[index].hasPrevNode;
                     for (let k in data) {
-                        if (data[k].id === nextid) {
+                        if (data[k]._id === nextid) {
                             if (data[k].teachUnit.mCourseUnit.material.url) {
                                 let temp = [];
                                 for (let i in data[k].teachUnit.aCourseUnit) {
@@ -285,7 +285,7 @@ class VizulyWeightedTree extends Component {
                                         aCUnit={temp}
                                         onNextCourse={this.onNextCourse}
                                         onPrevCourse={this.onPrevCourse}
-                                        tUnitId={data[k].id}
+                                        tUnitId={data[k]._id}
                                     />
                                     , document.getElementById('videoArea')
                                 )
@@ -344,8 +344,6 @@ class VizulyWeightedTree extends Component {
             .then(res => res.json())
             .then(res => {
                 if (res && res.status === 'success') {
-                    console.log(res.data)
-
                     this.props.onInit(res.data,this.initialize)
                 }
             })

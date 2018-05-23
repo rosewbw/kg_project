@@ -4,8 +4,6 @@ import './editor.css'
 
 import TeachUnitEditor from './teachunit-editor';
 
-// import {TeachUnit, Course} from './componentConstructor';
-
 import {Input, Select} from 'antd';
 import {Row, Col} from 'antd';
 import {Button} from 'antd';
@@ -29,14 +27,12 @@ class KnowledgeEditor extends Component {
         //不知道有没有什么好方法
         this.parentRelationAdd = this.parentRelationAdd.bind(this);
         this.childRelationAdd = this.childRelationAdd.bind(this);
-        this.relyRelationAdd = this.relyRelationAdd.bind(this);
         this.relateRelationAdd = this.relateRelationAdd.bind(this);
         this.broRelationAdd = this.broRelationAdd.bind(this);
         this.paraRelationAdd = this.paraRelationAdd.bind(this);
 
         this.parentRelationDel = this.parentRelationDel.bind(this);
         this.childRelationDel = this.childRelationDel.bind(this);
-        this.relyRelationDel = this.relyRelationDel.bind(this);
         this.relateRelationDel = this.relateRelationDel.bind(this);
         this.broRelationDel = this.broRelationDel.bind(this);
         this.paraRelationDel = this.paraRelationDel.bind(this);
@@ -89,54 +85,82 @@ class KnowledgeEditor extends Component {
         kUnit[inputType] = inputValue;
         this.setState({
             kUnit: kUnit
-        })
-
+        });
         if (inputType === 'name' || inputType === 'thumbnailUrl') {
-            this.props.onUpdateUrlAndName(kUnit.id, inputType, inputValue);
+            this.props.onUpdateUrlAndName(kUnit._id, inputType, inputValue);
         }
     }
 
     parentRelationAdd(value) {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
-        this.kUnitAdd(kUnit, addNode, 'related');
-        this.kUnitAdd(addNode, kUnit, 'related');
+        this.kUnitAdd(kUnit, addNode, 'hasParentNode');
+        this.kUnitAdd(addNode, kUnit, 'hasChildNode');
     }
 
     childRelationAdd(value) {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
-        this.kUnitAdd(kUnit, addNode, 'contain');
-        this.kUnitAdd(addNode, kUnit, 'parent');
+        this.kUnitAdd(kUnit, addNode, 'hasChildNode');
+        this.kUnitAdd(addNode, kUnit, 'hasParentNode');
     }
 
-    relyRelationAdd(value) {
+    relyByRelationAdd(value) {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
-        this.kUnitAdd(kUnit, addNode, 'isBeingRelyOnBy');
-        this.kUnitAdd(addNode, kUnit, 'isRelyOnTo');
+        this.kUnitAdd(kUnit, addNode, 'hasBeRelyByNode');
+        this.kUnitAdd(addNode, kUnit, 'hasRelyOnNode');
+    }
+
+    relyOnRelationAdd = (value) => {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitAdd(kUnit, addNode, 'hasRelyOnNode');
+        this.kUnitAdd(addNode, kUnit, 'hasBeRelyByNode');
     }
 
     relateRelationAdd(value) {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
-        this.kUnitAdd(kUnit, addNode, 'rely');
-        this.kUnitAdd(addNode, kUnit, 'rely');
+        this.kUnitAdd(kUnit, addNode, 'hasRelateNode');
+        this.kUnitAdd(addNode, kUnit, 'hasRelateNode');
     }
 
     broRelationAdd(value) {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
-        this.kUnitAdd(kUnit, addNode, 'brothers');
-        this.kUnitAdd(addNode, kUnit, 'brothers');
+        this.kUnitAdd(kUnit, addNode, 'hasBrotherNode');
+        this.kUnitAdd(addNode, kUnit, 'hasBrotherNode');
     }
 
     paraRelationAdd(value) {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
-        this.kUnitAdd(kUnit, addNode, 'parent');
-        this.kUnitAdd(addNode, kUnit, 'contain');
+        this.kUnitAdd(kUnit, addNode, 'hasParallelNode');
+        this.kUnitAdd(addNode, kUnit, 'hasParallelNode');
     }
+
+    onNextLKnowledgeAdd = (value) => {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+    };
+
+    onPrevLKnowledgeAdd = (value) => {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+    };
+
+    onNextLKnowledgeDel = (value) => {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+    };
+
+    onPrevLKnowledgeDel = (value) => {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+    };
+
+
 
     parentRelationDel(value) {
         console.log(value)
@@ -145,8 +169,11 @@ class KnowledgeEditor extends Component {
     childRelationDel(value) {
         console.log(value)
     }
+    relyByRelationDel = (value) => {
+        console.log(value)
+    }
 
-    relyRelationDel(value) {
+    relyOnRelationDel = (value) => {
         console.log(value)
     }
 
@@ -165,14 +192,13 @@ class KnowledgeEditor extends Component {
     getkUnitObjectById = (id) => {
         const kUnits = this.props.knowledgeUnitList;
         for (let index in kUnits) {
-            if (kUnits[index].id === id) {
+            if (kUnits[index]._id === id) {
                 return kUnits[index]
             }
         }
     };
 
     kUnitAdd = (targetNode, addUnit, type) => {
-        console.log()
         targetNode[type].push(addUnit);
         console.log( targetNode[type])
     };
@@ -183,15 +209,7 @@ class KnowledgeEditor extends Component {
 
 
     onSelect = (value) => {
-        console.log(value);
-        // const kUnit = this.state.kUnit;
-        // const knowledgeUnitList = this.props.knowledgeUnitList;
-        // let unitSelected;
-        // for (let index in knowledgeUnitList) {
-        //     if (knowledgeUnitList[index].name === value) {
-        //         unitSelected = knowledgeUnitList[index]
-        //     }
-        // }
+
     };
 
     componentDidMount() {
@@ -199,27 +217,28 @@ class KnowledgeEditor extends Component {
     }
 
     render() {
-        console.log()
         const kUnit = this.state.kUnit;
         const knowledgeUnitList = this.props.knowledgeUnitList;
         const children = [];
         for (let index in knowledgeUnitList) {
-            if (knowledgeUnitList[index].id !== kUnit.id) {
-                children.push(<Option key={knowledgeUnitList[index].id}>{knowledgeUnitList[index].name}</Option>);
+            if (knowledgeUnitList[index]._id !== kUnit._id) {
+                children.push(<Option key={knowledgeUnitList[index]._id}>{knowledgeUnitList[index].title}</Option>);
             }
         }
         let defaultChildren = {
-            parent: [],
-            isBeingRelyOnBy: [],
-            related: [],
-            brothers: [],
-            contain: [],
-            parallel: []
+            hasParentNode: [],
+            hasBeRelyByNode: [],
+            hasRelateNode: [],
+            hasChildNode: [],
+            hasParallelNode: []
         };
+
+        let hasPrevNode = kUnit.hasPrevNode;
+        let hasNextNode = kUnit.hasNextNode;
         for (let item in defaultChildren) {
             if (kUnit[item]) {
                 kUnit[item].map((object) => {
-                    defaultChildren[item].push(object.name);
+                    defaultChildren[item].push(object.title);
                 })
             }
         }
@@ -237,7 +256,7 @@ class KnowledgeEditor extends Component {
                                             <Input
                                                 id="name"
                                                 size="small"
-                                                defaultValue={kUnit.name}
+                                                defaultValue={kUnit.title}
                                             />
                                         </section>
                                         <section>
@@ -255,7 +274,6 @@ class KnowledgeEditor extends Component {
                                                 size="small"
                                                 defaultValue={kUnit.demand}
                                             />
-
                                         </section>
                                         <section>
                                             <label>知识点学生掌握程度（0-100）</label>
@@ -277,13 +295,13 @@ class KnowledgeEditor extends Component {
                                 <section id="skUnitRelation" className="skUnitRelation">
                                     <div className="kUnitRelation">
                                         <div id="parentNode" className="parentNode">
-                                            <label>父节点</label>
+                                            <label>父知识点</label>
                                             <Select
-                                                label="父节点"
+                                                label="父知识点"
                                                 mode="multiple"
                                                 style={{width: '100%'}}
-                                                placeholder="Please select"
-                                                defaultValue={defaultChildren.parent}
+                                                placeholder="请选择"
+                                                defaultValue={defaultChildren.hasParentNode}
                                                 onSelect={this.parentRelationAdd}
                                                 onDeselect={this.parentRelationDel}
                                             >
@@ -291,12 +309,12 @@ class KnowledgeEditor extends Component {
                                             </Select>
                                         </div>
                                         <div id="containNode" className="containNode">
-                                            <label>子节点</label>
+                                            <label>子知识点</label>
                                             <Select
                                                 mode="multiple"
                                                 style={{width: '100%'}}
-                                                placeholder="Please select"
-                                                defaultValue={defaultChildren.contain}
+                                                placeholder="请选择"
+                                                defaultValue={defaultChildren.hasChildNode}
                                                 onSelect={this.childRelationAdd}
                                                 onDeselect={this.childRelationDel}
                                             >
@@ -304,58 +322,82 @@ class KnowledgeEditor extends Component {
                                             </Select>
                                         </div>
                                         <div id="relyNode" className="relyNode">
-                                            <label>下一个课程</label>
+                                            <label>受依赖知识点</label>
                                             <Select
                                                 mode="multiple"
                                                 style={{width: '100%'}}
-                                                placeholder="Please select"
-                                                defaultValue={defaultChildren.isBeingRelyOnBy}
-                                                onSelect={this.relyRelationAdd}
-                                                onDeselect={this.relyRelationDel}
+                                                placeholder="请选择"
+                                                defaultValue={defaultChildren.hasBeRelyByNode}
+                                                onSelect={this.relyByRelationAdd}
+                                                onDeselect={this.relyByRelationDel}
+                                            >
+                                                {children}
+                                            </Select>
+                                        </div>
+                                        <div id="relyNode" className="relyNode">
+                                            <label>依赖的知识点</label>
+                                            <Select
+                                                mode="multiple"
+                                                style={{width: '100%'}}
+                                                placeholder="请选择"
+                                                defaultValue={defaultChildren.hasRelyOnNode}
+                                                onSelect={this.relyOnRelationAdd}
+                                                onDeselect={this.relyOnRelationDel}
                                             >
                                                 {children}
                                             </Select>
                                         </div>
                                         <div id="relatedNode" className="relatedNode">
-                                            <label>相关关系</label>
+                                            <label>相关知识点</label>
                                             <Select
                                                 mode="multiple"
                                                 style={{width: '100%'}}
-                                                placeholder="Please select"
-                                                defaultValue={defaultChildren.related}
+                                                placeholder="请选择"
+                                                defaultValue={defaultChildren.hasRelateNode}
                                                 onSelect={this.relateRelationAdd}
                                                 onDeselect={this.relateRelationDel}
                                             >
                                                 {children}
                                             </Select>
                                         </div>
-                                        {/*<div id="brothersNode" className="brothersNode">*/}
-                                            {/*<label>兄弟关系</label>*/}
-                                            {/*<Select*/}
-                                                {/*mode="multiple"*/}
-                                                {/*style={{width: '100%'}}*/}
-                                                {/*placeholder="Please select"*/}
-                                                {/*defaultValue={defaultChildren.brothers}*/}
-                                                {/*onSelect={this.broRelationAdd}*/}
-                                                {/*onDeselect={this.broRelationDel}*/}
-                                            {/*>*/}
-                                                {/*{children}*/}
-                                            {/*</Select>*/}
-                                        {/*</div>*/}
-                                        {/*<div id="parallelNode" className="parallelNode">*/}
-                                            {/*<label>平行关系</label>*/}
-                                            {/*<Select*/}
-                                                {/*mode="multiple"*/}
-                                                {/*style={{width: '100%'}}*/}
-                                                {/*placeholder="Please select"*/}
-                                                {/*defaultValue={defaultChildren.parallel}*/}
-                                                {/*onSelect={this.paraRelationAdd}*/}
-                                                {/*onDeselect={this.paraRelationDel}*/}
-                                            {/*>*/}
-                                                {/*{children}*/}
-                                            {/*</Select>*/}
-                                        {/*</div>*/}
+                                        <div id="brothersNode" className="brothersNode">
+                                            <label>同义知识点</label>
+                                            <Select
+                                                mode="multiple"
+                                                style={{width: '100%'}}
+                                                placeholder="请选择"
+                                                defaultValue={defaultChildren.hasSynonymNode}
+                                                onSelect={this.broRelationAdd}
+                                                onDeselect={this.broRelationDel}
+                                            >
+                                                {children}
+                                            </Select>
+                                        </div>
+                                        <div id="parallelNode" className="parallelNode">
+                                            <label>上一个知识点</label>
+                                            <Select
 
+                                                style={{width: '100%'}}
+                                                placeholder="请选择"
+                                                defaultValue={hasPrevNode}
+                                                onSelect={this.paraRelationAdd}
+                                                onDeselect={this.paraRelationDel}
+                                            >
+                                                {children}
+                                            </Select>
+                                        </div>
+                                        <div id="parallelNode" className="parallelNode">
+                                            <label>下一个知识点</label>
+                                            <Select
+                                                style={{width: '100%'}}
+                                                placeholder="请选择"
+                                                defaultValue={hasNextNode}
+                                                onSelect={this.paraRelationAdd}
+                                                onDeselect={this.paraRelationDel}
+                                            >
+                                                {children}
+                                            </Select>
+                                        </div>
                                     </div>
                                 </section>
                                 <section id="skUnitBtn" className="skUnitBtn">
