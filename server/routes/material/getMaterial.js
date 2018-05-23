@@ -14,7 +14,7 @@ const getMaterial = function (req, res, next) {
     });
 
     findOneInModel('tUser', { name: username })
-        .then(user => findInModel('tMaterial', { userid: user.userid }))
+        .then(user => findInModel('tMaterial', { userId: user._id }))
         .then(onSuccess)
         .catch(onError);
 
