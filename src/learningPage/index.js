@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
-import { Layout, Menu, Icon } from 'antd';
+import {Layout, Menu, Icon} from 'antd';
 import {
     Redirect,
     Link,
     Route
 } from "react-router-dom";
 
-import { LearnerCourseRoute } from '../course-manage';
+import {LearnerCourseRoute} from '../course-manage';
 import {SearchPage} from '../searchManager'
 
 const {Sider} = Layout;
@@ -30,7 +30,7 @@ class LearningPage extends Component {
     }
 
     onCollapse = (collapsed) => {
-        this.setState({ collapsed });
+        this.setState({collapsed});
     };
 
     onMenuItemClick({key}) {
@@ -38,7 +38,7 @@ class LearningPage extends Component {
         && this.menuItemClickEvents[key]();
     }
 
-    getSubMenuAndItemKeyFromLocation({ pathname }) {
+    getSubMenuAndItemKeyFromLocation({pathname}) {
         // TODO: 获取 SubMenu 的 Key，从而自动展开导航栏
         return {
             itemKey: pathname.split('/').pop(),
@@ -47,26 +47,26 @@ class LearningPage extends Component {
     }
 
     render() {
-        const { username, location }= this.props;
+        const {username, location} = this.props;
         if (!username) {
             return <Redirect push to={{
                 pathname: '/',
-                state: { from: location },
-            }} />
+                state: {from: location},
+            }}/>
         }
 
-        let { itemKey } = this.getSubMenuAndItemKeyFromLocation(this.props.location);
+        let {itemKey} = this.getSubMenuAndItemKeyFromLocation(this.props.location);
         if (itemKey === "learning-page") itemKey = 'home';
 
         return (
-            <Layout style={{ minHeight: '100vh' }}>
+            <Layout style={{minHeight: '100vh'}}>
                 <Sider
                     collapsible
                     collapsed={this.state.collapsed}
                     onCollapse={this.onCollapse}
-                    style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }}
+                    style={{overflow: 'auto', height: '100vh', position: 'fixed', left: 0}}
                 >
-                    <div className="logo" >
+                    <div className="logo">
                     </div>
                     <Menu
                         theme="dark"
@@ -75,20 +75,20 @@ class LearningPage extends Component {
                         onClick={this.onMenuItemClick}
                     >
                         <Menu.Item key="home">
-                            <Icon type="pie-chart" />
+                            <Icon type="pie-chart"/>
                             <span>首页</span>
                         </Menu.Item>
                         <Menu.Item key="search">
                             <Link to={`${this.props.match.url}/search`}
                                   style={{textDecoration: 'none'}}>
-                                <Icon type="search" />
+                                <Icon type="search"/>
                                 <span>知识检索</span>
                             </Link>
 
                         </Menu.Item>
                         <SubMenu
                             key="course"
-                            title={<span><Icon type="user" /><span>课程管理</span></span>}
+                            title={<span><Icon type="user"/><span>课程管理</span></span>}
                         >
                             <Menu.Item key="list">
                                 <Link to={`${this.props.match.url}/course/list`}
@@ -102,28 +102,29 @@ class LearningPage extends Component {
                                       style={{textDecoration: 'none'}}>
                                     当前课程
                                 </Link>
-                                </Menu.Item>
+                            </Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="sub2"
-                            title={<span><Icon type="team" /><span>个人中心</span></span>}
+                            title={<span><Icon type="team"/><span>个人中心</span></span>}
                         >
                             <Menu.Item key="6">Team 1</Menu.Item>
                         </SubMenu>
-                        <Menu.Item key="logout" >
-                            <Icon type="logout" />
+                        <Menu.Item key="logout">
+                            <Icon type="logout"/>
                             <span>登出</span>
                         </Menu.Item>
                     </Menu>
                 </Sider>
-                <Layout style={{ marginLeft: 200 }}>
-                    <Route path={`${this.props.match.url}/course`} component={LearnerCourseRoute} />
+                <Layout style={{marginLeft: 200, overflowY: 'hidden'}}>
+                    <Route path={`${this.props.match.url}/course`} component={LearnerCourseRoute}/>
 
-                    <Route path={`${this.props.match.url}/search`} component={SearchPage} />
+                    <Route path={`${this.props.match.url}/search`} component={SearchPage}/>
                 </Layout>
             </Layout>
         )
     }
 }
+
 export default LearningPage;
 
