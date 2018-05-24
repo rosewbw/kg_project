@@ -9,6 +9,7 @@ import {Row, Col} from 'antd';
 import {Button} from 'antd';
 
 const Option = Select.Option;
+const InputGroup = Input.Group;
 
 
 class KnowledgeEditor extends Component {
@@ -16,7 +17,7 @@ class KnowledgeEditor extends Component {
         super(props);
         this.state = {
             kUnit: this.props.kUnitData,
-            username:this.props.username
+            username: this.props.username
         };
         this.cancelHandler = this.cancelHandler.bind(this);
         this.saveHandler = this.saveHandler.bind(this);
@@ -79,8 +80,10 @@ class KnowledgeEditor extends Component {
 
     kUnitInfoChange(e) {
         let inputType = e.target.id;
+        if(inputType === 'synonym'){
+            return
+        }
         let inputValue = e.target.value;
-
         let kUnit = this.state.kUnit;
         kUnit[inputType] = inputValue;
         this.setState({
@@ -161,7 +164,6 @@ class KnowledgeEditor extends Component {
     };
 
 
-
     parentRelationDel(value) {
         console.log(value)
     }
@@ -169,6 +171,7 @@ class KnowledgeEditor extends Component {
     childRelationDel(value) {
         console.log(value)
     }
+
     relyByRelationDel = (value) => {
         console.log(value)
     }
@@ -200,7 +203,7 @@ class KnowledgeEditor extends Component {
 
     kUnitAdd = (targetNode, addUnit, type) => {
         targetNode[type].push(addUnit);
-        console.log( targetNode[type])
+        console.log(targetNode[type])
     };
 
     kUnitDel = () => {
@@ -210,6 +213,14 @@ class KnowledgeEditor extends Component {
 
     onSelect = (value) => {
 
+    };
+
+    onKnowledgeKeywordChanged = (data) => {
+        let kUnit = this.state.kUnit;
+        kUnit.synonym = data;
+        this.setState({
+            kUnit:kUnit
+        })
     };
 
     componentDidMount() {
@@ -225,6 +236,13 @@ class KnowledgeEditor extends Component {
                 children.push(<Option key={knowledgeUnitList[index]._id}>{knowledgeUnitList[index].title}</Option>);
             }
         }
+
+        const synonym = [];
+        for (let index in kUnit.synonym) {
+            synonym.push(<Option key={kUnit.synonym[index]}>{kUnit.synonym[index]}</Option>);
+        }
+
+
         let defaultChildren = {
             hasParentNode: [],
             hasBeRelyByNode: [],
@@ -282,6 +300,19 @@ class KnowledgeEditor extends Component {
                                                 size="small"
                                                 defaultValue={kUnit.achieve}
                                             />
+                                        </section>
+                                        <section>
+                                            <label>知识点同义词</label>
+                                            <Select
+                                                mode="tags"
+                                                style={{width: '100%'}}
+                                                placeholder="知识点同义词"
+                                                onChange={this.onKnowledgeKeywordChanged}
+                                                defaultValue={kUnit.synonym}
+                                                id="synonym"
+                                            >
+                                                {synonym}
+                                            </Select>
                                         </section>
                                     </div>
                                 </section>

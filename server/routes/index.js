@@ -27,6 +27,7 @@ router.post('/getProject', tokenObj.checkToken, project.getProject);
 router.post('/getProjectData', tokenObj.checkToken, project.getProjectData);
 router.post('/saveProjectData', tokenObj.checkToken, project.saveProjectData);
 router.post('/deleteProject', tokenObj.checkToken, project.deleteProject);
+router.post('/getCourse', tokenObj.checkToken, course.getCourse);
 
 /* 资源 */
 router.post('/upload', tokenObj.checkToken, material.uploadMaterial);

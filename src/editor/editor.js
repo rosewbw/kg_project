@@ -401,7 +401,7 @@ class Editor extends Component {
             circle_comewith_ele(fun.start);
 
             info.map(function (elm) {
-                let div = createNewElement(fun, elm.id, elm.thumbnailUrl, elm.videoUrl);
+                let div = createNewElement(fun, elm._id, elm.thumbnailUrl, elm.videoUrl);
                 div.css({
                     'left': elm.position.x + 'px',
                     'top': elm.position.y + 'px'
@@ -413,12 +413,12 @@ class Editor extends Component {
                 for (let item in elm) {
                     if (item === 'root' && elm[item] === true) {
                         add_path($('#transStart'), fun);
-                        static_path($('#' + elm.id), $('#transStart'), fun, 'init');
+                        static_path($('#' + elm._id), $('#transStart'), fun, 'init');
                     }
                     if (item === 'hasChildNode') {
                         for (let idx in elm[item]) {
-                            add_path($('#' + elm.id), fun);
-                            static_path($('#' + elm[item][idx].id), $('#' + elm.id), fun, 'init');
+                            add_path($('#' + elm._id), fun);
+                            static_path($('#' + elm[item][idx]._id), $('#' + elm._id), fun, 'init');
                         }
 
                     }

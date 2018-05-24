@@ -96,6 +96,7 @@ class VizulyWeightedTree extends Component {
 
         //Remove empty child nodes left at end of aggregation and add unqiue ids
         function removeEmptyNodes(node, parentId, childId) {
+            console.log(node)
             if (!node) return;
             node.id = parentId + "_" + childId;
             if (node.values) {
@@ -143,18 +144,18 @@ class VizulyWeightedTree extends Component {
                 return d.children
             })                     // 指定哪个属性是子节点
             .key(function (d) {
-                return d.id
+                return d._id
             })                              // 唯一值
             // .key(d => d.name)
             // .value(d => d.agg_Local)
             .value(function (d) {
-                return 1;
+                return 0.5;
             })// 指定粗细的属性
             // .value(function (d) { return d.value;})// 指定粗细的属性
             .fixedSpan(-1)                                                  // fixedSpan > 0 will use this pixel value for horizontal spread versus auto size based on viz width
             .branchPadding(.07)
             // .label(function (d) { return trimLabel(d.key || (d['Level' + d.depth]))}) // returns label for each node.
-            .label(d => d.name) // 指定显示的浮动标签
+            .label(d => d.title) // 指定显示的浮动标签
             .on("measure", onMeasure)                                        // Make any measurement changes
             .on("mouseover", onMouseOver)                                    // mouseover callback - all viz components issue these events
             .on("mouseout", onMouseOut)                                      // mouseout callback - all viz components issue these events
@@ -338,12 +339,13 @@ class VizulyWeightedTree extends Component {
                 "Authorization": token,
             },
             body: JSON.stringify({
-                projectID:"d8a31930-4a65-46c1-9b00-15673aab5ad8"
+                projectID:"8b580be6-b424-4801-8735-76299bd27047"
             })
         })
             .then(res => res.json())
             .then(res => {
                 if (res && res.status === 'success') {
+                    console.log(res.data);
                     this.props.onInit(res.data,this.initialize)
                 }
             })

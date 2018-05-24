@@ -17,10 +17,10 @@ class CourseContent extends Component {
             return null
         }
         const createTree = (root) => {
+            console.log(root)
             if (!root.hasChildNode || root.hasChildNode.length === 0) return;
-
             root.children = [];
-            root.hasChildNode.forEach(id => root.children.push(course.data.filter(node => node.id === id)[0]));
+            root.hasChildNode.forEach(id => root.children.push(course.data.filter(node => node._id === id)[0]));
             root.children.forEach(item => createTree(item));
             return root;
         };
@@ -35,11 +35,9 @@ class CourseContent extends Component {
 
 
     getData = (data,callback) => {
-        console.log('ok')
             this.setState({
                 course:data
             },()=>{
-                console.log('ok')
                 callback()
             })
     };

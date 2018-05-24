@@ -270,7 +270,7 @@
 }
 
 .kEditorBody .kUnitInfo section label {
-
+    margin:0;
 }
 
 .kUnitInfo .ant-input {
