@@ -1,0 +1,28 @@
+.sub-course {
+    height: 26rem;
+    overflow-y: scroll;
+}
+
+
+.main-course-body label {
+    margin: 0;
+}
+
+.main-course-body .sim-progress {
+    margin-bottom: 1rem;
+}
+
+.main-course-body .main-course-title, .sub-course-title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.main-course-body .main-course-description {
+    overflow: hidden;
+}
+
+.sub-course small {
+    margin-right: 2rem;
+}
+

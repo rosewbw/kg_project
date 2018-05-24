@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 import { LearnerCourseRoute } from '../course-manage';
+import {SearchPage} from '../searchManager'
 
 const {Sider} = Layout;
 const SubMenu = Menu.SubMenu;
@@ -77,6 +78,14 @@ class LearningPage extends Component {
                             <Icon type="pie-chart" />
                             <span>首页</span>
                         </Menu.Item>
+                        <Menu.Item key="search">
+                            <Link to={`${this.props.match.url}/search`}
+                                  style={{textDecoration: 'none'}}>
+                                <Icon type="search" />
+                                <span>知识检索</span>
+                            </Link>
+
+                        </Menu.Item>
                         <SubMenu
                             key="course"
                             title={<span><Icon type="user" /><span>课程管理</span></span>}
@@ -110,6 +119,7 @@ class LearningPage extends Component {
                 <Layout style={{ marginLeft: 200 }}>
                     <Route path={`${this.props.match.url}/course`} component={LearnerCourseRoute} />
 
+                    <Route path={`${this.props.match.url}/search`} component={SearchPage} />
                 </Layout>
             </Layout>
         )

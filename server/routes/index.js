@@ -6,6 +6,7 @@ let graph = require('./graph');
 let project = require('./project');
 let material = require('./material');
 let course = require('./course');
+let search = require('./search');
 
 let tokenObj = require('./utils/token');
 
@@ -34,5 +35,9 @@ router.post('/upload', tokenObj.checkToken, material.uploadMaterial);
 router.get('/materials', tokenObj.checkToken, material.getMaterial);
 router.delete('/deleteMaterial', tokenObj.checkToken, material.deleteMaterial);
 router.put('/updateMaterial', tokenObj.checkToken, material.updateMaterial);
+
+/* 检索 */
+router.post('/search', tokenObj.checkToken, search.getSearchResult);
+
 
 module.exports = router;
