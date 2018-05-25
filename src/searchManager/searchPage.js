@@ -6,25 +6,41 @@ import SearchList from './searchList'
 import {Row, Col} from 'antd';
 
 class SearchPage extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            searchInput:''
+            searchInput: '',
+            searchResult: {
+                lesson: [],
+                knowledge: []
+            },
+            hasSearched:false
         }
-    }
+    };
 
     updateSearchList = (data) => {
-        console.log(data)
+        let searchResult = {
+            lesson: [],
+            knowledge: []
+        };
+        if (data.searchResult.lesson) {
+            searchResult.lesson = data.searchResult.lesson
+        }
+        if (data.searchResult.knowledge) {
+            searchResult.knowledge = data.searchResult.knowledge
+        }
         this.setState({
-            searchInput:data.searchInput
+            searchInput: data.searchInput,
+            searchResult: searchResult,
+            hasSearched:true
         })
-    }
+    };
 
     render() {
         return (
             <div id="searchWrapper" className="searchWrapper">
                 <Row
-                    style={{marginTop:'1rem', marginBottom:'1rem'}}
+                    style={{marginTop: '1rem', marginBottom: '1rem'}}
                 >
                     <SearchInput
                         updateSearchList={this.updateSearchList}
@@ -36,11 +52,12 @@ class SearchPage extends Component {
                 >
                     <Col span={20}>
                         <h1>搜索词：{this.state.searchInput}</h1>
-                        <SearchList/>
+                        <SearchList
+                            hasSearched={this.state.hasSearched}
+                            searchResult={this.state.searchResult}
+                        />
                     </Col>
                 </Row>
-
-
             </div>
         );
     }

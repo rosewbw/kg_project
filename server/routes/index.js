@@ -21,14 +21,14 @@ router.post('/register', user.register);
 router.get('/fetchUserInfoWithToken', tokenObj.checkToken, user.fetchUserInfo);
 
 /* 课程 */
-// router.post('/upload', tokenObj.checkToken, graph.upload);
-// router.post('/upload', tokenObj.checkToken, graph.updateTeacher);
 router.post('/addProject', tokenObj.checkToken, project.addProject);
 router.post('/getProject', tokenObj.checkToken, project.getProject);
 router.post('/getProjectData', tokenObj.checkToken, project.getProjectData);
 router.post('/saveProjectData', tokenObj.checkToken, project.saveProjectData);
 router.post('/deleteProject', tokenObj.checkToken, project.deleteProject);
 router.post('/getCourse', tokenObj.checkToken, course.getCourse);
+
+router.post('/publishCourse', tokenObj.checkToken, course.publishCourse);
 
 /* 资源 */
 router.post('/upload', tokenObj.checkToken, material.uploadMaterial);

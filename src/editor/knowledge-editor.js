@@ -89,7 +89,8 @@ class KnowledgeEditor extends Component {
         this.setState({
             kUnit: kUnit
         });
-        if (inputType === 'name' || inputType === 'thumbnailUrl') {
+        console.log(inputType)
+        if (inputType === 'title' || inputType === 'thumbnailUrl') {
             this.props.onUpdateUrlAndName(kUnit._id, inputType, inputValue);
         }
     }
@@ -272,7 +273,7 @@ class KnowledgeEditor extends Component {
                                         <section>
                                             <label>知识点名称</label>
                                             <Input
-                                                id="name"
+                                                id="title"
                                                 size="small"
                                                 defaultValue={kUnit.title}
                                             />

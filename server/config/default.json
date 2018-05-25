@@ -10,6 +10,7 @@
   "secret": "1234567",
   "debug":true,
   "debugConfig":{
-    "noGraphServer":true
-  }
+    "noGraphServer":false
+  },
+  "graphServer":"http://localhost:5000"
 }

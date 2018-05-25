@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Editor from './editor'
-import { Route } from 'react-router-dom';
+import {Route} from 'react-router-dom';
 import defaultImg from './defaultImg.jpg'
 import './editor.css'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -16,7 +16,7 @@ class EditorControl extends Component {
             projectData: [],
             visible: false,
             username: '',
-            currentProjectId:'',
+            currentProjectId: '',
             projectFetched: false,
         };
         this.getToken = this.getToken.bind(this);
@@ -28,6 +28,7 @@ class EditorControl extends Component {
         this.onEditClick = this.onEditClick.bind(this);
         this.onSaveClick = this.onSaveClick.bind(this);
         this.onDeleteClick = this.onDeleteClick.bind(this);
+        this.onPublishClick = this.onPublishClick.bind(this);
         this.backToThisPage = this.backToThisPage.bind(this);
     }
 
@@ -76,8 +77,8 @@ class EditorControl extends Component {
 
     }
 
-    onEditClick(e){
-        const { history, match } = this.props;
+    onEditClick(e) {
+        const {history, match} = this.props;
         const courseid = e.target.parentNode.dataset.pid;
 
         this.setState({
@@ -89,33 +90,53 @@ class EditorControl extends Component {
         });
     }
 
-    onSaveClick(e){
+    onSaveClick(e) {
         const _this = this;
         _this.request('/getProject', {username: _this.state.username}, function (res) {
             const projectData = res;
-            const { history, match } = _this.props;
+            const {history, match} = _this.props;
 
             history.push(`${match.url}`);
             _this.setState({
-                projectData:projectData
+                projectData: projectData
             })
         });
 
     }
 
-    onDeleteClick(e){
-        let pid = e.target.parentNode.dataset.pid;
-        let _this = this;
-        _this.request('/deleteProject',{username:_this.state.username,projectId:pid},function (e) {
-            let pData = e;
-            _this.setState({
-                projectData:pData
+    onPublishClick(e){
+        let pid
+        if(e.target.type === 'button'){
+            pid = e.target.parentNode.dataset.pid;
+        }else{
+            pid = e.target.parentNode.parentNode.dataset.pid;
+        }
+        this.request('/publishCourse', {username: this.state.username, projectId: pid}, (data) => {
+            let pData = this.state.projectData;
+            pData.forEach((item)=>{
+                if(item._id === pid){
+                    item.publishStatus = data
+                }
+            });
+            this.setState({
+                projectData: pData
             })
         })
     }
 
-    backToThisPage(){
-        const { history, match } = this.props;
+    onDeleteClick(e) {
+        let pid = e.target.parentNode.dataset.pid;
+        let _this = this;
+        _this.request('/deleteProject', {username: _this.state.username, projectId: pid}, function (e) {
+            let pData = e;
+            _this.setState({
+                projectData: pData
+            })
+        })
+    }
+
+    backToThisPage() {
+        const {history, match} = this.props;
 
         history.push(`${match.url}`);
     }
@@ -141,7 +162,7 @@ class EditorControl extends Component {
     }
 
     render() {
-        const { match } = this.props;
+        const {match} = this.props;
 
         return (
             <div style={{width: '100%', height: '100%'}}>
@@ -159,6 +180,7 @@ class EditorControl extends Component {
                                 projectData={this.state.projectData}
                                 username={this.state.username}
                                 onCreateHandle={this.onCreateHandle}
+                                onPublishClick={this.onPublishClick}
                                 onDeleteClick={this.onDeleteClick}
                     />)}
                 />
@@ -207,34 +229,47 @@ const EditorInfo = (props) => {
 
 const ProjectBox = (props) => {
     const pData = props.pData;
-    let publishStatus,publishStatusClassName;
+    let publishStatus, publishStatusClassName;
     const {onEditClick, onDeleteClick, onPublishClick} = props;
-    if(pData.publishStatus === 'unPublish'){
+    if (pData.publishStatus === 'unPublish') {
         publishStatusClassName = 'unPublish';
-        publishStatus = '未发布';
-    }else{
-        publishStatus = '已发布';
+        publishStatus = '发布';
+    } else {
+        publishStatus = '取消发布';
         publishStatusClassName = 'publish';
     }
     return (
-        <div className="card mb-4 box-shadow" >
-            <img className="card-img-top" src={pData.thumbnailUrl||defaultImg}
+        <div className="card mb-4 box-shadow">
+            <img className="card-img-top" src={pData.thumbnailUrl || defaultImg}
                  alt="Card image cap"/>
             <div className="card-body">
-                <div className="projectName" style={{overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis' }}>{pData.projectName}</div>
-                <p className="card-text" style={{overflow:'hidden'}} title={pData.description}>{pData.description}</p>
+                <div className="projectName" style={{
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis'
+                }}>{pData.projectName}</div>
+                <p className="card-text" style={{overflow: 'hidden'}} title={pData.description}>{pData.description}</p>
                 <div className="d-flex justify-content-between align-items-center buttonGroup">
                     <div className="btn-group" data-pid={pData._id}>
-                        <button type="button" className="btn btn-sm btn-outline-secondary edit" onClick={onEditClick}>编辑</button>
-                        <button type="button" className="btn btn-sm btn-outline-secondary delete" onClick={onDeleteClick}>删除</button>
-                        <button type="button" className="btn btn-sm btn-outline-secondary publishStatus" onClick={onPublishClick}>
+                        <button type="button" className="btn btn-sm btn-outline-secondary edit" onClick={onEditClick}>
+                            编辑
+                        </button>
+                        <button type="button" className="btn btn-sm btn-outline-secondary delete"
+                                onClick={onDeleteClick}>删除
+                        </button>
+                        <button type="button" className="btn btn-sm btn-outline-secondary publishStatus"
+                                onClick={onPublishClick}>
                             <span className={publishStatusClassName}>{publishStatus}</span>
                         </button>
                     </div>
 
                 </div>
-                <div className="text-muted"><small>创建时间：{pData.createDate}</small></div>
-                <div className="text-muted"><small>更新时间：{pData.updateDate}</small></div>
+                <div className="text-muted">
+                    <small>创建时间：{pData.createDate}</small>
+                </div>
+                <div className="text-muted">
+                    <small>更新时间：{pData.updateDate}</small>
+                </div>
             </div>
         </div>
     )

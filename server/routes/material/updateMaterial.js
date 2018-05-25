@@ -4,8 +4,7 @@ const path = require('path');
 const uuid = require('node-uuid');
 
 const formatParser = require('../utils/format-parser');
-const updateGraph = require('../utils/updateGraph');
-const { findByIdAndUpdateInModel, findOneInModel } = require('../../database/model-operations');
+const {findByIdAndUpdateInModel, findOneInModel} = require('../../database/model-operations');
 
 /**
  * 上传文件并返回文件相关属性
@@ -21,7 +20,9 @@ const uploadFile = function (file) {
     let extension, duration, thumbnailPath;
 
     fs.rename(file.path, targetPath, function (err) {
-        if (err) {return Promise.reject(err.toString());}
+        if (err) {
+            return Promise.reject(err.toString());
+        }
     });
 
 
@@ -84,7 +85,9 @@ const uploadFile = function (file) {
             newOptions.thumbnailUrl = "/resources/icons/audio-logo.png";
             ffmpeg(originalPath)
                 .ffprobe(function (err, data) {
-                    if (err) { reject(err.toString()); }
+                    if (err) {
+                        reject(err.toString());
+                    }
 
                     duration = data.format.duration.toString();
                     newOptions.duration = duration;
@@ -94,10 +97,14 @@ const uploadFile = function (file) {
     };
 
     switch (formatParser.toType(originalExtension)) {
-        case 'video': return processVideo();
-        case 'image': return processImage();
-        case 'audio': return processAudio();
-        default: return Promise.resolve({}); // 默认不处理，返回的 newOptions 为空
+        case 'video':
+            return processVideo();
+        case 'image':
+            return processImage();
+        case 'audio':
+            return processAudio();
+        default:
+            return Promise.resolve({}); // 默认不处理，返回的 newOptions 为空
     }
 
 };
@@ -158,37 +165,37 @@ const updateMaterial = function (req, res, next) {
     });
 
     // 失败返回错误信息
-    const onError = err => {console.log(err);res.json({
-        status: 'error',
-        message: err.toString(),
-    })};
+    const onError = err => {
+        console.log(err);
+        res.json({
+            status: 'error',
+            message: err.toString(),
+        })
+    };
 
-    const updateDatabaseAndGraph = function(materialInfo) {
-        const pUpdateDatabase = findByIdAndUpdateInModel('tMaterial', materialInfo._id, materialInfo, { new: true });
-        const pUpdateGraph = Promise.resolve(updateGraph(materialInfo, 'material'));
-
-        return Promise.all([pUpdateDatabase, pUpdateGraph]);
+    const updateDatabase = function (materialInfo) {
+        return findByIdAndUpdateInModel('tMaterial', materialInfo._id, materialInfo, {new: true});
     };
 
     // 判断用户 id 和 Material 对应
-    const checkUserMatchMaterial = function() {
+    const checkUserMatchMaterial = function () {
         // 判断用户 id 和 Material 对应
-        const pCheckUser = findOneInModel('tUser', { name: username });
-        const pCheckMaterial = findOneInModel('tMaterial', { _id: req.query.materialId });
+        const pCheckUser = findOneInModel('tUser', {name: username});
+        const pCheckMaterial = findOneInModel('tMaterial', {_id: req.query.materialId});
 
         return Promise.all([pCheckUser, pCheckMaterial])
             .then(([user, material]) => {
-                if (user._id !== material.userId) { return Promise.reject('资源不属于该用户！')}
-
-                userId = user.id;
+                if (user._id !== material.userId) {
+                    return Promise.reject('资源不属于该用户！')
+                }
+                userId = user._id;
                 return;
             })
     };
 
     checkUserMatchMaterial()
         .then(() => getInfoFromReq(req))
-        .then(updateDatabaseAndGraph)
-        .then(([newMaterial, resOfGraph]) => newMaterial) // 只需要新的 Material 数据
+        .then(updateDatabase)
         .then(onSuccess)
         .catch(onError);
 

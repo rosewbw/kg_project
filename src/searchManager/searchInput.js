@@ -47,7 +47,6 @@ class SearchInput extends React.Component {
     handleSearch = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            console.log(values);
             let searchInput = values.searchInput;
             let searchOptions = [];
             if(values.plainOptions){
@@ -62,6 +61,7 @@ class SearchInput extends React.Component {
                 searchInput: searchInput,
                 searchOptions: searchOptions
             }, (data) => {
+                console.log(data)
                 this.props.updateSearchList(data)
             })
         });

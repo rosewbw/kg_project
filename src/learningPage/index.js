@@ -118,7 +118,6 @@ class LearningPage extends Component {
                 </Sider>
                 <Layout style={{marginLeft: 200, overflowY: 'hidden'}}>
                     <Route path={`${this.props.match.url}/course`} component={LearnerCourseRoute}/>
-
                     <Route path={`${this.props.match.url}/search`} component={SearchPage}/>
                 </Layout>
             </Layout>

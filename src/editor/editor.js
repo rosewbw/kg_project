@@ -869,7 +869,8 @@ class Editor extends Component {
                 .css('width', imgSize[0] * 2);
             input.change((e) => {
                 let kUnit = _this.getKnowledgeObjectById(e.target.parentNode.id);
-                kUnit.name = e.target.value;
+                console.log(e.target.parentNode.id)
+                kUnit.title = e.target.value;
                 _this.updateKnowledgeUnit(kUnit);
             });
 
@@ -1373,7 +1374,8 @@ class Editor extends Component {
     //这种写法好烂......
     onUpdateUrlAndName(kUnitId, type, value) {
         let kUnitDOM = document.getElementById(kUnitId);
-        if (type === 'name') {
+        if (type === 'title') {
+            console.log(kUnitDOM.childNodes[1].value)
             kUnitDOM.childNodes[1].value = value;
         } else {
             kUnitDOM.childNodes[0].src = value;

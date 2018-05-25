@@ -22,6 +22,7 @@ module.exports = {
         _id: {type: String, required: true},
         projectName: {type: String, required: true},
         userName: {type: String, required: true},
+        userId: {type: String, required: true},
         thumbnailUrl: {type: String},
         data: {type: Object, required: true},
         publishStatus: {type: String, required: true},

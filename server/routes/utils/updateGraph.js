@@ -1,30 +1,33 @@
 const request = require('request');
 const config = require('config');
 
+const REQUEST_URL = {
+    'publish': config.get('graphServer') + '/publishLesson',
+    'unPublish': config.get('graphServer') + '/unPublishLesson',
+    'search':config.get('graphServer') + '/search',
+};
+
 const UpdateGraph = function (data, type, callback) {
-    let options = {
-        graphType:type,
-        data:data
-    };
     let option = {
         method: "POST",
-        url: 'http://localhost:5000/updateGraph',
-        form: options,
+        url: REQUEST_URL[type],
+        json: true,
+        body: data,
         header: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': "application/json"
         }
     };
 
     config.get('debug') && config.get('debugConfig').noGraphServer
-    ? callback && callback(data)
-    : request(option, function (err, res, body) {
-        if (err) {
-            return console.log(err);
-        } else {
-            console.log('update Success');
-            return callback && callback(data);
-        }
-    });
+        ? callback && callback()
+        : request(option, function (err, res) {
+            if (err) {
+                return console.log(err);
+            }
+            if (res.body.status === 'success') {
+                return callback && callback(res.body.result);
+            }
+        });
 
 };
 module.exports = UpdateGraph;

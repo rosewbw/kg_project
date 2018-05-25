@@ -339,7 +339,7 @@ class VizulyWeightedTree extends Component {
                 "Authorization": token,
             },
             body: JSON.stringify({
-                projectID:"8b580be6-b424-4801-8735-76299bd27047"
+                projectId:"8b580be6-b424-4801-8735-76299bd27047"
             })
         })
             .then(res => res.json())
