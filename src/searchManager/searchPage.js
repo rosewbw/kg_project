@@ -51,7 +51,7 @@ class SearchPage extends Component {
 
     render() {
         return (
-            <div id="searchWrapper" className="searchWrapper">
+            <div id="searchWrapper" className="searchWrapper" style={{position: 'relative'}}>
                 <Row
                     style={{marginTop: '1rem', marginBottom: '1rem'}}
                 >

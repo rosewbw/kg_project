@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css'
 
-import {SearchKnowledgePreview, SearchLessonPreview} from './searchPreview'
+import SearchKnowledgePreview from './searchPreview'
 
 import {Row, Col} from 'antd';
 import {Progress} from 'antd';
@@ -35,18 +35,16 @@ class SearchList extends Component {
 
 
     checkFullInfoOfKnowledge = (e) => {
-        const lessonId = e.target.parentNode.dataset.lid;
-        const lessonList = this.state.searchResult.lesson;
-        let lessonInfo;
-        for (let item in lessonList) {
-            if (lessonList[item].lesson.id === lessonId) {
-                lessonInfo = lessonList[item].lesson
-            }
-        }
+        // const lessonId = e.target.parentNode.dataset.lid;
+        // const lessonList = this.state.searchResult.lesson;
+        // let lessonInfo;
+        // for (let item in lessonList) {
+        //     if (lessonList[item].lesson.id === lessonId) {
+        //         lessonInfo = lessonList[item].lesson
+        //     }
+        // }
         ReactDOM.render(
-            <SearchKnowledgePreview
-
-            />
+            <SearchKnowledgePreview/>
             , document.getElementById('searchPreview')
         )
     };

@@ -5,9 +5,9 @@ import ReactDOM from 'react-dom';
 import {Row, Col} from 'antd';
 
 
-class SearchLessonPreview extends Component {
+class SearchKnowledgePreview extends Component {
     state = {
-        lessonInfo: this.props.lessonInfo
+        // lessonInfo: this.props.lessonInfo
     };
 
     getFullInfoOfLesson = (lessonId) => {
@@ -24,12 +24,12 @@ class SearchLessonPreview extends Component {
     }
 
     render() {
-        const lessonInfo = this.state.lessonInfo.data;
-        const lessonId = this.state.lessonInfo.id;
+        // const lessonInfo = this.state.lessonInfo.data;
+        // const lessonId = this.state.lessonInfo.id;
         return (
             <div id="searchPreviewArea" className="searchPreviewArea">
                 <div id="previewContainer" className="previewContainer">
-                    <EditorHeader closeBtn={this.cancelEditor} title={lessonInfo.title}/>
+                    <EditorHeader closeBtn={this.cancelEditor} title={'123'}/>
                     <div id="previewBody" className="previewBody">
                         <Row gutter={16} style={{height: '100%'}}>
                             <Col className="gutter-row" span={16} style={{height: '100%'}}>
@@ -48,18 +48,6 @@ class SearchLessonPreview extends Component {
     }
 }
 
-
-class SearchKnowledgePreview extends Component {
-    render() {
-        return (
-            <div>
-                lllllllll
-            </div>
-        )
-    }
-}
-
-
 const EditorHeader = ({closeBtn, title}) => {
     return (
         <div id="editorHeader" className="editorHeader">
@@ -69,7 +57,4 @@ const EditorHeader = ({closeBtn, title}) => {
 
 };
 
-export {
-    SearchKnowledgePreview,
-    SearchLessonPreview
-}
+export default SearchKnowledgePreview
