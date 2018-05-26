@@ -407,7 +407,7 @@ class Editor extends Component {
                     'top': elm.position.y + 'px'
                 });
                 div[0].circle = create_circle(div, fun);
-                div.children('input').attr('value', elm.name);
+                div.children('input').attr('value', elm.title);
             });
             info.map(function (elm) {
                 for (let item in elm) {
@@ -869,7 +869,6 @@ class Editor extends Component {
                 .css('width', imgSize[0] * 2);
             input.change((e) => {
                 let kUnit = _this.getKnowledgeObjectById(e.target.parentNode.id);
-                console.log(e.target.parentNode.id)
                 kUnit.title = e.target.value;
                 _this.updateKnowledgeUnit(kUnit);
             });

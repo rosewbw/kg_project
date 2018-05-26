@@ -207,6 +207,7 @@ vizuly.viz.weighted_tree = function (parent) {
         viz.validate();
 
         // Get our size based on height, width, and margin
+
         size = vizuly.core.util.size(scope.margin, scope.width, scope.height);
 
         // Transpose dimensions because we are projecting from left to right versus top to bottom
@@ -417,7 +418,7 @@ vizuly.viz.weighted_tree = function (parent) {
             .duration(scope.duration)
             .attr("d", diagonal)
             .style("stroke-width",function (d) {
-                return nodeRadius(d.target)*2});
+                return nodeRadius(d.target)*30});
 
         // Transition exiting nodes to the parent's new position.
         link.exit().transition()

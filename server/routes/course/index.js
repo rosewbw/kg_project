@@ -2,7 +2,7 @@ const UpdateGraph = require('../utils/updateGraph')
 module.exports = {
     getCourse: function (req, res, next) {
         let tProject = global.dbHandel.getModel('tProject');
-        tProject.findOne({_id: req.body.projectID}, function (err, doc) {
+        tProject.findOne({_id: req.body.projectId}, function (err, doc) {
             if (err) {
                 return res.statusCode(404)
             }
@@ -50,6 +50,19 @@ module.exports = {
                     })
                 })
             }
+        })
+    },
+    getAllCourses:function (req, res, next) {
+        let tProject = global.dbHandel.getModel('tProject');
+        tProject.find({publishStatus:'publish'}, function (err, doc) {
+            if (err) {
+                return res.statusCode(404)
+            }
+            doc.map((item)=>item.data = []);
+            res.json({
+                status: 'success',
+                data: doc
+            })
         })
     }
 };

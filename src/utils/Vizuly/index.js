@@ -52,7 +52,6 @@ class VizulyWeightedTree extends Component {
 
     loadData() {
         let {data, initialize, prepData} = this;
-
         d3.csv(CSVFILE, function (csv) {
             data.values = prepData(csv);
             //console.log(data.values);
@@ -63,7 +62,7 @@ class VizulyWeightedTree extends Component {
     prepData(csv) {
         let values = [];
         let {valueFields} = this;
-
+        console.log(valueFields)
         //Clean federal budget data and remove all rows where all values are zero or no labels
         csv.forEach(function (d, i) {
             let t = 0;
@@ -96,7 +95,6 @@ class VizulyWeightedTree extends Component {
 
         //Remove empty child nodes left at end of aggregation and add unqiue ids
         function removeEmptyNodes(node, parentId, childId) {
-            console.log(node)
             if (!node) return;
             node.id = parentId + "_" + childId;
             if (node.values) {
@@ -126,6 +124,9 @@ class VizulyWeightedTree extends Component {
         let {trimLabel, onMeasure, onMouseOver, onMouseOut, onClick, onDBClick} = this;
         const _this = this;
         this.data = this.props.data;
+        if(!this.data){
+            return
+        }
 
         _this.viz = vizuly.viz.weighted_tree(document.getElementById("viz_container"));
 
@@ -138,7 +139,7 @@ class VizulyWeightedTree extends Component {
         //Here we set some bases line properties for all three components.
         _this.viz.data(_this.data)                                                      // Expects hierarchical array of objects.
             .width(1000)                                                     // Width of component
-            // .height(600)                                                    // Height of component
+            .height(800)                                                    // Height of component
             // .children(d => d.values)
             .children(function (d) {
                 return d.children
@@ -148,9 +149,7 @@ class VizulyWeightedTree extends Component {
             })                              // 唯一值
             // .key(d => d.name)
             // .value(d => d.agg_Local)
-            .value(function (d) {
-                return 0.5;
-            })// 指定粗细的属性
+            .value((d, i) => d.value)// 指定粗细的属性
             // .value(function (d) { return d.value;})// 指定粗细的属性
             .fixedSpan(-1)                                                  // fixedSpan > 0 will use this pixel value for horizontal spread versus auto size based on viz width
             .branchPadding(.07)
@@ -339,13 +338,12 @@ class VizulyWeightedTree extends Component {
                 "Authorization": token,
             },
             body: JSON.stringify({
-                projectId:"8b580be6-b424-4801-8735-76299bd27047"
+                projectId:this.props.projectId
             })
         })
             .then(res => res.json())
             .then(res => {
                 if (res && res.status === 'success') {
-                    console.log(res.data);
                     this.props.onInit(res.data,this.initialize)
                 }
             })
@@ -356,8 +354,14 @@ class VizulyWeightedTree extends Component {
     render() {
         return (
             <div className="container" style={{width: "100%", height: "100%"}}>
-                <div id="viz_container" className="z-depth-3" style={{height: "90%"}}>
-                    <div id="videoArea"></div>
+                <div
+                    id="viz_container"
+                     className="z-depth-3"
+                     style={{
+                         height:'100%',
+                         width:'100%'
+                     }}>
+                    {/*<div id="videoArea"></div>*/}
                 </div>
 
             </div>

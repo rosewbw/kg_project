@@ -28,7 +28,7 @@ module.exports = function (req, res, next) {
             }
             let updateData = projectData;
             updateData['updateDate'] = new Date().toLocaleString();
-            tProject.update(updateData, function (err, newDoc) {
+            tProject.findOneAndUpdate({_id:updateData._id},updateData, function (err, newDoc) {
                 if(err){
                     return res.json({
                         status: 'false',

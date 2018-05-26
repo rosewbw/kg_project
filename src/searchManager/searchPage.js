@@ -5,6 +5,13 @@ import SearchList from './searchList'
 
 import {Row, Col} from 'antd';
 
+
+import {
+    Switch,
+    Route,
+    withRouter
+} from 'react-router-dom';
+
 class SearchPage extends Component {
     constructor(props) {
         super(props);
@@ -36,6 +43,12 @@ class SearchPage extends Component {
         })
     };
 
+    jumpToLessonPage = (e) => {
+        const lessonId = e.target.parentNode.dataset.lid;
+        console.log(lessonId)
+    };
+
+
     render() {
         return (
             <div id="searchWrapper" className="searchWrapper">
@@ -58,6 +71,7 @@ class SearchPage extends Component {
                         />
                     </Col>
                 </Row>
+                <div id="searchPreview"/>
             </div>
         );
     }

@@ -8,6 +8,7 @@ import {
 
 import {LearnerCourseRoute} from '../course-manage';
 import {SearchPage} from '../searchManager'
+import Home from '../homepage/homepage'
 
 const {Sider} = Layout;
 const SubMenu = Menu.SubMenu;
@@ -18,7 +19,8 @@ class LearningPage extends Component {
         super(props);
 
         this.state = {
-            collapsed: false
+            collapsed: false,
+            currentLesson: ""
         };
 
         this.menuItemClickEvents = {
@@ -46,6 +48,12 @@ class LearningPage extends Component {
         }
     }
 
+    updateCurrentLesson = (data) => {
+        this.setState({
+            currentLesson: data
+        })
+    }
+
     render() {
         const {username, location} = this.props;
         if (!username) {
@@ -58,6 +66,7 @@ class LearningPage extends Component {
         let {itemKey} = this.getSubMenuAndItemKeyFromLocation(this.props.location);
         if (itemKey === "learning-page") itemKey = 'home';
 
+        console.log(itemKey);
         return (
             <Layout style={{minHeight: '100vh'}}>
                 <Sider
@@ -75,8 +84,12 @@ class LearningPage extends Component {
                         onClick={this.onMenuItemClick}
                     >
                         <Menu.Item key="home">
-                            <Icon type="pie-chart"/>
-                            <span>首页</span>
+                            <Link to={`${this.props.match.url}/home`}
+                                  style={{textDecoration: 'none'}}>
+                                <Icon type="pie-chart"/>
+                                <span>首页</span>
+                            </Link>
+
                         </Menu.Item>
                         <Menu.Item key="search">
                             <Link to={`${this.props.match.url}/search`}
@@ -96,9 +109,13 @@ class LearningPage extends Component {
                                     课程列表
                                 </Link>
                             </Menu.Item>
-                            <Menu.Item key="learned">已学课程</Menu.Item>
-                            <Menu.Item key="current">
-                                <Link to={`${this.props.match.url}/course/view`}
+                            <Menu.Item key="view">
+                                <Link to={{
+                                    pathname: `${this.props.match.url}/course/view`,
+                                    state: {
+                                        lessonId: this.state.currentLesson
+                                    }
+                                }}
                                       style={{textDecoration: 'none'}}>
                                     当前课程
                                 </Link>
@@ -117,7 +134,10 @@ class LearningPage extends Component {
                     </Menu>
                 </Sider>
                 <Layout style={{marginLeft: 200, overflowY: 'hidden'}}>
-                    <Route path={`${this.props.match.url}/course`} component={LearnerCourseRoute}/>
+                    <Route path={`${this.props.match.url}/home`} component={Home}/>
+                    <Route path={`${this.props.match.url}/course`} render={() => <LearnerCourseRoute
+                        updateCurrentLesson={this.updateCurrentLesson}
+                    />}/>
                     <Route path={`${this.props.match.url}/search`} component={SearchPage}/>
                 </Layout>
             </Layout>
