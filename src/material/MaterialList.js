@@ -1,24 +1,27 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, Icon, Modal } from 'antd';
-import { Link } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Row, Col, Card, Icon, Modal} from 'antd';
+import {Link} from 'react-router-dom';
 
 import MaterialForm from './MaterialForm';
-import { formatParser } from '../utils';
+import {formatParser} from '../utils';
 
 import DEFAULT_IMAGE from "../defaultImg.jpg";
+
 const DEFAULT_TYPE = "question-circle-o"; // 默认资源类型对应的图标
 const DEFAULT_URL = "#";
 const DEFAULT_TITLE = "无标题";
 const DEFAULT_DESCRIPTION = "无描述";
 
-const { Meta } = Card;
+const DEFAULT_PATH = 'http://localhost:3001';
+
+const {Meta} = Card;
 
 class MaterialList extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            edit:{
+            edit: {
                 enable: false,
                 materialId: '',
             }
@@ -39,28 +42,28 @@ class MaterialList extends Component {
     }
 
     showEditModal(id) {
-        this.setState({ edit: { enable: true, materialId: id } });
+        this.setState({edit: {enable: true, materialId: id}});
     }
 
     closeEditModal() {
-        this.setState({ edit: { enable: false, materialId: '' } });
+        this.setState({edit: {enable: false, materialId: ''}});
     }
 
     render() {
-        const { edit } = this.state;
-        const { materials } = this.props;
+        const {edit} = this.state;
+        const {materials} = this.props;
 
         return (
             <div>
-                {edit.enable && <MaterialEditModal visible={ edit.enable }
-                                                   material={ materials.filter(material => material._id === edit.materialId)[0] }
+                {edit.enable && <MaterialEditModal visible={edit.enable}
+                                                   material={materials.filter(material => material._id === edit.materialId)[0]}
                                                    onClose={this.closeEditModal}
                                                    onEdit={newMaterial => this.handleEdit(edit.materialId, newMaterial)}
                 />}
-                <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} >
+                <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
                     {
-                        materials.map(({ _id: id, title, description, format, url, thumbnailUrl: thumbnail }) => (
-                            <Col key={id} span={4} style={{ marginBottom: "15px" }}>
+                        materials.map(({_id: id, title, description, format, url, thumbnailUrl: thumbnail}) => (
+                            <Col key={id} span={4} style={{marginBottom: "15px"}}>
                                 <MaterialCard
                                     id={id}
                                     title={title}
@@ -80,20 +83,20 @@ class MaterialList extends Component {
     }
 }
 
-const MaterialCard = ({ title, description, format, url, thumbnail, onDelete, onEdit }) => {
+const MaterialCard = ({title, description, format, url, thumbnail, onDelete, onEdit}) => {
     const type = formatParser.toIcon(format);
 
     return (
         <Card
             cover={<Link to={url || DEFAULT_URL}>
-                <img src={thumbnail || DEFAULT_IMAGE} style={{"height": "150px", "width": "100%" }}/>
-            </Link> }
-            actions={[<div onClick={onEdit}><Icon type="edit" /></div>,
-                <div onClick={onDelete}><Icon type="delete" /></div>]}
+                <img src={DEFAULT_PATH + thumbnail || DEFAULT_IMAGE} style={{"height": "150px", "width": "100%"}}/>
+            </Link>}
+            actions={[<div onClick={onEdit}><Icon type="edit"/></div>,
+                <div onClick={onDelete}><Icon type="delete"/></div>]}
         >
             <Meta
-                avatar={<Icon type={type || DEFAULT_TYPE} style={{ fontSize: 48 }} />}
-                title={ <Link to={url || DEFAULT_URL}>{title || DEFAULT_TITLE}</Link>}
+                avatar={<Icon type={type || DEFAULT_TYPE} style={{fontSize: 48}}/>}
+                title={<Link to={url || DEFAULT_URL}>{title || DEFAULT_TITLE}</Link>}
                 description={description || DEFAULT_DESCRIPTION}
             />
         </Card>
@@ -108,19 +111,19 @@ class MaterialEditModal extends Component {
     }
 
     handleClose = () => {
-        const { onClose } = this.props;
+        const {onClose} = this.props;
         onClose();
     };
 
     handleSave = res => {
         if (!res.success) return;
 
-        const { onClose, onEdit } = this.props;
+        const {onClose, onEdit} = this.props;
         onClose();
         onEdit(res.data);
     };
 
-    render () {
+    render() {
         const {
             _id: materialId,
             title: materialName,

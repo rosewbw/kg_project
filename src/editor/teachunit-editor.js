@@ -111,15 +111,11 @@ class CourseEdit extends Component {
     componentDidMount() {
         let _this = this;
         const token = localStorage.getItem('token');
-        fetch('/getMediaList', {
-            method: 'POST',
+        fetch('/materials?username=' + _this.props.username, {
+            method: 'GET',
             headers: {
-                "Content-Type": "application/json",
                 "Authorization": token,
-            },
-            body: JSON.stringify({
-                username: _this.props.username
-            })
+            }
         })
             .then(res => res.json())
             .then(res => {
@@ -143,7 +139,7 @@ class CourseEdit extends Component {
         let aCUnit = this.state.aCUnit;
         aCUnit.push(data);
         this.setState({
-            aCUnit:aCUnit
+            aCUnit: aCUnit
         })
     };
 
@@ -214,9 +210,10 @@ class AidList extends Component {
         loading: false,
         hasMore: true
     };
-    handleInfiniteOnLoad = () =>{
+    handleInfiniteOnLoad = () => {
 
     };
+
     render() {
         let data = [];
         for (let index in this.state.aCUnit) {
@@ -234,7 +231,7 @@ class AidList extends Component {
                     <List
                         dataSource={data}
                         renderItem={item => (
-                            <List.Item >{item}</List.Item>
+                            <List.Item>{item}</List.Item>
                         )}
                     />
                 </InfiniteScroll>
@@ -419,9 +416,10 @@ const MainCourseInfo = (props) => {
             if (children[type] === undefined) {
                 children[type] = [];
             }
-            children[type].push(<Option key={tMaterialList[index]._id}>{tMaterialList[index].name}</Option>);
+            children[type].push(<Option key={tMaterialList[index]._id}>{tMaterialList[index].title}</Option>);
         }
     }
+    console.log(mCInfo)
     return (
         <div>
             <Row>
@@ -516,7 +514,7 @@ const MainCourseInfo = (props) => {
                             <Select
                                 defalt
                                 style={{width: 200}}
-                                defaultValue={mCInfo.material[0] === undefined ? '请选择素材' : mCInfo.material[0].name}
+                                defaultValue={mCInfo.material === undefined ? '请选择素材' : mCInfo.material.title}
                                 id="material"
                                 onChange={mainCourseMaterialInfoChanged}
                             >
@@ -670,7 +668,7 @@ class AidCourseInfo extends Component {
                 if (children[type] === undefined) {
                     children[type] = [];
                 }
-                children[type].push(<Option key={tMaterialList[index]._id}>{tMaterialList[index].name}</Option>);
+                children[type].push(<Option key={tMaterialList[index]._id}>{tMaterialList[index].title}</Option>);
             }
         }
 

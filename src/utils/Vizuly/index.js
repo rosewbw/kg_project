@@ -5,8 +5,10 @@ import $ from 'jquery';
 
 import fetch from 'isomorphic-fetch';
 
-
 import InfiniteScroll from 'react-infinite-scroller';
+
+import {KnowledgePreview} from '../index'
+
 import {List, Avatar, Spin} from 'antd';
 
 import {Row, Col, Button} from 'antd';
@@ -62,7 +64,6 @@ class VizulyWeightedTree extends Component {
     prepData(csv) {
         let values = [];
         let {valueFields} = this;
-        console.log(valueFields)
         //Clean federal budget data and remove all rows where all values are zero or no labels
         csv.forEach(function (d, i) {
             let t = 0;
@@ -202,7 +203,8 @@ class VizulyWeightedTree extends Component {
 
 
     onDBClick(e, d, i) {
-        let data = this.props.odata;
+        console.log(this.props.originData)
+        let data = this.props.originData;
         for (let index in data) {
             if (data[index]._id === d.vz_tree_id) {
                 if (data[index].teachUnit.mCourseUnit.material.url) {
@@ -211,15 +213,12 @@ class VizulyWeightedTree extends Component {
                         temp.push(data[index].teachUnit.aCourseUnit[i])
                     }
 
+                    console.log(data[index])
                     ReactDOM.render(
-                        <TeachUnitEditor
-                            title={data[index].teachUnit.title}
-                            videoUrl={data[index].teachUnit.mCourseUnit.material.url}
-                            aCUnit={temp}
+                        <KnowledgePreview
                             onNextCourse={this.onNextCourse}
                             onPrevCourse={this.onPrevCourse}
-                            tUnitId={data[index]._id}
-                            tUnit={data[index]}
+                            kUnit={data[index]}
                         />
                         , document.getElementById('videoArea')
                     )
@@ -231,7 +230,7 @@ class VizulyWeightedTree extends Component {
     }
 
     onNextCourse = (id) => {
-        let data = this.props.odata;
+        let data = this.props.originData;
         for (let index in data) {
             if (data[index]._id === id) {
                 if(data[index].hasNextNode){
@@ -243,15 +242,16 @@ class VizulyWeightedTree extends Component {
                                 for (let i in data[k].teachUnit.aCourseUnit) {
                                     temp.push(data[k].teachUnit.aCourseUnit[i])
                                 }
+
                                 ReactDOM.unmountComponentAtNode(document.getElementById('videoArea'));
                                 ReactDOM.render(
-                                    <TeachUnitEditor
+                                    <KnowledgePreview
                                         title={data[k].teachUnit.title}
                                         videoUrl={data[k].teachUnit.mCourseUnit.material.url}
                                         aCUnit={temp}
                                         onNextCourse={this.onNextCourse}
                                         onPrevCourse={this.onPrevCourse}
-                                        tUnitId={data[k]._id}
+                                        kUnitId={data[k]._id}
                                     />
                                     , document.getElementById('videoArea')
                                 )
@@ -261,11 +261,12 @@ class VizulyWeightedTree extends Component {
                 }
             }
         }
+        alert('没有下一节')
     };
 
 
     onPrevCourse = (id) => {
-        let data = this.props.odata;
+        let data = this.props.originData;
         for (let index in data) {
             if (data[index]._id === id) {
                 if(data[index].hasPrevNode ){
@@ -277,15 +278,16 @@ class VizulyWeightedTree extends Component {
                                 for (let i in data[k].teachUnit.aCourseUnit) {
                                     temp.push(data[k].teachUnit.aCourseUnit[i])
                                 }
+
                                 ReactDOM.unmountComponentAtNode(document.getElementById('videoArea'));
                                 ReactDOM.render(
-                                    <TeachUnitEditor
+                                    <KnowledgePreview
                                         title={data[k].teachUnit.title}
                                         videoUrl={data[k].teachUnit.mCourseUnit.material.url}
                                         aCUnit={temp}
                                         onNextCourse={this.onNextCourse}
                                         onPrevCourse={this.onPrevCourse}
-                                        tUnitId={data[k]._id}
+                                        kUnitId={data[k]._id}
                                     />
                                     , document.getElementById('videoArea')
                                 )
@@ -295,6 +297,7 @@ class VizulyWeightedTree extends Component {
                 }
             }
         }
+        alert('没有上一节')
     };
 
     //This function is called when the user selects a different skin.
@@ -361,7 +364,7 @@ class VizulyWeightedTree extends Component {
                          height:'100%',
                          width:'100%'
                      }}>
-                    {/*<div id="videoArea"></div>*/}
+                    <div id="videoArea"/>
                 </div>
 
             </div>

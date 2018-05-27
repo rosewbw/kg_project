@@ -53,7 +53,7 @@ class CourseContent extends Component {
         return <VizulyWeightedTree
             projectId={this.props.projectId}
             data={this.courseToData(this.state.course)}
-            odata={this.state.course &&this.state.course.data}
+            originData={this.state.course &&this.state.course.data}
             onInit={this.getData}/>;
     }
 }

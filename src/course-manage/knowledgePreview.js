@@ -4,14 +4,14 @@ import ReactDOM from 'react-dom';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import {Document, Page} from 'react-pdf'
-import {Row, Col, List, Card} from 'antd';
+import {Row, Col, List, Card, Button} from 'antd';
 
 import {
     withRouter,
     Link
 } from 'react-router-dom';
 
-import DEFAULT from './test.pdf'
+// import DEFAULT from './test.pdf'
 
 const DEFAULT_MATERIAL = {
     'img': 'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2486531409,3348270894&fm=27&gp=0.jpg',
@@ -33,15 +33,15 @@ const TYPE_CONVERSE = {
 };
 
 
-class SearchKnowledgePreview extends Component {
+class KnowledgePreview extends Component {
     state = {
-        knowledgeData: this.props.knowledgeData,
-        currentUrl: this.props.knowledgeData.mcourse.data.material_data.data.url,
-        currentType: TYPE_CONVERSE[this.props.knowledgeData.mcourse.data.material_data.data.type]
+        kUnit: this.props.kUnit,
+        currentUrl: this.props.kUnit.teachUnit.mCourseUnit.material.url,
+        currentType: TYPE_CONVERSE[this.props.kUnit.teachUnit.mCourseUnit.material.type]
     };
 
     cancelEditor = () => {
-        ReactDOM.unmountComponentAtNode(document.getElementById('searchPreview'));
+        ReactDOM.unmountComponentAtNode(document.getElementById('videoArea'));
     };
 
     onDocumentLoad = ({numPages}) => {
@@ -53,16 +53,16 @@ class SearchKnowledgePreview extends Component {
 
     changeAidCourseMedia = (e) => {
         let pendingId = e.target.dataset.aid;
-        const aidCourseInfo = this.state.knowledgeData.acourse;
+        const aidCourseInfo = this.state.kUnit.teachUnit.aCourseUnit;
 
         aidCourseInfo.map(item => {
-            if (pendingId === item.id) {
-                let type = item.data.learningObjectType;
+            if (pendingId === item._id) {
+                let type = item.learningObjectType;
                 if (type === '') {
-                    type = TYPE_CONVERSE[item.data.material_data.data.type]
+                    type = TYPE_CONVERSE[item.material.type]
                 }
                 this.setState({
-                    currentUrl: item.data.material_data.data.url,
+                    currentUrl: item.material.url,
                     currentType: type
                 })
             }
@@ -73,32 +73,27 @@ class SearchKnowledgePreview extends Component {
 
     changeMainCourseMedia = (e) => {
         let pendingId = e.target.dataset.mid;
-        const mainCourseInfo = this.state.knowledgeData.mcourse;
-        if (pendingId === mainCourseInfo.id) {
-            let type = mainCourseInfo.data.learningObjectType;
+        const mainCourseInfo = this.state.kUnit.teachUnit.mCourseUnit;
+        if (pendingId === mainCourseInfo._id) {
+            let type = mainCourseInfo.learningObjectType;
             if (type === '') {
-                type = TYPE_CONVERSE[mainCourseInfo.data.material_data.data.type]
+                type = TYPE_CONVERSE[mainCourseInfo.material.type]
             }
             this.setState({
-                currentUrl: mainCourseInfo.data.material_data.data.url,
+                currentUrl: mainCourseInfo.material.url,
                 currentType: type
             })
         }
     };
 
-    componentDidMount() {
-
-    }
     render() {
-        const {knowledgeData} = this.state;
-        const knowledgeInfo = knowledgeData.knowledge;
-        const aidCourseInfo = knowledgeData.acourse;
-        const mainCourseInfo = knowledgeData.mcourse;
-        const teachInfo = knowledgeData.teach;
-        // const TeachInfoAreaRouter = withRouter(TeachInfoArea);
-        const lessonId = knowledgeData.lesson.id
+        const {kUnit} = this.state;
+        const knowledgeInfo = kUnit;
+        const teachInfo = knowledgeInfo.teachUnit;
+        const aidCourseInfo = teachInfo.aCourseUnit;
+        const mainCourseInfo = teachInfo.mCourseUnit;
         return (
-            <div id="searchPreviewArea" className="searchPreviewArea">
+            <div id="knowledgePreviewArea" className="knowledgePreviewArea">
                 <div id="previewContainer" className="previewContainer">
                     <Row>
                         <Col span={24}>
@@ -139,8 +134,9 @@ class SearchKnowledgePreview extends Component {
                             </Col>
                             <Col className="gutter-row" span={8} key={2}>
                                 <TeachInfoArea
+                                    onNextCourse={this.props.onNextCourse}
+                                    onPrevCourse={this.props.onPrevCourse}
                                     enterLesson={this.props.enterLesson}
-                                    lessonId={lessonId}
                                     teachInfo={teachInfo}
                                 />
                             </Col>
@@ -222,13 +218,15 @@ class AidList extends Component {
     };
 
     render() {
+
         let data = [];
         const adiCourseInfo = this.state.aidCourseInfo;
+        console.log(adiCourseInfo)
         for (let index in adiCourseInfo) {
             data.push({
-                courseId: adiCourseInfo[index].id,
-                title: adiCourseInfo[index].data.title,
-                description: adiCourseInfo[index].data.description
+                courseId: adiCourseInfo[index]._id,
+                title: adiCourseInfo[index].title,
+                description: adiCourseInfo[index].description || ''
             })
         }
         return (
@@ -267,10 +265,10 @@ const KnowledgeInfoArea = ({knowledgeInfo}) => {
     return (
         <div className="KnowledgeInfoArea">
             <Card title="知识点信息">
-                <p>知识点名称：{knowledgeInfo.data.title}</p>
-                <p>大纲要求难度：{knowledgeInfo.data.demand}</p>
-                <p>学生掌握程度：{knowledgeInfo.data.achieve}</p>
-                <p style={{visibility:'hidden'}}> 1 </p>
+                <p>知识点名称：{knowledgeInfo.title}</p>
+                <p>大纲要求难度：{knowledgeInfo.demand}</p>
+                <p>学生掌握程度：{knowledgeInfo.achieve}</p>
+                <p style={{visibility: 'hidden'}}> 1 </p>
             </Card>
         </div>
     )
@@ -280,40 +278,44 @@ const MainLessonInfoArea = ({mainCourseInfo, changeMainCourseMedia}) => {
     return (
         <div className="mainCourseInfoArea">
             <Card title="主课时信息"
-                  extra={[<div data-mid={mainCourseInfo.id} style={{cursor: 'pointer'}} onClick={changeMainCourseMedia}>
+                  extra={[<div data-mid={mainCourseInfo._id} style={{cursor: 'pointer'}}
+                               onClick={changeMainCourseMedia}>
                       播放</div>]}>
-                <p>主课时名称：{mainCourseInfo.data.title}</p>
-                <p>主课时难度：{TYPE_CONVERSE[mainCourseInfo.data.difficulty]}</p>
-                <p>主课时交互程度：{TYPE_CONVERSE[mainCourseInfo.data.interactionDegree]}</p>
-                <p>主课时交互类型：{TYPE_CONVERSE[mainCourseInfo.data.interactionType]}</p>
+                <p>主课时名称：{mainCourseInfo.title}</p>
+                <p>主课时难度：{TYPE_CONVERSE[mainCourseInfo.difficulty]}</p>
+                <p>主课时交互程度：{TYPE_CONVERSE[mainCourseInfo.interactionDegree]}</p>
+                <p>主课时交互类型：{TYPE_CONVERSE[mainCourseInfo.interactionType]}</p>
             </Card>
         </div>
     )
 }
-
-// [<Link to={{
-//     pathname: '/learning-page/course/view',
-//     state: {lessonId: lessonId}
-// }}>查看课程</Link>]
 
 
 const TeachInfoArea = (props) => {
-    const {teachInfo, lessonId, enterLesson} = props;
+    const {teachInfo, onNextCourse, onPrevCourse} = props;
     return (
         <div className="teachInfoArea">
             <Card title="教学单元信息"
-                  extra={[<div style={{cursor:'pointer'}} onClick={()=>{
-                      enterLesson(lessonId)
-                  }}>查看课程</div>]}
             >
-                <p>教学单元名称：{teachInfo.data.title}</p>
-                <p>教学单元描述：{TYPE_CONVERSE[teachInfo.data.description]}</p>
-                <p>教学单元关键字：{TYPE_CONVERSE[teachInfo.data.keyword]}</p>
-                <p style={{visibility:'hidden'}}> 1 </p>
+                <p>教学单元名称：{teachInfo.title}</p>
+                <p>教学单元描述：{TYPE_CONVERSE[teachInfo.description]}</p>
+                <p>教学单元关键字：{TYPE_CONVERSE[teachInfo.keyword]}</p>
+                <Button
+                    style={{marginTop: '0.4rem'}}
+                    onClick={(e) => {
+                        onPrevCourse(teachInfo._id)
+                    }}
+                >上一节</Button>
+                <Button
+                    style={{marginTop: '0.4rem'}}
+                    onClick={(e) => {
+                        onNextCourse(teachInfo._id)
+                    }}
+                >下一节</Button>
             </Card>
         </div>
     )
 }
 
 
-export default SearchKnowledgePreview
+export default KnowledgePreview

@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 import {LearnerCourseRoute} from '../course-manage';
+import {SearchRoute} from '../searchManager';
 import {SearchPage} from '../searchManager'
 import Home from '../homepage/homepage'
 
@@ -138,7 +139,7 @@ class LearningPage extends Component {
                     <Route path={`${this.props.match.url}/course`} render={() => <LearnerCourseRoute
                         updateCurrentLesson={this.updateCurrentLesson}
                     />}/>
-                    <Route path={`${this.props.match.url}/search`} component={SearchPage}/>
+                    <Route path={`${this.props.match.url}/search`} component={SearchRoute}/>
                 </Layout>
             </Layout>
         )
