@@ -64,5 +64,14 @@
     background: #ffffff;
 }
 
+#pdfView {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    margin-left: -30%;
+    margin-top: -22.5%;
+    z-index: 1000;
+}
+
 
 

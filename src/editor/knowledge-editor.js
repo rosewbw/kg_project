@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './editor.css'
 
+import fetch from 'isomorphic-fetch';
+
 import TeachUnitEditor from './teachunit-editor';
 
 import {Input, Select} from 'antd';
@@ -17,7 +19,8 @@ class KnowledgeEditor extends Component {
         super(props);
         this.state = {
             kUnit: this.props.kUnitData,
-            username: this.props.username
+            username: this.props.username,
+            materialList: []
         };
         this.cancelHandler = this.cancelHandler.bind(this);
         this.saveHandler = this.saveHandler.bind(this);
@@ -76,6 +79,7 @@ class KnowledgeEditor extends Component {
 
 
     kUnitInfoChange(e) {
+        console.log(e)
         let inputType = e.target.id;
         if (inputType === 'synonym') {
             return
@@ -222,7 +226,8 @@ class KnowledgeEditor extends Component {
 
     };
 
-    onKnowledgeKeywordChanged = (data) => {
+    onKnowledgeSynonymChanged = (data) => {
+        console.log(data);
         let kUnit = this.state.kUnit;
         kUnit.synonym = data;
         this.setState({
@@ -230,7 +235,32 @@ class KnowledgeEditor extends Component {
         })
     };
 
+    onThumbnailUrlSelect = (data) => {
+        let kUnit = this.state.kUnit;
+        kUnit.thumbnailUrl = data
+        this.props.onUpdateUrlAndName(kUnit._id, 'thumbnail', data);
+        this.setState({
+            kUnit: kUnit
+        })
+    }
+
     componentDidMount() {
+        const token = localStorage.getItem('token');
+        fetch('/materials?username=' + this.props.username, {
+            method: 'GET',
+            headers: {
+                "Authorization": token,
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res && res.status === 'success') {
+                    this.setState({
+                        materialList: res.data
+                    });
+                }
+            })
+            .catch(err => console.log(err));
 
     }
 
@@ -248,7 +278,6 @@ class KnowledgeEditor extends Component {
         for (let index in kUnit.synonym) {
             synonym.push(<Option key={kUnit.synonym[index]}>{kUnit.synonym[index]}</Option>);
         }
-        console.log(kUnit)
 
 
         let defaultChildren = {
@@ -262,8 +291,6 @@ class KnowledgeEditor extends Component {
             hasNextNode: []
         };
 
-        // let hasPrevNode = kUnit.hasPrevNode[0];
-        // let hasNextNode = kUnit.hasNextNode[0];
         for (let item in defaultChildren) {
             if (kUnit[item]) {
                 kUnit[item].map((object) => {
@@ -271,7 +298,19 @@ class KnowledgeEditor extends Component {
                 })
             }
         }
-        console.log(defaultChildren)
+
+        const imageList = []
+        const materialList = this.state.materialList;
+        for (let index in materialList) {
+            if (materialList[index]) {
+                if (materialList[index].type === '图片') {
+                    imageList.push(<Option key={materialList[index].url}>{materialList[index].title}</Option>);
+                }
+
+            }
+        }
+
+
         return (
             <div id="kEditorContainerArea" className="kEditorContainerArea">
                 <div id="kEditorContainer" className="kEditorContainer">
@@ -291,11 +330,20 @@ class KnowledgeEditor extends Component {
                                         </section>
                                         <section>
                                             <label>知识点缩略图</label>
-                                            <Input
-                                                id="thumbnailUrl"
-                                                size="small"
+                                            <Select
+                                                label="知识点缩略图"
+                                                style={{width: '100%'}}
+                                                placeholder="请选择"
                                                 defaultValue={kUnit.thumbnailUrl}
-                                            />
+                                                onSelect={this.onThumbnailUrlSelect}
+                                            >
+                                                {imageList}
+                                            </Select>
+                                            {/*<Input*/}
+                                            {/*id="thumbnailUrl"*/}
+                                            {/*size="small"*/}
+                                            {/*defaultValue={kUnit.thumbnailUrl}*/}
+                                            {/*/>*/}
                                         </section>
                                         <section>
                                             <label>知识点大纲要求难度（0-100）</label>
@@ -319,7 +367,7 @@ class KnowledgeEditor extends Component {
                                                 mode="tags"
                                                 style={{width: '100%'}}
                                                 placeholder="知识点同义词"
-                                                onChange={this.onKnowledgeKeywordChanged}
+                                                onChange={this.onKnowledgeSynonymChanged}
                                                 defaultValue={kUnit.synonym}
                                                 id="synonym"
                                             >

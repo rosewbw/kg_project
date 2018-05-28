@@ -352,20 +352,6 @@ const BasicInfo = (props) => {
                             </Select>
                         </Col>
                     </InputGroup>
-                    {/*<InputGroup label="status" size="middle">*/}
-                        {/*<Col span={8}>*/}
-                            {/*<label>教学单元发布状态</label>*/}
-                            {/*<Select*/}
-                                {/*defaultValue={tUnit.status || '未发布'}*/}
-                                {/*style={{width: '100%'}}*/}
-                                {/*id="status"*/}
-                                {/*onChange={statusChange}>*/}
-                                {/*<Option value="publish">已发布</Option>*/}
-                                {/*<Option value="unpublish">未发布</Option>*/}
-
-                            {/*</Select>*/}
-                        {/*</Col>*/}
-                    {/*</InputGroup>*/}
                 </div>
             </section>
         </div>

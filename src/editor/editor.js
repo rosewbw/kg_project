@@ -6,11 +6,16 @@ import $ from 'jquery';
 import './editor.css';
 import {KnowledgeUnit} from './componentConstructor';
 import {createElement, path_container_construct} from '../utils/utils';
+import fetch from 'isomorphic-fetch';
 
 import KnowledgeEditor from './knowledge-editor';
 import 'jquery-mousewheel'
 
-import {Input, Button} from 'antd';
+import {Input, Button, Modal, Row, Col, Form, Select} from 'antd';
+
+const FormItem = Form.Item;
+const Option = Select.Option;
+const OptGroup = Select.OptGroup;
 
 class Editor extends Component {
     constructor(props) {
@@ -20,13 +25,15 @@ class Editor extends Component {
             projectId: '',
             username: '',
             projectName: '',
+            thumbnailUrl: '',
+            description: '',
             startPosition: {
                 x: 250,
                 y: 300
             },
             projectDataFetched: false,
-            path_container: []
-
+            path_container: [],
+            visible: false
         };
         this.canvasConstructor = this.canvasConstructor.bind(this);
         this.getKnowledgeObjectById = this.getKnowledgeObjectById.bind(this);
@@ -37,6 +44,42 @@ class Editor extends Component {
         this.getProjectData = this.getProjectData.bind(this);
         this.updateProjectName = this.updateProjectName.bind(this);
         this.saveProject = this.saveProject.bind(this);
+    }
+
+    showModal = () => {
+        this.setState({
+            visible: true,
+        });
+    }
+
+    handleCreate = () => {
+        console.log('handleCreate')
+        let updateOptions = {}
+        const form = this.formRef.props.form;
+        form.validateFields((err, values) => {
+            console.log(values)
+            if (err) {
+                return;
+            }
+            values.title ? updateOptions.projectName = values.title : '';
+            values.description ? updateOptions.description = values.description : '';
+            values.thumbnailUrl ? updateOptions.thumbnailUrl = values.thumbnailUrl : '';
+            updateOptions.visible = false;
+            console.log(updateOptions)
+
+            form.resetFields();
+            this.setState(updateOptions);
+        });
+    }
+    handleCancel = (e) => {
+        console.log('handleCancel');
+        this.setState({
+            visible: false,
+        });
+    }
+
+    saveFormRef = (formRef) => {
+        this.formRef = formRef;
     }
 
     canvasConstructor(canvas, dragBox, options, callback) {
@@ -187,7 +230,6 @@ class Editor extends Component {
                                         startPosition: newPositionInfo.position
                                     })
                                 } else {
-                                    console.log(newPositionInfo);
                                     let kUnit = _this.getKnowledgeObjectById(newPositionInfo._id)
                                     kUnit.position = newPositionInfo.position;
                                     //callback ? callback('pushNewPosition', newPositionInfo) : '';
@@ -233,7 +275,7 @@ class Editor extends Component {
                         });
                     } else if (ele.attr('class') === basicOptions.pathCollect) {
                         //No.3 发送添加新路径请求，发送新路径的 fromId 和 targetId
-                        let newPathInfo = fn.staticed_path(ele.parent());
+                        fn.staticed_path(ele.parent());
                         //callback ? callback('pushNewPath', newPathInfo) : '';
                         $(document).unbind();
                     } else if (ele[0].tagName === 'path') {
@@ -941,7 +983,6 @@ class Editor extends Component {
             let path_back = createElement('path');
             let arrow = createElement('path');
             fun.svgContainer.prepend(svg.append(path_back, path, arrow));
-            console.log(fun.svgContainer);
             set_path_cssAndAttr(svg, path, path_back, arrow);
             set_path_position(ele, svg);
             return svg;
@@ -1280,6 +1321,8 @@ class Editor extends Component {
             _id: _this.state.projectId,
             projectName: _this.state.projectName,
             userName: _this.state.username,
+            description: _this.state.description,
+            thumbnailUrl: this.state.thumbnailUrl,
             publishStatus: 'unPublish',
             data: _this.convertStructure(_this.state.knowledgeUnitList),
             startPosition: startPosition
@@ -1295,7 +1338,7 @@ class Editor extends Component {
             let kUnit = kList[idx];
             let k = new KnowledgeUnit();
             for (let i in kUnit) {
-                if (typeof(kUnit[i]) !== 'object' || i === 'teachUnit' || i === 'position') {
+                if (typeof(kUnit[i]) !== 'object' || i === 'teachUnit' || i === 'position'||i ==='synonym') {
                     k[i] = kUnit[i]
                 } else {
                     if (k[i] === undefined) {
@@ -1308,7 +1351,7 @@ class Editor extends Component {
         for (let idx in kList) {
             let kUnit = kList[idx];
             for (let i in kUnit) {
-                if (typeof(kUnit[i]) !== 'object' || i === 'teachUnit' || i === 'position') {
+                if (typeof(kUnit[i]) !== 'object' || i === 'teachUnit' || i === 'position'||i ==='synonym') {
 
                 } else {
                     for (let j in kUnit[i]) {
@@ -1332,7 +1375,7 @@ class Editor extends Component {
             let kUnit = kList[idx];
             let temp = {};
             for (let i in kUnit) {
-                if (typeof(kUnit[i]) !== 'object' || i === 'teachUnit' || i === 'position') {
+                if (typeof(kUnit[i]) !== 'object' || i === 'teachUnit' || i === 'position'||i ==='synonym') {
                     temp[i] = kUnit[i]
                 } else {
                     if (temp[i] === undefined) {
@@ -1377,6 +1420,7 @@ class Editor extends Component {
 
     //这种写法好烂......
     onUpdateUrlAndName(kUnitId, type, value) {
+        console.log(value)
         let kUnitDOM = document.getElementById(kUnitId);
         if (type === 'title') {
             console.log(kUnitDOM.childNodes[1].value)
@@ -1710,6 +1754,8 @@ class Editor extends Component {
         }, function (data) {
             _this.setState({
                 projectName: data[0].projectName,
+                description: data[0].description,
+                thumbnailUrl: data[0].thumbnailUrl,
                 projectDataFetched: true,
                 username: _this.props.username,
                 knowledgeUnitList: _this.reConvertStructure(data[0].data) || [],
@@ -1732,7 +1778,6 @@ class Editor extends Component {
     render() {
         const {projectFetched} = this.props;
         const {projectDataFetched} = this.state;
-
         if (projectFetched && !projectDataFetched) {
             this.getProjectData(() => {
                 const options = {
@@ -1748,6 +1793,7 @@ class Editor extends Component {
             });
 
         }
+        const visible = this.state.visible
 
         return (
             <div id="editorArea">
@@ -1760,8 +1806,8 @@ class Editor extends Component {
                     <Button id="deleteBtn"
                             className="editBtn editorBtn ant-btn-primary"
                     >删除</Button>
-                    <Button id="previewBtn"
-                            className="previewBtn editorBtn">预览</Button>
+                    {/*<Button id="previewBtn"*/}
+                    {/*className="previewBtn editorBtn">预览</Button>*/}
                     <Button id="saveBtn"
                             onClick={this.saveProject}
                             className="saveBtn editorBtn">保存</Button>
@@ -1769,14 +1815,20 @@ class Editor extends Component {
                             type="dashed"
                             className="backBtn editorBtn"
                             onClick={this.props.onBack}>后退</Button>
-
-                    <div id="projectStatus" className="projectStatus">
-                        <Input
-                            addonBefore="课程名称"
-                            placeholder={this.state.projectName}
-                            onChange={this.updateProjectName}
-                        />
-                    </div>
+                    <Button id="settingBtn"
+                            type="dashed"
+                            className="backBtn editorBtn"
+                            onClick={this.showModal}>设置</Button>
+                    <UpdateSettingForm
+                        username={this.state.username}
+                        wrappedComponentRef={this.saveFormRef}
+                        visible={visible}
+                        onCancel={this.handleCancel}
+                        onCreate={this.handleCreate}
+                        projectName={this.state.projectName}
+                        thumbnailUrl={this.state.thumbnailUrl}
+                        description={this.state.description}
+                    />
                 </div>
                 <div id="mainCanvas"/>
                 <div id="unitEdit"/>
@@ -1785,5 +1837,92 @@ class Editor extends Component {
         )
     }
 }
+
+
+class UpdateSetting extends Component {
+    state = {
+        materialList: []
+    }
+
+    componentDidMount() {
+        const token = localStorage.getItem('token');
+        fetch('/materials?username=' + this.props.username, {
+            method: 'GET',
+            headers: {
+                "Authorization": token,
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res && res.status === 'success') {
+                    this.setState({
+                        materialList: res.data
+                    });
+                }
+            })
+            .catch(err => console.log(err));
+    }
+
+    render() {
+        const {visible, onCancel, onCreate, form} = this.props;
+        const {getFieldDecorator} = form;
+        const {projectName, thumbnailUrl, description} = this.props;
+        const materialList = this.state.materialList;
+        const children = [];
+        let type;
+        for (let index in materialList) {
+            if (materialList[index]) {
+                if (materialList[index].type === '图片') {
+                    children.push(<Option key={materialList[index].url}>{materialList[index].title}</Option>);
+                }
+
+            }
+        }
+
+
+        return (
+            <Modal
+                title="修改课程信息"
+                visible={visible}
+                onCancel={onCancel}
+                onOk={onCreate}
+            >
+                <Form layout="vertical">
+                    <FormItem label="课程名称">
+                        {getFieldDecorator('title')(
+                            <Input
+                                placeholder={projectName}
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem label="课程描述">
+                        {getFieldDecorator('description')(
+                            <Input
+                                placeholder={description}
+                                type="textarea"/>
+                        )}
+                    </FormItem>
+                    <FormItem label="课程缩略图">
+                        {getFieldDecorator('thumbnailUrl')(
+                            <Select
+                                combobox={false}
+                                size="default"
+                                className='thumbnailUrlSelect'
+                                id="material"
+                            >
+                                <OptGroup label="图片">
+                                    {children}
+                                </OptGroup>
+                            </Select>
+                        )}
+                    </FormItem>
+                </Form>
+            </Modal>
+        )
+    }
+}
+
+const UpdateSettingForm = Form.create()(UpdateSetting)
+
 
 export default withRouter(Editor);

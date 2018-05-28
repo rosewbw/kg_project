@@ -241,6 +241,7 @@ const ProjectBox = (props) => {
     return (
         <div className="card mb-4 box-shadow">
             <img className="card-img-top" src={pData.thumbnailUrl || defaultImg}
+                 style={{height:'9rem'}}
                  alt="Card image cap"/>
             <div className="card-body">
                 <div className="projectName" style={{

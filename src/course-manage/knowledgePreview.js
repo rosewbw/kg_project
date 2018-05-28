@@ -6,12 +6,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import {Document, Page} from 'react-pdf'
 import {Row, Col, List, Card, Button} from 'antd';
 
-import {
-    withRouter,
-    Link
-} from 'react-router-dom';
-
-// import DEFAULT from './test.pdf'
+import DEFAULT_PDF from '../searchManager/test.pdf'
 
 const DEFAULT_MATERIAL = {
     'img': 'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2486531409,3348270894&fm=27&gp=0.jpg',
@@ -49,6 +44,16 @@ class KnowledgePreview extends Component {
     };
 
     onItemClick = ({pageNumber}) => alert('Clicked an item from page ' + pageNumber + '!')
+
+    unfoldPDFView = (url) => {
+        ReactDOM.render(
+            <PDFViewer
+                url={url}
+            />
+            , document.getElementById('pdfView')
+        )
+
+    }
 
 
     changeAidCourseMedia = (e) => {
@@ -110,6 +115,7 @@ class KnowledgePreview extends Component {
                                      className="coursePreview"
                                 >
                                     <DisplayArea
+                                        unfoldPDFView={this.unfoldPDFView}
                                         type={this.state.currentType}
                                         url={this.state.currentUrl || DEFAULT_MATERIAL.video}
                                     />
@@ -155,13 +161,26 @@ class KnowledgePreview extends Component {
     }
 }
 
-const DisplayArea = ({type, url}) => {
-    console.log(type)
+const DisplayArea = ({type, url, unfoldPDFView}) => {
+    console.log(type);
     if (type === 'pdf') {
         return (
-            <div>
-                点击显示
+            <div style={{height: '100%'}}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                    height: '100%'
+
+                }}
+                     onClick={() => unfoldPDFView(url)}
+                >
+                    <span style={{cursor: 'pointer'}}>点击显示</span>
+                </div>
+                <div id="pdfView"/>
             </div>
+
         )
     }
     else if (type === 'video') {
@@ -316,6 +335,55 @@ const TeachInfoArea = (props) => {
             </Card>
         </div>
     )
+}
+
+class PDFViewer extends Component {
+    state = {
+        numPages: null,
+        pageNumber: 1,
+    }
+    onDocumentLoad = ({numPages}) => {
+        this.setState({numPages});
+    }
+
+
+    prevPage = () => {
+        this.setState(prev => {
+            let newPage = prev.pageNumber <= 1 ? 1 : prev.pageNumber - 1;
+            return {pageNumber: newPage};
+        });
+    };
+
+    nextPage = () => {
+        this.setState(prev => {
+            let newPage = prev.pageNumber >= prev.numPages ? prev.numPages : prev.pageNumber + 1;
+            return {pageNumber: newPage};
+        });
+    };
+
+    closePage = () => {
+        ReactDOM.unmountComponentAtNode(document.getElementById('pdfView'));
+    }
+
+    render() {
+        const {pageNumber, numPages} = this.state;
+        const url = this.props.url;
+        return (
+            <div>
+                <Button onClick={this.prevPage}>上一页</Button>
+                <Button onClick={this.nextPage}>下一页</Button>
+                <Button onClick={this.closePage}>关闭</Button>
+                <Document
+                    onItemClick={() => alert('oh')}
+                    file={DEFAULT_PDF || url}
+                    onLoadSuccess={this.onDocumentLoad}
+                >
+                    <Page pageNumber={pageNumber}/>
+                </Document>
+                <p>Page {pageNumber} of {numPages}</p>
+            </div>
+        );
+    }
 }
 
 

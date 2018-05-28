@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import {Document, Page} from 'react-pdf'
-import {Row, Col, List, Card} from 'antd';
+import {Row, Col, List, Card, Button} from 'antd';
 
 
 import DEFAULT_PDF from './test.pdf'
@@ -67,6 +67,12 @@ class SearchKnowledgePreview extends Component {
     };
 
     unfoldPDFView = (url) => {
+        ReactDOM.render(
+            <PDFViewer
+                url={url}
+            />
+            , document.getElementById('pdfView')
+        )
 
     }
 
@@ -161,12 +167,27 @@ class SearchKnowledgePreview extends Component {
     }
 }
 
+
 const DisplayArea = ({type, url, unfoldPDFView}) => {
+    console.log(type)
     if (type === 'pdf') {
         return (
-            <div onClick={() => unfoldPDFView(url)}>
-                点击显示
+            <div style={{height: '100%'}}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                    height: '100%'
+
+                }}
+                     onClick={() => unfoldPDFView(url)}
+                >
+                    <span style={{cursor: 'pointer'}}>点击显示</span>
+                </div>
+                <div id="pdfView"/>
             </div>
+
         )
     }
     else if (type === 'video') {
@@ -296,9 +317,14 @@ const MainLessonInfoArea = ({mainCourseInfo, changeMainCourseMedia}) => {
 const TeachInfoArea = (props) => {
     const {teachInfo, lessonId, enterLesson} = props;
     let keyword = [];
-    teachInfo.data.keyword.forEach(item => {
-        keyword.push(item.data)
-    });
+    if (typeof teachInfo.data.keyword === 'object') {
+        teachInfo.data.keyword.forEach(item => {
+            keyword.push(item.data)
+        });
+    } else {
+        keyword.push(teachInfo.data.keyword)
+    }
+
     return (
         <div className="teachInfoArea">
             <Card title="教学单元信息"
@@ -324,14 +350,36 @@ class PDFViewer extends Component {
         this.setState({numPages});
     }
 
+
+    prevPage = () => {
+        this.setState(prev => {
+            let newPage = prev.pageNumber <= 1 ? 1 : prev.pageNumber - 1;
+            return {pageNumber: newPage};
+        });
+    };
+
+    nextPage = () => {
+        this.setState(prev => {
+            let newPage = prev.pageNumber >= prev.numPages ? prev.numPages : prev.pageNumber + 1;
+            return {pageNumber: newPage};
+        });
+    };
+
+    closePage = () => {
+        ReactDOM.unmountComponentAtNode(document.getElementById('pdfView'));
+    }
+
     render() {
         const {pageNumber, numPages} = this.state;
-
+        const url = this.props.url;
         return (
             <div>
+                <Button onClick={this.prevPage}>上一页</Button>
+                <Button onClick={this.nextPage}>下一页</Button>
+                <Button onClick={this.closePage}>关闭</Button>
                 <Document
                     onItemClick={() => alert('oh')}
-                    file={DEFAULT_PDF}
+                    file={DEFAULT_PDF || url}
                     onLoadSuccess={this.onDocumentLoad}
                 >
                     <Page pageNumber={pageNumber}/>
