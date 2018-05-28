@@ -93,11 +93,11 @@ class KnowledgeEditor extends Component {
     }
 
     parentRelationAdd(value) {
-        console.log(value)
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
         this.kUnitAdd(kUnit, addNode, 'hasParentNode');
         this.kUnitAdd(addNode, kUnit, 'hasChildNode');
+        this.props.updatePath(addNode._id, kUnit._id, 'add');
     }
 
     childRelationAdd(value) {
@@ -105,6 +105,7 @@ class KnowledgeEditor extends Component {
         let addNode = this.getkUnitObjectById(value);
         this.kUnitAdd(kUnit, addNode, 'hasChildNode');
         this.kUnitAdd(addNode, kUnit, 'hasParentNode');
+        this.props.updatePath(kUnit._id, addNode._id, 'add');
     }
 
     relyByRelationAdd = (value) => {
@@ -158,6 +159,7 @@ class KnowledgeEditor extends Component {
         let addNode = this.getkUnitObjectById(value);
         this.kUnitDel(kUnit, addNode, 'hasParentNode');
         this.kUnitDel(addNode, kUnit, 'hasChildNode');
+        this.props.updatePath(addNode._id, kUnit._id, 'del');
     }
 
     childRelationDel(value) {
@@ -165,6 +167,7 @@ class KnowledgeEditor extends Component {
         let addNode = this.getkUnitObjectById(value);
         this.kUnitDel(kUnit, addNode, 'hasChildNode');
         this.kUnitDel(addNode, kUnit, 'hasParentNode');
+        this.props.updatePath(kUnit._id, addNode._id, 'del');
     }
 
     relyByRelationDel = (value) => {
@@ -211,7 +214,6 @@ class KnowledgeEditor extends Component {
 
     kUnitDel = (targetNode, addUnit, type) => {
         let idx = targetNode[type].indexOf(addUnit);
-        console.log(idx)
         targetNode[type].splice(idx, 1)
     };
 

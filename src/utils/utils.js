@@ -28,4 +28,10 @@ function createElement(table) {
     }
 }
 
-export {createElement}
+function path_container_construct(_from, _path, _to) {
+    this.from = _from[0];
+    this.path = _path[0];
+    this.to = _to[0];
+}
+
+export {createElement, path_container_construct}

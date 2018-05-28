@@ -5,7 +5,7 @@ import queryString from 'query-string';
 import $ from 'jquery';
 import './editor.css';
 import {KnowledgeUnit} from './componentConstructor';
-import {createElement} from '../utils/utils';
+import {createElement, path_container_construct} from '../utils/utils';
 
 import KnowledgeEditor from './knowledge-editor';
 import 'jquery-mousewheel'
@@ -25,6 +25,7 @@ class Editor extends Component {
                 y: 300
             },
             projectDataFetched: false,
+            path_container: []
 
         };
         this.canvasConstructor = this.canvasConstructor.bind(this);
@@ -68,7 +69,7 @@ class Editor extends Component {
         let targetUrl = null;
         let img_ori_position = {};
         let scale = 1;
-        let path_container = [];
+        let path_container = this.state.path_container;
         let path_from = null;
         let elements = [];
         let _this = this;
@@ -276,6 +277,7 @@ class Editor extends Component {
                             }
                             remove_ele(c, fn);
                         } else if (c.path === ele[0]) {
+                            console.log(c)
                             butnId = c.to.id;
                             if (c.from.id === fn.start.attr('id')) {
                                 elmId = 'isStart';
@@ -286,8 +288,10 @@ class Editor extends Component {
                             remove_ele(c, fn);
                         }
                     });
+                    console.log(path_container)
                     //No.4 发送删除元素或路径的信息，发送要删除元素的id，或要删除路径的目标id，type='delElement'为删除元素，type='delPath'为删除路径
                     if (type === 'delElement') {
+                        console.log('23434234')
                         ele.remove();
                         $(ele[0].circle).remove();
                         callback ? callback(type, {elmId: ele.attr('id'), butn: butnArray}) : '';
@@ -937,6 +941,7 @@ class Editor extends Component {
             let path_back = createElement('path');
             let arrow = createElement('path');
             fun.svgContainer.prepend(svg.append(path_back, path, arrow));
+            console.log(fun.svgContainer);
             set_path_cssAndAttr(svg, path, path_back, arrow);
             set_path_position(ele, svg);
             return svg;
@@ -1109,7 +1114,7 @@ class Editor extends Component {
         }
 
         function makePath(deltaX, deltaY, path, arrow) {
-            let ax = basicOptions.arrowHeight, ay = basicOptions.arrowBottom;
+            let ax = 6, ay = basicOptions.arrowBottom;
             if (deltaX > 42) {
                 if (deltaY < -12 && deltaY >= -45) {
                     path.attr('d', 'M 0 45 L ' + (deltaX - 12) / 2 + ' 45 A 6 6,0 0 0,' + deltaX / 2 + ' 39 L ' + deltaX / 2 + ' ' + (51 + deltaY) + ' A 6 6,0 0 1,' + (deltaX / 2 + 6) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
@@ -1382,12 +1387,288 @@ class Editor extends Component {
 
     }
 
+    //从这往后蠢得一批.............................
+
+
+    remove_ele = (c) => {
+        $(c.path).remove();
+        c.from = c.to = c.path = null;
+    }
+
+
+    path_container_construct = (_from, _path, _to) => {
+        this.from = _from[0];
+        this.path = _path[0];
+        this.to = _to[0];
+    }
+
+    makeSvg = (deltaX, deltaY, tagSvg, X, Y) => {
+        if (deltaY <= 45 && deltaY >= -45) {
+            tagSvg.css('top', Y);
+        }
+        if (deltaY < -45) {
+            tagSvg.css('top', Y + deltaY + 45);
+            if (deltaY < -90) {
+                tagSvg.height((-deltaY));
+            }
+        }
+        else if (deltaY > 45) {
+            tagSvg.css('top', Y + deltaY - 45);
+            if (deltaY > 90) {
+                tagSvg.css('top', Y + 45);
+                tagSvg.height(deltaY);
+            }
+        }
+        if (deltaX > 21) {
+            tagSvg.css('left', X);
+            if (deltaX > 90) {
+                tagSvg.width(deltaX);
+            }
+        }
+        else if (deltaX >= 0 && deltaX <= 21) {
+            tagSvg.css('left', X - 21 + deltaX);
+        }
+        else if (deltaX < 0) {
+            tagSvg.css('left', X + deltaX - 21);
+            if (deltaX < -48) {
+                tagSvg.width((-deltaX) + 42);
+            }
+        }
+    }
+
+    makePath = (deltaX, deltaY, path, arrow) => {
+        let ax = 6, ay = 3;
+        if (deltaX > 42) {
+            if (deltaY < -12 && deltaY >= -45) {
+                path.attr('d', 'M 0 45 L ' + (deltaX - 12) / 2 + ' 45 A 6 6,0 0 0,' + deltaX / 2 + ' 39 L ' + deltaX / 2 + ' ' + (51 + deltaY) + ' A 6 6,0 0 1,' + (deltaX / 2 + 6) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+            }
+            else if (deltaY < -45) {
+                path.attr('d', 'M 0 ' + (-deltaY) + ' L ' + (deltaX - 12) / 2 + ' ' + (-deltaY) + ' A 6 6,0 0 0,' + deltaX / 2 + ' ' + -(deltaY + 6) + ' L ' + deltaX / 2 + ' 6 A 6 6,0 0 1,' + (deltaX / 2 + 6) + ' ' + 0 + ' L ' + deltaX + ' ' + 0);
+                arrow.attr('d', 'M ' + deltaX + ' 0 L ' + (deltaX - ax) + ' ' + ay + ' L ' + (deltaX - ax) + ' ' + (-ay) + ' Z');
+            }
+            else if (deltaY <= 0 && deltaY > -12) {
+                path.attr('d', 'M 0 45 L ' + (deltaX + deltaY) / 2 + ' 45 A ' + (-deltaY / 2) + ' ' + (-deltaY / 2) + ',0 0 0,' + deltaX / 2 + ' ' + (45 + deltaY / 2) + ' A ' + (-deltaY / 2) + ' ' + (-deltaY / 2) + ',0 0 1,' + (deltaX / 2 - deltaY / 2) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+            }
+            else if (deltaY > 0 && deltaY < 12) {
+                path.attr('d', 'M 0 45 L ' + (deltaX - deltaY) / 2 + ' 45 A ' + deltaY / 2 + ' ' + deltaY / 2 + ',0 0 1,' + deltaX / 2 + ' ' + (45 + deltaY / 2) + ' A ' + deltaY / 2 + ' ' + deltaY / 2 + ',0 0 0,' + (deltaX / 2 + deltaY / 2) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + ((deltaX - ax)) + ' ' + (45 + deltaY - ay) + ' Z');
+            }
+            else if (deltaY > 12 && deltaY < 45) {
+                path.attr('d', 'M 0 45 L ' + (deltaX - 12) / 2 + ' 45 A 6 6,0 0 1,' + deltaX / 2 + ' 51 L ' + deltaX / 2 + ' ' + (39 + deltaY) + ' A 6 6,0 0 0,' + (deltaX / 2 + 6) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+            }
+            else if (deltaY > 45 && deltaY < 90) {
+                path.attr('d', 'M 0 ' + (90 - deltaY) + ' L ' + (deltaX - 12) / 2 + ' ' + (90 - deltaY) + ' A 6 6,0 0 1,' + deltaX / 2 + ' ' + (96 - deltaY) + ' L ' + deltaX / 2 + ' 84 A 6 6,0 0 0,' + (deltaX / 2 + 6) + ' ' + 90 + ' L ' + deltaX + ' ' + 90);
+                arrow.attr('d', 'M ' + deltaX + ' 90 L ' + (deltaX - ax) + ' ' + (90 + ay) + ' L ' + (deltaX - ax) + ' ' + (90 - ay) + ' Z');
+            }
+            else if (deltaY >= 90) {
+                path.attr('d', 'M 0 0 L ' + (deltaX - 12) / 2 + ' 0 A 6 6,0 0 1,' + deltaX / 2 + ' 6 L ' + deltaX / 2 + ' ' + (deltaY - 6) + ' A 6 6,0 0 0,' + (deltaX / 2 + 6) + ' ' + deltaY + ' L ' + deltaX + ' ' + deltaY);
+                arrow.attr('d', 'M ' + deltaX + ' ' + deltaY + ' L ' + (deltaX - ax) + ' ' + (deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (deltaY - ay) + ' Z');
+            }
+        }
+        else if (deltaX <= 42) {
+            if (deltaX > 29) {
+                if (deltaY < -24 && deltaY > -45) {
+                    path.attr('d', 'M 0 45 L 15 45 A 6 6,0 0 0,21 39 L 21 ' + (66 - deltaX / 2 + deltaY / 2) + ' A ' + (42 - deltaX) / 2 + ' ' + (42 - deltaX) / 2 + ',0 0 0,' + deltaX / 2 + ' ' + (45 + deltaY / 2) + 'A ' + (42 - deltaX) / 2 + ' ' + (42 - deltaX) / 2 + ',0 0 1,' + (deltaX - 21) + ' ' + (24 + deltaY / 2 + deltaX / 2) + ' L ' + (deltaX - 21) + ' ' + (51 + deltaY) + 'A 6 6,0 0 1,' + (deltaX - 15) + ' ' + (45 + deltaY) + 'L ' + deltaX + ' ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY <= -45) {
+                    path.attr('d', 'M 0 ' + (-deltaY) + ' L 15 ' + (-deltaY) + ' A 6 6,0 0 0,21 ' + (-deltaY - 6) + ' L 21 ' + (21 - deltaY / 2 - deltaX / 2) + ' A ' + (42 - deltaX) / 2 + ' ' + (42 - deltaX) / 2 + ',0 0 0,' + deltaX / 2 + ' ' + (-deltaY / 2) + ' A ' + (42 - deltaX) / 2 + ' ' + (42 - deltaX) / 2 + ',0 0 1,' + (deltaX - 21) + ' ' + (deltaX / 2 - deltaY / 2 - 21) + ' L ' + (deltaX - 21) + ' 6 A 6 6,0 0 1' + (deltaX - 15) + ' 0 L ' + deltaX + ' 0');
+                    arrow.attr('d', 'M ' + deltaX + ' 0 L ' + (deltaX - ax) + ' ' + ay + ' L ' + (deltaX - ax) + ' ' + (-ay) + ' Z');
+                }
+                else if (deltaY <= 0 && deltaY > -24) {
+                    path.attr('d', 'M 0 45 L 15 45 A ' + (-deltaY / 4) + ' ' + (-deltaY / 4) + ',0 0 0,' + 15 + ' ' + (45 + deltaY / 2) + ' A ' + (-deltaY / 4) + ' ' + (-deltaY / 4) + ',0 0 1,' + (15 - deltaY / 4) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY > 0 && deltaY < 24) {
+                    path.attr('d', 'M 0 45 L 15 45 A ' + deltaY / 4 + ' ' + deltaY / 4 + ',0 0 1,15 ' + (45 + deltaY / 2) + ' A ' + deltaY / 4 + ' ' + deltaY / 4 + ',0 0 0,' + (15 + deltaY / 4) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY > 24 && deltaY < 45) {
+                    path.attr('d', 'M 0 45 L 15 45 A 6 6,0 0 1,21 51 L 21 ' + (24 + deltaY / 2 + deltaX / 2) + ' A ' + (42 - deltaX) / 2 + ' ' + (42 - deltaX) / 2 + ',0 0 1,' + deltaX / 2 + ' ' + (45 + deltaY / 2) + ' A ' + (21 - deltaX / 2) + ' ' + (21 - deltaX / 2) + ',0 0 0,' + (deltaX - 21) + ' ' + (66 + deltaY / 2 - deltaX / 2) + ' L ' + (deltaX - 21) + ' ' + (39 + deltaY) + ' A 6 6 ,0 0 0,' + (deltaX - 15) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY > 45 && deltaY < 90) {
+                    path.attr('d', 'M 0 ' + (90 - deltaY) + ' L 15 ' + (90 - deltaY) + ' A 6 6,0 0 1,21 ' + (96 - deltaY) + ' L 21 ' + (69 - deltaY / 2 + deltaX / 2) + ' A ' + (21 - deltaX / 2) + ' ' + (21 - deltaX / 2) + ',0 0 1,' + deltaX / 2 + ' ' + (90 - deltaY / 2) + ' A ' + (21 - deltaX / 2) + ' ' + (21 - deltaX / 2) + ',0 0 0,' + (deltaX - 21) + ' ' + (111 - deltaY / 2 - deltaX / 2) + ' L ' + (deltaX - 21) + ' 86 A 6 6,0 0 0,' + (deltaX - 15) + ' 90 L ' + deltaX + ' 90');
+                    arrow.attr('d', 'M ' + deltaX + ' 90 L ' + (deltaX - ax) + ' ' + (90 + ay) + ' L ' + (deltaX - ax) + ' ' + (90 - ay) + ' Z');
+                }
+                else if (deltaY >= 90) {
+                    path.attr('d', 'M 0 0 L 15 0 A 6 6,0 0 1,21 6 L 21 ' + (deltaY / 2 + deltaX / 2 - 21) + ' A ' + (21 - deltaX / 2) + ' ' + (21 - deltaX / 2) + ',0 0 1,' + deltaX / 2 + ' ' + deltaY / 2 + ' A ' + (21 - deltaX / 2) + ' ' + (21 - deltaX / 2) + ',0 0 0,' + (deltaX - 21) + ' ' + (deltaY / 2 - deltaX / 2 + 21) + ' L ' + (deltaX - 21) + ' ' + (deltaY - 6) + ' A 6 6,0 0 0,' + (deltaX - 15) + ' ' + deltaY + ' L ' + deltaX + ' ' + deltaY);
+                    arrow.attr('d', 'M ' + deltaX + ' ' + deltaY + ' L ' + (deltaX - ax) + ' ' + (deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (deltaY - ay) + ' Z');
+                }
+            }
+            else if (deltaX > 20) {
+                if (deltaY < -24 && deltaY > -45) {
+                    path.attr('d', 'M 0 45 L 15 45 A 6 6,0 0 0,21 39 L 21 ' + (51 + deltaY / 2) + ' A 6 6,0 0 0,15 ' + (45 + deltaY / 2) + ' L ' + (deltaX - 15) + ' ' + (45 + deltaY / 2) + ' A 6 6,0 0 1,' + (deltaX - 21) + ' ' + (39 + deltaY / 2) + ' L ' + (deltaX - 21) + ' ' + (51 + deltaY) + 'A 6 6,0 0 1,' + (deltaX - 15) + ' ' + (45 + deltaY) + 'L ' + deltaX + ' ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY <= -45) {
+                    path.attr('d', 'M 0 ' + (-deltaY) + ' L 15 ' + (-deltaY) + ' A 6 6,0 0 0,21 ' + (-deltaY - 6) + ' L 21 ' + (6 - deltaY / 2) + ' A 6 6,0 0 0,15 ' + (-deltaY / 2) + ' L ' + (deltaX - 15) + ' ' + (-deltaY / 2) + ' A 6 6,0 0 1,' + (deltaX - 21) + ' ' + (-deltaY / 2 - 6) + ' L ' + (deltaX - 21) + ' 6 A 6 6,0 0 1,' + (deltaX - 15) + ' 0 L ' + deltaX + ' 0');
+                    arrow.attr('d', 'M ' + deltaX + ' 0 L ' + (deltaX - ax) + ' ' + ay + ' L ' + (deltaX - ax) + ' ' + (-ay) + ' Z');
+                }
+                else if (deltaY <= 0 && deltaY > -24) {
+                    path.attr('d', 'M 0 45 L 15 45 A ' + (-deltaY / 4) + ' ' + (-deltaY / 4) + ',0 0 0,15 ' + (45 + deltaY / 2) + ' L ' + (deltaX - deltaY / 2 - 27) + ' ' + (45 + deltaY / 2) + ' A ' + (-deltaY / 4) + ' ' + (-deltaY / 4) + ',0 0 1,' + (deltaX - deltaY / 2 - 27) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY > 0 && deltaY < 24) {
+                    path.attr('d', 'M 0 45 L 15 45 A ' + deltaY / 4 + ' ' + deltaY / 4 + ',0 0 1,15 ' + (45 + deltaY / 2) + ' L ' + (deltaX + deltaY / 2 - 27) + ' ' + (45 + deltaY / 2) + ' A ' + deltaY / 4 + ' ' + deltaY / 4 + ',0 0 0,' + (deltaX + deltaY / 2 - 27) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY > 24 && deltaY < 45) {
+                    path.attr('d', 'M 0 45 L 15 45 A 6 6,0 0 1,21 51 L 21 ' + (39 + deltaY / 2) + ' A 6 6,0 0 1,15 ' + (45 + deltaY / 2) + ' L ' + (deltaX - 15) + ' ' + (45 + deltaY / 2) + ' A 6 6,0 0 0,' + (deltaX - 21) + ' ' + (51 + deltaY / 2) + ' L ' + (deltaX - 21) + ' ' + (39 + deltaY) + ' A 6 6 ,0 0 0,' + (deltaX - 15) + ' ' + (45 + deltaY) + ' L ' + deltaX + ' ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + deltaX + ' ' + (45 + deltaY) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY > 45 && deltaY < 90) {
+                    path.attr('d', 'M 0 ' + (90 - deltaY) + ' L 15 ' + (90 - deltaY) + ' A 6 6,0 0 1,21 ' + (96 - deltaY) + ' L 21 ' + (84 - deltaY / 2) + ' A 6 6,0 0 1,15 ' + (90 - deltaY / 2) + ' L ' + (deltaX - 15) + ' ' + (90 - deltaY / 2) + ' A 6 6,0 0 0,' + (deltaX - 21) + ' ' + (96 - deltaY / 2) + ' L ' + (deltaX - 21) + ' 86 A 6 6,0 0 0,' + (deltaX - 15) + ' 90 L ' + deltaX + ' 90');
+                    arrow.attr('d', 'M ' + deltaX + ' 90 L ' + (deltaX - ax) + ' ' + (90 + ay) + ' L ' + (deltaX - ax) + ' ' + (90 - ay) + ' Z');
+                }
+                else if (deltaY >= 90) {
+                    path.attr('d', 'M 0 0 L 15 0 A 6 6,0 0 1,21 6 L 21 ' + (deltaY / 2 - 6) + ' A 6 6,0 0 1,15 ' + deltaY / 2 + ' L ' + (deltaX - 15) + ' ' + (deltaY / 2) + ' A 6 6,0 0 0,' + (deltaX - 21) + ' ' + (deltaY / 2 + 6) + ' L ' + (deltaX - 21) + ' ' + (deltaY - 6) + ' A 6 6,0 0 0,' + (deltaX - 15) + ' ' + deltaY + ' L ' + deltaX + ' ' + deltaY);
+                    arrow.attr('d', 'M ' + deltaX + ' ' + deltaY + ' L ' + (deltaX - ax) + ' ' + (deltaY + ay) + ' L ' + (deltaX - ax) + ' ' + (deltaY - ay) + ' Z');
+                }
+            }
+            else {
+                if (deltaY < -24 && deltaY > -45) {
+                    path.attr('d', 'M ' + (21 - deltaX) + ' 45 L ' + (36 - deltaX) + ' 45 A 6 6,0 0 0,' + (42 - deltaX) + ' 39 L ' + (42 - deltaX) + ' ' + (51 + deltaY / 2) + ' A 6 6,0 0 0,' + (36 - deltaX) + ' ' + (45 + deltaY / 2) + ' L 6 ' + (45 + deltaY / 2) + ' A 6 6,0 0 1,0 ' + (39 + deltaY / 2) + ' L 0 ' + (51 + deltaY) + ' A 6 6,0 0 1,6 ' + (45 + deltaY) + 'L 21 ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + ' 21 ' + (45 + deltaY) + ' L ' + (21 - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (21 - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY <= -45) {
+                    path.attr('d', 'M ' + (21 - deltaX) + ' ' + (-deltaY) + ' L ' + (36 - deltaX) + ' ' + (-deltaY) + ' A 6 6,0 0 0,' + (42 - deltaX) + ' ' + (-deltaY - 6) + ' L ' + (42 - deltaX) + ' ' + (6 - deltaY / 2) + ' A 6 6,0 0 0,' + (36 - deltaX) + ' ' + (-deltaY / 2) + ' L 6 ' + (-deltaY / 2) + ' A 6 6,0 0 1,0 ' + (-deltaY / 2 - 6) + ' L 0 6 A 6 6,0 0 1,6 0 L 21 0');
+                    arrow.attr('d', 'M ' + ' 21 0 L ' + (21 - ax) + ' ' + ay + ' L ' + (21 - ax) + ' ' + (-ay) + ' Z');
+                }
+                else if (deltaY <= 0 && deltaY > -24) {
+                    path.attr('d', 'M ' + (21 - deltaX) + ' 45 L ' + (36 - deltaX) + ' 45 A ' + (-deltaY / 4) + ' ' + (-deltaY / 4) + ',0 0 0,' + (36 - deltaX) + ' ' + (45 + deltaY / 2) + ' L ' + (-deltaY / 4) + ' ' + (45 + deltaY / 2) + ' A ' + (-deltaY / 4) + ' ' + (-deltaY / 4) + ',0 0 1,' + (-deltaY / 4) + ' ' + (45 + deltaY) + ' L 21 ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + ' 21 ' + (45 + deltaY) + ' L ' + (21 - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (21 - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY > 0 && deltaY < 24) {
+                    path.attr('d', 'M ' + (21 - deltaX) + ' 45 L ' + (36 - deltaX) + ' 45 A ' + deltaY / 4 + ' ' + deltaY / 4 + ',0 0 1,' + (36 - deltaX) + ' ' + (45 + deltaY / 2) + ' L ' + (deltaY / 4) + ' ' + (45 + deltaY / 2) + ' A ' + deltaY / 4 + ' ' + deltaY / 4 + ',0 0 0,' + (deltaY / 4) + ' ' + (45 + deltaY) + ' L 21 ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + ' 21 ' + (45 + deltaY) + ' L ' + (21 - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (21 - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY > 24 && deltaY < 45) {
+                    path.attr('d', 'M ' + (21 - deltaX) + ' 45 L ' + (36 - deltaX) + ' 45 A 6 6,0 0 1,' + (42 - deltaX) + ' 51 L ' + (42 - deltaX) + ' ' + (39 + deltaY / 2) + ' A 6 6,0 0 1,' + (36 - deltaX) + ' ' + (45 + deltaY / 2) + ' L 6 ' + (45 + deltaY / 2) + ' A 6 6,0 0 0,0 ' + (51 + deltaY / 2) + ' L 0 ' + (39 + deltaY) + ' A 6 6 ,0 0 0,6 ' + (45 + deltaY) + ' L 21 ' + (45 + deltaY));
+                    arrow.attr('d', 'M ' + ' 21 ' + (45 + deltaY) + ' L ' + (21 - ax) + ' ' + (45 + deltaY + ay) + ' L ' + (21 - ax) + ' ' + (45 + deltaY - ay) + ' Z');
+                }
+                else if (deltaY > 45 && deltaY < 90) {
+                    path.attr('d', 'M ' + (21 - deltaX) + ' ' + (90 - deltaY) + ' L ' + (36 - deltaX) + ' ' + (90 - deltaY) + ' A 6 6,0 0 1,' + (42 - deltaX) + ' ' + (96 - deltaY) + ' L ' + (42 - deltaX) + ' ' + (84 - deltaY / 2) + ' A 6 6,0 0 1,' + (36 - deltaX) + ' ' + (90 - deltaY / 2) + ' L 6 ' + (90 - deltaY / 2) + ' A 6 6,0 0 0,0 ' + (96 - deltaY / 2) + ' L 0 86 A 6 6,0 0 0,6 90 L 21 90');
+                    arrow.attr('d', 'M ' + ' 21 90 L ' + (21 - ax) + ' ' + (90 - ay) + ' L ' + (21 - ax) + ' ' + (90 + ay) + ' Z');
+                }
+                else if (deltaY >= 90) {
+                    path.attr('d', 'M ' + (21 - deltaX) + ' 0 L ' + (36 - deltaX) + ' 0 A 6 6,0 0 1,' + (42 - deltaX) + ' 6 L ' + (42 - deltaX) + ' ' + (deltaY / 2 - 6) + ' A 6 6,0 0 1,' + (36 - deltaX) + ' ' + deltaY / 2 + ' L 6 ' + (deltaY / 2) + ' A 6 6,0 0 0,0 ' + (deltaY / 2 + 6) + ' L 0 ' + (deltaY - 6) + ' A 6 6,0 0 0,6 ' + deltaY + ' L 21 ' + deltaY);
+                    arrow.attr('d', 'M ' + ' 21 ' + deltaY + ' L ' + (21 - ax) + ' ' + (deltaY + ay) + ' L ' + (21 - ax) + ' ' + (deltaY - ay) + ' Z');
+                }
+            }
+        }
+    }
+
+    get_deltaXY = (from, to) => {
+        let deltaX = parseInt(to.css('left')) - parseInt(from.css('left')) - from.width();
+        let deltaY = parseInt(to.css('top')) + to.height() / 2 - parseInt(from.css('top')) - from.height() / 2;
+        return {
+            deltaX: deltaX,
+            deltaY: deltaY
+        };
+    }
+
+
+    path_move_with_img = (from, to, path) => {
+        let path_from_position = this.get_path_from_position(from);
+        let delta = this.get_deltaXY(from, to);
+        this.makeSvg(delta.deltaX, delta.deltaY, path, path_from_position.left, path_from_position.top);
+        this.makePath(delta.deltaX, delta.deltaY, path.children('.path'), path.children('.arrow'));
+    }
+
+    set_path_cssAndAttr = (svg, path, path_back, arrow) => {
+        svg[0].style.cssText = 'pointer-events:none;position:absolute;overflow:visible;';
+        arrow[0].style.cssText = path_back[0].style.cssText = path[0].style.cssText = 'pointer-events:auto;cursor:pointer';
+        path[0].setAttribute('class', 'path');
+        path_back[0].setAttribute('class', 'path');
+        arrow[0].setAttribute('class', 'arrow');
+        svg[0].setAttribute('class', 'path-active');
+        svg.attr({
+            'width': '90',
+            'height': '90'
+        });
+        path_back.attr({
+            'stroke-width': 0,
+            'fill': 'none',
+            'stroke': '#fff'
+        });
+        path.attr({
+            'stroke-width': 1,
+            'fill': 'none',
+            'stroke': '#ca910a'
+        });
+        arrow.attr({
+            'stroke-width': '2px',
+            'fill': '#ca910a',
+            'stroke': '#ca910a'
+        });
+    }
+
+    set_path_position = (ele, svg) => {
+        let svgPosition = this.get_path_from_position(ele);
+        svg.offset({
+            left: svgPosition.left,
+            top: svgPosition.top
+        });
+    }
+    get_path_from_position = (ele) => {
+        return {
+            left: parseInt(ele.css('left')) + ele.innerWidth(),
+            top: parseInt(ele.css('top')) - (90 - ele.innerHeight()) / 2
+        };
+    }
+
+    add_path = (ele, svgContainer) => {
+        let svg = createElement('svg');
+        let path = createElement('path');
+        let path_back = createElement('path');
+        let arrow = createElement('path');
+        svgContainer.prepend(svg.append(path_back, path, arrow));
+        this.set_path_cssAndAttr(svg, path, path_back, arrow);
+        this.set_path_position(ele, svg);
+        return svg;
+    }
+
+
+    static_path = (ele, path_from) => {
+        let isStart = false;
+        let tagSvg = $('.path-active');
+        tagSvg[0].moving = this.path_move_with_img;
+        tagSvg[0].setAttribute('class', 'path-static');
+        this.path_move_with_img(path_from, ele, tagSvg);
+        this.state.path_container.push(new path_container_construct(path_from, tagSvg, ele));
+    };
+
+    updatePath = (from_id, to_id, type) => {
+        let transSvgCont = $('#trans-svg-cont');
+        let from_ele = $('#' + from_id);
+        let to_ele = $('#' + to_id);
+        if (type === 'add') {
+            this.add_path(from_ele, transSvgCont);
+            this.static_path(to_ele, from_ele);
+        } else {
+            let currentPath;
+            this.state.path_container.map(item => {
+                if (item.from === from_ele[0] && item.to === to_ele[0]) {
+                    currentPath = item;
+                }
+            });
+            let idx = this.state.path_container.indexOf(currentPath);
+            this.remove_ele(currentPath);
+            this.state.path_container.splice(idx, 1)
+        }
+    };
+
 
     buttonEdit(e) {
-        let kUnitData = this.getKnowledgeObjectById($('.chosen').attr('id'))
+        let kUnitData = this.getKnowledgeObjectById($('.chosen').attr('id'));
 
         ReactDOM.render(
             <KnowledgeEditor
+                updatePath={this.updatePath}
                 kUnitData={kUnitData}
                 knowledgeUnitList={this.state.knowledgeUnitList}
                 onUpdatekUnit={this.updateKnowledgeUnit}
