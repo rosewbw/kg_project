@@ -134,6 +134,7 @@ class KnowledgePreview extends Component {
                             </Col>
                             <Col className="gutter-row" span={8} key={2}>
                                 <TeachInfoArea
+                                    kUnitId={knowledgeInfo._id}
                                     onNextCourse={this.props.onNextCourse}
                                     onPrevCourse={this.props.onPrevCourse}
                                     enterLesson={this.props.enterLesson}
@@ -292,24 +293,24 @@ const MainLessonInfoArea = ({mainCourseInfo, changeMainCourseMedia}) => {
 
 
 const TeachInfoArea = (props) => {
-    const {teachInfo, onNextCourse, onPrevCourse} = props;
+    const {teachInfo, onNextCourse, onPrevCourse, kUnitId} = props;
     return (
         <div className="teachInfoArea">
             <Card title="教学单元信息"
             >
                 <p>教学单元名称：{teachInfo.title}</p>
-                <p>教学单元描述：{TYPE_CONVERSE[teachInfo.description]}</p>
-                <p>教学单元关键字：{TYPE_CONVERSE[teachInfo.keyword]}</p>
+                <p>教学单元描述：{teachInfo.description}</p>
+                <p>教学单元关键字：{teachInfo.keyword}</p>
                 <Button
                     style={{marginTop: '0.4rem'}}
                     onClick={(e) => {
-                        onPrevCourse(teachInfo._id)
+                        onPrevCourse(kUnitId)
                     }}
                 >上一节</Button>
                 <Button
                     style={{marginTop: '0.4rem'}}
                     onClick={(e) => {
-                        onNextCourse(teachInfo._id)
+                        onNextCourse(kUnitId)
                     }}
                 >下一节</Button>
             </Card>

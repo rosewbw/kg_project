@@ -35,8 +35,8 @@ function KnowledgeUnit(title, _id, x, y,thumbnailUrl) {
     this.hasSynonymNode = [];
     this.hasRelateNode = [];
 
-    this.hasNextNode = undefined;
-    this.hasPrevNode = undefined;
+    this.hasNextNode = [];
+    this.hasPrevNode = [];
 
     //包含的教学单元
     this.teachUnit = new TeachUnit(this._id);

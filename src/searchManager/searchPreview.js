@@ -91,6 +91,7 @@ class SearchKnowledgePreview extends Component {
     }
 
     render() {
+
         const {knowledgeData} = this.state;
         const knowledgeInfo = knowledgeData.knowledge;
         const aidCourseInfo = knowledgeData.acourse;
@@ -115,7 +116,6 @@ class SearchKnowledgePreview extends Component {
                                 <div id="coursePreview"
                                      className="coursePreview"
                                 >
-                                    <PDFViewer/>
                                     <DisplayArea
                                         unfoldPDFView={this.unfoldPDFView}
                                         type={this.state.currentType}
@@ -295,6 +295,10 @@ const MainLessonInfoArea = ({mainCourseInfo, changeMainCourseMedia}) => {
 
 const TeachInfoArea = (props) => {
     const {teachInfo, lessonId, enterLesson} = props;
+    let keyword = [];
+    teachInfo.data.keyword.forEach(item => {
+        keyword.push(item.data)
+    });
     return (
         <div className="teachInfoArea">
             <Card title="教学单元信息"
@@ -303,8 +307,8 @@ const TeachInfoArea = (props) => {
                   }}>查看课程</div>]}
             >
                 <p>教学单元名称：{teachInfo.data.title}</p>
-                <p>教学单元描述：{TYPE_CONVERSE[teachInfo.data.description]}</p>
-                <p>教学单元关键字：{TYPE_CONVERSE[teachInfo.data.keyword]}</p>
+                <p>教学单元描述：{teachInfo.data.description}</p>
+                <p>教学单元关键字：{keyword.join('；')}</p>
                 <p style={{visibility: 'hidden'}}> 1 </p>
             </Card>
         </div>
@@ -326,7 +330,7 @@ class PDFViewer extends Component {
         return (
             <div>
                 <Document
-                    onItemClick={()=>alert('oh')}
+                    onItemClick={() => alert('oh')}
                     file={DEFAULT_PDF}
                     onLoadSuccess={this.onDocumentLoad}
                 >

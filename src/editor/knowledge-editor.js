@@ -29,14 +29,11 @@ class KnowledgeEditor extends Component {
         this.parentRelationAdd = this.parentRelationAdd.bind(this);
         this.childRelationAdd = this.childRelationAdd.bind(this);
         this.relateRelationAdd = this.relateRelationAdd.bind(this);
-        this.broRelationAdd = this.broRelationAdd.bind(this);
-        this.paraRelationAdd = this.paraRelationAdd.bind(this);
+
 
         this.parentRelationDel = this.parentRelationDel.bind(this);
         this.childRelationDel = this.childRelationDel.bind(this);
         this.relateRelationDel = this.relateRelationDel.bind(this);
-        this.broRelationDel = this.broRelationDel.bind(this);
-        this.paraRelationDel = this.paraRelationDel.bind(this);
 
         this.getkUnitObjectById = this.getkUnitObjectById.bind(this);
         this.kUnitAdd = this.kUnitAdd.bind(this);
@@ -80,7 +77,7 @@ class KnowledgeEditor extends Component {
 
     kUnitInfoChange(e) {
         let inputType = e.target.id;
-        if(inputType === 'synonym'){
+        if (inputType === 'synonym') {
             return
         }
         let inputValue = e.target.value;
@@ -96,6 +93,7 @@ class KnowledgeEditor extends Component {
     }
 
     parentRelationAdd(value) {
+        console.log(value)
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
         this.kUnitAdd(kUnit, addNode, 'hasParentNode');
@@ -109,19 +107,21 @@ class KnowledgeEditor extends Component {
         this.kUnitAdd(addNode, kUnit, 'hasParentNode');
     }
 
-    relyByRelationAdd(value) {
+    relyByRelationAdd = (value) => {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
         this.kUnitAdd(kUnit, addNode, 'hasBeRelyByNode');
         this.kUnitAdd(addNode, kUnit, 'hasRelyOnNode');
+        console.log(kUnit, addNode)
     }
 
     relyOnRelationAdd = (value) => {
+        console.log(this)
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
         this.kUnitAdd(kUnit, addNode, 'hasRelyOnNode');
         this.kUnitAdd(addNode, kUnit, 'hasBeRelyByNode');
-    }
+    };
 
     relateRelationAdd(value) {
         let kUnit = this.state.kUnit;
@@ -130,67 +130,70 @@ class KnowledgeEditor extends Component {
         this.kUnitAdd(addNode, kUnit, 'hasRelateNode');
     }
 
-    broRelationAdd(value) {
-        let kUnit = this.state.kUnit;
-        let addNode = this.getkUnitObjectById(value);
-        this.kUnitAdd(kUnit, addNode, 'hasBrotherNode');
-        this.kUnitAdd(addNode, kUnit, 'hasBrotherNode');
-    }
 
-    paraRelationAdd(value) {
+    synonymRelationAdd = (value) => {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
-        this.kUnitAdd(kUnit, addNode, 'hasParallelNode');
-        this.kUnitAdd(addNode, kUnit, 'hasParallelNode');
+        this.kUnitAdd(kUnit, addNode, 'hasSynonymNode');
+        this.kUnitAdd(addNode, kUnit, 'hasSynonymNode');
     }
 
     onNextLKnowledgeAdd = (value) => {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
+        kUnit.hasNextNode.splice(0, 1, addNode);
+        addNode.hasPrevNode.splice(0, 1, kUnit)
     };
 
     onPrevLKnowledgeAdd = (value) => {
         let kUnit = this.state.kUnit;
         let addNode = this.getkUnitObjectById(value);
-    };
-
-    onNextLKnowledgeDel = (value) => {
-        let kUnit = this.state.kUnit;
-        let addNode = this.getkUnitObjectById(value);
-    };
-
-    onPrevLKnowledgeDel = (value) => {
-        let kUnit = this.state.kUnit;
-        let addNode = this.getkUnitObjectById(value);
+        kUnit.hasPrevNode.splice(0, 1, addNode);
+        addNode.hasNextNode.splice(0, 1, kUnit)
     };
 
 
     parentRelationDel(value) {
-        console.log(value)
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitDel(kUnit, addNode, 'hasParentNode');
+        this.kUnitDel(addNode, kUnit, 'hasChildNode');
     }
 
     childRelationDel(value) {
-        console.log(value)
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitDel(kUnit, addNode, 'hasChildNode');
+        this.kUnitDel(addNode, kUnit, 'hasParentNode');
     }
 
     relyByRelationDel = (value) => {
-        console.log(value)
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitDel(kUnit, addNode, 'hasBeRelyByNode');
+        this.kUnitDel(addNode, kUnit, 'hasRelyOnNode');
+        console.log(kUnit, addNode)
     }
 
     relyOnRelationDel = (value) => {
-        console.log(value)
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitDel(kUnit, addNode, 'hasRelyOnNode');
+        this.kUnitDel(addNode, kUnit, 'hasBeRelyByNode');
     }
 
     relateRelationDel(value) {
-        console.log(value)
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitDel(kUnit, addNode, 'hasRelateNode');
+        this.kUnitDel(addNode, kUnit, 'hasRelateNode');
     }
 
-    broRelationDel(value) {
-        console.log(value)
-    }
-
-    paraRelationDel(value) {
-        console.log(value)
+    synonymRelationDel = (value) => {
+        let kUnit = this.state.kUnit;
+        let addNode = this.getkUnitObjectById(value);
+        this.kUnitDel(kUnit, addNode, 'hasSynonymNode');
+        this.kUnitDel(addNode, kUnit, 'hasSynonymNode');
     }
 
     getkUnitObjectById = (id) => {
@@ -204,11 +207,12 @@ class KnowledgeEditor extends Component {
 
     kUnitAdd = (targetNode, addUnit, type) => {
         targetNode[type].push(addUnit);
-        console.log(targetNode[type])
     };
 
-    kUnitDel = () => {
-
+    kUnitDel = (targetNode, addUnit, type) => {
+        let idx = targetNode[type].indexOf(addUnit);
+        console.log(idx)
+        targetNode[type].splice(idx, 1)
     };
 
 
@@ -220,7 +224,7 @@ class KnowledgeEditor extends Component {
         let kUnit = this.state.kUnit;
         kUnit.synonym = data;
         this.setState({
-            kUnit:kUnit
+            kUnit: kUnit
         })
     };
 
@@ -242,25 +246,30 @@ class KnowledgeEditor extends Component {
         for (let index in kUnit.synonym) {
             synonym.push(<Option key={kUnit.synonym[index]}>{kUnit.synonym[index]}</Option>);
         }
+        console.log(kUnit)
 
 
         let defaultChildren = {
             hasParentNode: [],
             hasBeRelyByNode: [],
+            hasRelyOnNode: [],
             hasRelateNode: [],
             hasChildNode: [],
-            hasParallelNode: []
+            hasSynonymNode: [],
+            hasPrevNode: [],
+            hasNextNode: []
         };
 
-        let hasPrevNode = kUnit.hasPrevNode;
-        let hasNextNode = kUnit.hasNextNode;
+        // let hasPrevNode = kUnit.hasPrevNode[0];
+        // let hasNextNode = kUnit.hasNextNode[0];
         for (let item in defaultChildren) {
             if (kUnit[item]) {
                 kUnit[item].map((object) => {
-                    defaultChildren[item].push(object.title);
+                    defaultChildren[item].push(object._id);
                 })
             }
         }
+        console.log(defaultChildren)
         return (
             <div id="kEditorContainerArea" className="kEditorContainerArea">
                 <div id="kEditorContainer" className="kEditorContainer">
@@ -392,15 +401,15 @@ class KnowledgeEditor extends Component {
                                                 {children}
                                             </Select>
                                         </div>
-                                        <div id="brothersNode" className="brothersNode">
+                                        <div id="synonymNode" className="synonymNode">
                                             <label>同义知识点</label>
                                             <Select
                                                 mode="multiple"
                                                 style={{width: '100%'}}
                                                 placeholder="请选择"
                                                 defaultValue={defaultChildren.hasSynonymNode}
-                                                onSelect={this.broRelationAdd}
-                                                onDeselect={this.broRelationDel}
+                                                onSelect={this.synonymRelationAdd}
+                                                onDeselect={this.synonymRelationDel}
                                             >
                                                 {children}
                                             </Select>
@@ -411,9 +420,8 @@ class KnowledgeEditor extends Component {
 
                                                 style={{width: '100%'}}
                                                 placeholder="请选择"
-                                                defaultValue={hasPrevNode}
-                                                onSelect={this.paraRelationAdd}
-                                                onDeselect={this.paraRelationDel}
+                                                defaultValue={defaultChildren.hasPrevNode}
+                                                onSelect={this.onPrevLKnowledgeAdd}
                                             >
                                                 {children}
                                             </Select>
@@ -423,9 +431,8 @@ class KnowledgeEditor extends Component {
                                             <Select
                                                 style={{width: '100%'}}
                                                 placeholder="请选择"
-                                                defaultValue={hasNextNode}
-                                                onSelect={this.paraRelationAdd}
-                                                onDeselect={this.paraRelationDel}
+                                                defaultValue={defaultChildren.hasNextNode}
+                                                onSelect={this.onNextLKnowledgeAdd}
                                             >
                                                 {children}
                                             </Select>

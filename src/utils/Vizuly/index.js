@@ -233,8 +233,10 @@ class VizulyWeightedTree extends Component {
         let data = this.props.originData;
         for (let index in data) {
             if (data[index]._id === id) {
+                console.log(data[index])
                 if (data[index].hasNextNode) {
-                    let nextid = data[index].hasNextNode;
+                    console.log('111')
+                    let nextid = data[index].hasNextNode[0];
                     for (let k in data) {
                         if (data[k]._id === nextid) {
                             if (data[k].teachUnit.mCourseUnit.material.url) {
@@ -242,16 +244,13 @@ class VizulyWeightedTree extends Component {
                                 for (let i in data[k].teachUnit.aCourseUnit) {
                                     temp.push(data[k].teachUnit.aCourseUnit[i])
                                 }
-
+                                console.log(data[k])
                                 ReactDOM.unmountComponentAtNode(document.getElementById('videoArea'));
                                 ReactDOM.render(
                                     <KnowledgePreview
-                                        title={data[k].teachUnit.title}
-                                        videoUrl={data[k].teachUnit.mCourseUnit.material.url}
-                                        aCUnit={temp}
                                         onNextCourse={this.onNextCourse}
                                         onPrevCourse={this.onPrevCourse}
-                                        kUnitId={data[k]._id}
+                                        kUnit={data[k]}
                                     />
                                     , document.getElementById('videoArea')
                                 )
@@ -261,7 +260,7 @@ class VizulyWeightedTree extends Component {
                 }
             }
         }
-        alert('没有下一节')
+
     };
 
 
@@ -270,7 +269,7 @@ class VizulyWeightedTree extends Component {
         for (let index in data) {
             if (data[index]._id === id) {
                 if (data[index].hasPrevNode) {
-                    let nextid = data[index].hasPrevNode;
+                    let nextid = data[index].hasPrevNode[0];
                     for (let k in data) {
                         if (data[k]._id === nextid) {
                             if (data[k].teachUnit.mCourseUnit.material.url) {
@@ -282,12 +281,9 @@ class VizulyWeightedTree extends Component {
                                 ReactDOM.unmountComponentAtNode(document.getElementById('videoArea'));
                                 ReactDOM.render(
                                     <KnowledgePreview
-                                        title={data[k].teachUnit.title}
-                                        videoUrl={data[k].teachUnit.mCourseUnit.material.url}
-                                        aCUnit={temp}
                                         onNextCourse={this.onNextCourse}
                                         onPrevCourse={this.onPrevCourse}
-                                        kUnitId={data[k]._id}
+                                        kUnit={data[k]}
                                     />
                                     , document.getElementById('videoArea')
                                 )
@@ -297,7 +293,7 @@ class VizulyWeightedTree extends Component {
                 }
             }
         }
-        alert('没有上一节')
+
     };
 
     //This function is called when the user selects a different skin.

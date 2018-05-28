@@ -61,6 +61,7 @@ class SearchList extends Component {
 
 
     checkFullInfoOfKnowledge = (e) => {
+        console.log('111')
 
         const knowledgeId = e.target.parentNode.dataset.kid;
         const knowledgeList = this.state.searchResult.knowledge;
@@ -71,6 +72,7 @@ class SearchList extends Component {
                 knowledgeData = knowledgeList[item][0]
             }
         }
+        console.log(knowledgeData);
         ReactDOM.render(
             <SearchKnowledgePreview
                 enterLesson={this.enterLesson}
@@ -107,10 +109,11 @@ class SearchList extends Component {
         }
         if (searchResult.knowledge.length !== 0) {
             searchResult.knowledge.forEach(knowledges => {
-
+                let i=0;
                 knowledges.forEach((item) => {
+                    i+=1
                     knowledge.push(
-                        <Col span={22} key={item.knowledge.id}>
+                        <Col span={22} key={i}>
                             <SearchItemOfKnowledge
                                 checkFullInfoOfKnowledge={this.checkFullInfoOfKnowledge}
                                 knowledgeInfo={item}
@@ -144,7 +147,7 @@ class SearchList extends Component {
                 </Row>
                 <Row justify="center"
                      type="flex">
-                    <Col>
+                    <Col >
                         {mention}
                     </Col>
                 </Row>
