@@ -6,12 +6,8 @@ import InfiniteScroll from 'react-infinite-scroller';
 import {Document, Page} from 'react-pdf'
 import {Row, Col, List, Card} from 'antd';
 
-import {
-    withRouter,
-    Link
-} from 'react-router-dom';
 
-import DEFAULT from './test.pdf'
+import DEFAULT_PDF from './test.pdf'
 
 const DEFAULT_MATERIAL = {
     'img': 'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2486531409,3348270894&fm=27&gp=0.jpg',
@@ -70,6 +66,10 @@ class SearchKnowledgePreview extends Component {
 
     };
 
+    unfoldPDFView = (url) => {
+
+    }
+
 
     changeMainCourseMedia = (e) => {
         let pendingId = e.target.dataset.mid;
@@ -89,6 +89,7 @@ class SearchKnowledgePreview extends Component {
     componentDidMount() {
 
     }
+
     render() {
         const {knowledgeData} = this.state;
         const knowledgeInfo = knowledgeData.knowledge;
@@ -96,7 +97,7 @@ class SearchKnowledgePreview extends Component {
         const mainCourseInfo = knowledgeData.mcourse;
         const teachInfo = knowledgeData.teach;
         // const TeachInfoAreaRouter = withRouter(TeachInfoArea);
-        const lessonId = knowledgeData.lesson.id
+        const lessonId = knowledgeData.lesson.id;
         return (
             <div id="searchPreviewArea" className="searchPreviewArea">
                 <div id="previewContainer" className="previewContainer">
@@ -114,7 +115,9 @@ class SearchKnowledgePreview extends Component {
                                 <div id="coursePreview"
                                      className="coursePreview"
                                 >
+                                    <PDFViewer/>
                                     <DisplayArea
+                                        unfoldPDFView={this.unfoldPDFView}
                                         type={this.state.currentType}
                                         url={this.state.currentUrl || DEFAULT_MATERIAL.video}
                                     />
@@ -158,11 +161,10 @@ class SearchKnowledgePreview extends Component {
     }
 }
 
-const DisplayArea = ({type, url}) => {
-    console.log(type)
+const DisplayArea = ({type, url, unfoldPDFView}) => {
     if (type === 'pdf') {
         return (
-            <div>
+            <div onClick={() => unfoldPDFView(url)}>
                 点击显示
             </div>
         )
@@ -261,7 +263,7 @@ class AidList extends Component {
         )
     }
 
-};
+}
 
 const KnowledgeInfoArea = ({knowledgeInfo}) => {
     return (
@@ -270,11 +272,11 @@ const KnowledgeInfoArea = ({knowledgeInfo}) => {
                 <p>知识点名称：{knowledgeInfo.data.title}</p>
                 <p>大纲要求难度：{knowledgeInfo.data.demand}</p>
                 <p>学生掌握程度：{knowledgeInfo.data.achieve}</p>
-                <p style={{visibility:'hidden'}}> 1 </p>
+                <p style={{visibility: 'hidden'}}> 1 </p>
             </Card>
         </div>
     )
-}
+};
 
 const MainLessonInfoArea = ({mainCourseInfo, changeMainCourseMedia}) => {
     return (
@@ -289,30 +291,51 @@ const MainLessonInfoArea = ({mainCourseInfo, changeMainCourseMedia}) => {
             </Card>
         </div>
     )
-}
-
-// [<Link to={{
-//     pathname: '/learning-page/course/view',
-//     state: {lessonId: lessonId}
-// }}>查看课程</Link>]
-
+};
 
 const TeachInfoArea = (props) => {
     const {teachInfo, lessonId, enterLesson} = props;
     return (
         <div className="teachInfoArea">
             <Card title="教学单元信息"
-                  extra={[<div style={{cursor:'pointer'}} onClick={()=>{
+                  extra={[<div style={{cursor: 'pointer'}} onClick={() => {
                       enterLesson(lessonId)
                   }}>查看课程</div>]}
             >
                 <p>教学单元名称：{teachInfo.data.title}</p>
                 <p>教学单元描述：{TYPE_CONVERSE[teachInfo.data.description]}</p>
                 <p>教学单元关键字：{TYPE_CONVERSE[teachInfo.data.keyword]}</p>
-                <p style={{visibility:'hidden'}}> 1 </p>
+                <p style={{visibility: 'hidden'}}> 1 </p>
             </Card>
         </div>
     )
+};
+
+class PDFViewer extends Component {
+    state = {
+        numPages: null,
+        pageNumber: 1,
+    }
+    onDocumentLoad = ({numPages}) => {
+        this.setState({numPages});
+    }
+
+    render() {
+        const {pageNumber, numPages} = this.state;
+
+        return (
+            <div>
+                <Document
+                    onItemClick={()=>alert('oh')}
+                    file={DEFAULT_PDF}
+                    onLoadSuccess={this.onDocumentLoad}
+                >
+                    <Page pageNumber={pageNumber}/>
+                </Document>
+                <p>Page {pageNumber} of {numPages}</p>
+            </div>
+        );
+    }
 }
 
 

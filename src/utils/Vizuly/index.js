@@ -125,7 +125,7 @@ class VizulyWeightedTree extends Component {
         let {trimLabel, onMeasure, onMouseOver, onMouseOut, onClick, onDBClick} = this;
         const _this = this;
         this.data = this.props.data;
-        if(!this.data){
+        if (!this.data) {
             return
         }
 
@@ -203,7 +203,6 @@ class VizulyWeightedTree extends Component {
 
 
     onDBClick(e, d, i) {
-        console.log(this.props.originData)
         let data = this.props.originData;
         for (let index in data) {
             if (data[index]._id === d.vz_tree_id) {
@@ -212,8 +211,6 @@ class VizulyWeightedTree extends Component {
                     for (let i in data[index].teachUnit.aCourseUnit) {
                         temp.push(data[index].teachUnit.aCourseUnit[i])
                     }
-
-                    console.log(data[index])
                     ReactDOM.render(
                         <KnowledgePreview
                             onNextCourse={this.onNextCourse}
@@ -222,10 +219,13 @@ class VizulyWeightedTree extends Component {
                         />
                         , document.getElementById('videoArea')
                     )
+                } else {
+                    alert('当前知识点未设置课程')
                 }
 
             }
         }
+
 
     }
 
@@ -233,7 +233,7 @@ class VizulyWeightedTree extends Component {
         let data = this.props.originData;
         for (let index in data) {
             if (data[index]._id === id) {
-                if(data[index].hasNextNode){
+                if (data[index].hasNextNode) {
                     let nextid = data[index].hasNextNode;
                     for (let k in data) {
                         if (data[k]._id === nextid) {
@@ -269,7 +269,7 @@ class VizulyWeightedTree extends Component {
         let data = this.props.originData;
         for (let index in data) {
             if (data[index]._id === id) {
-                if(data[index].hasPrevNode ){
+                if (data[index].hasPrevNode) {
                     let nextid = data[index].hasPrevNode;
                     for (let k in data) {
                         if (data[k]._id === nextid) {
@@ -341,13 +341,13 @@ class VizulyWeightedTree extends Component {
                 "Authorization": token,
             },
             body: JSON.stringify({
-                projectId:this.props.projectId
+                projectId: this.props.projectId
             })
         })
             .then(res => res.json())
             .then(res => {
                 if (res && res.status === 'success') {
-                    this.props.onInit(res.data,this.initialize)
+                    this.props.onInit(res.data, this.initialize)
                 }
             })
             .catch(err => console.log(err));
@@ -359,11 +359,11 @@ class VizulyWeightedTree extends Component {
             <div className="container" style={{width: "100%", height: "100%"}}>
                 <div
                     id="viz_container"
-                     className="z-depth-3"
-                     style={{
-                         height:'100%',
-                         width:'100%'
-                     }}>
+                    className="z-depth-3"
+                    style={{
+                        height: '100%',
+                        width: '100%'
+                    }}>
                     <div id="videoArea"/>
                 </div>
 
@@ -382,8 +382,8 @@ class TeachUnitEditor extends Component {
         this.state = {
             videoUrl: this.props.videoUrl,
             adata: this.props.aCUnit,
-            tUnitId:this.props.tUnitId,
-            tUnit:props.tUnit
+            tUnitId: this.props.tUnitId,
+            tUnit: props.tUnit
         };
         this.cancelEditor = this.cancelEditor.bind(this);
     }
@@ -395,6 +395,7 @@ class TeachUnitEditor extends Component {
     componentDidMount() {
 
     }
+
     render() {
 
 
@@ -420,10 +421,14 @@ class TeachUnitEditor extends Component {
                         <Row gutter={16} style={{height: '100%'}}>
                             <Col className="gutter-row" span={8}>
                                 <Button
-                                    onClick={(e)=>{this.props.onPrevCourse(this.state.tUnitId)}}
+                                    onClick={(e) => {
+                                        this.props.onPrevCourse(this.state.tUnitId)
+                                    }}
                                 >上一节</Button>
                                 <Button
-                                    onClick={(e)=>{this.props.onNextCourse(this.state.tUnitId)}}
+                                    onClick={(e) => {
+                                        this.props.onNextCourse(this.state.tUnitId)
+                                    }}
                                 >下一节</Button>
                             </Col>
                         </Row>
@@ -436,14 +441,13 @@ class TeachUnitEditor extends Component {
 }
 
 
-
 const PlayArea = (props) => {
-    if(props.tUnitId.type === '视频'){
+    if (props.tUnitId.type === '视频') {
         return (
             <video style={{height: '100%'}} id="editor-video" src={props.videoUrl}
                    controls="controls" ref="view"/>
         )
-    }else{
+    } else {
         return (
             <video style={{height: '100%'}} id="editor-video" src={{}}
                    controls="controls" ref="view"/>
@@ -455,7 +459,7 @@ const PlayArea = (props) => {
 const EditorHeader = ({closeBtn, title}) => {
     return (
         <div id="editorHeader" className="editorHeader">
-            <span style={{fontSize:'17px', position:'absolute', left:'5px'}}>课程名称：{title}</span>
+            <span style={{fontSize: '17px', position: 'absolute', left: '5px'}}>课程名称：{title}</span>
             <span onClick={closeBtn}>×</span>
         </div>)
 
