@@ -239,12 +239,11 @@ class VizulyWeightedTree extends Component {
                     let nextid = data[index].hasNextNode[0];
                     for (let k in data) {
                         if (data[k]._id === nextid) {
-                            if (data[k].teachUnit.mCourseUnit.material.url) {
+                            if (true) {//data[k].teachUnit.mCourseUnit.material.url
                                 let temp = [];
                                 for (let i in data[k].teachUnit.aCourseUnit) {
                                     temp.push(data[k].teachUnit.aCourseUnit[i])
                                 }
-                                console.log(data[k])
                                 ReactDOM.unmountComponentAtNode(document.getElementById('videoArea'));
                                 ReactDOM.render(
                                     <KnowledgePreview
@@ -254,6 +253,9 @@ class VizulyWeightedTree extends Component {
                                     />
                                     , document.getElementById('videoArea')
                                 )
+                            }else{
+                               alert('下一节未设置资源')
+
                             }
                         }
                     }
@@ -272,7 +274,7 @@ class VizulyWeightedTree extends Component {
                     let nextid = data[index].hasPrevNode[0];
                     for (let k in data) {
                         if (data[k]._id === nextid) {
-                            if (data[k].teachUnit.mCourseUnit.material.url) {
+                            if (true) {//data[k].teachUnit.mCourseUnit.material.url
                                 let temp = [];
                                 for (let i in data[k].teachUnit.aCourseUnit) {
                                     temp.push(data[k].teachUnit.aCourseUnit[i])

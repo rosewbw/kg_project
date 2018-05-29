@@ -30,7 +30,7 @@ class Login extends Component {
         onLogin(username, password);
     }
     toRegister(){
-        this.props.history.push('Reg')
+        this.props.history.push('reg')
     }
 
     render() {
