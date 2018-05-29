@@ -10,7 +10,7 @@
 
 ## 环境要求
 
-- Node.js
+- Node.js（react-d3-graph 插件要求 node > 8.9.0）
 - MongoDB
 - Yarn
 

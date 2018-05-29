@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { VizulyWeightedTree } from '../utils/Vizuly';
+import Graph from 'react-graph-vis';
+// import { VizulyWeightedTree } from '../utils/Vizuly';
 
 import './index.css'
 
@@ -7,7 +8,16 @@ class CourseContent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            course:null
+            course: null,
+            graphConfig: {
+                nodeHighlightBehavior: true,
+                node: {
+                    labelProperty: 'title',
+                    symbolType: 'square',
+                },
+                link: {
+                },
+            }
         };
 
         this.courseToData = this.courseToData.bind(this);
@@ -18,7 +28,7 @@ class CourseContent extends Component {
             return null
         }
         let rootNode;
-        let result
+        let result;
         const createTree = (root) => {
             root.children = [];
             if (!root.hasChildNode || root.hasChildNode.length === 0) return;
@@ -38,23 +48,90 @@ class CourseContent extends Component {
         return data;
     }
 
-
-    getData = (data,callback) => {
+    pSetCourse = data => {
+        return new Promise((resolve, reject) => {
             this.setState({
-                course:data
+                course: data
             },()=>{
-                this.props.updateCurrentLesson(this.props.projectId)
-                callback()
+                resolve(this.props.projectId);
             })
+        });
     };
 
-    render() {
+    getData = (data,callback) => {
+        const token = localStorage.getItem('token');
+        fetch('/getCourse', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token,
+            },
+            body: JSON.stringify({
+                projectId: this.props.projectId
+            })
+        }).then(res => res.json())
+            .then(res => {
+                if (res && res.status === 'success') {
+                    return res.data;
+                    // this.props.onInit(res.data, this.initialize)
+                }
+            })
+            .then(this.pSetCourse)
+            .then(this.props.updateCurrentLesson)
+            .catch(err => console.log(err));
 
-        return <VizulyWeightedTree
-            projectId={this.props.projectId}
-            data={this.courseToData(this.state.course)}
-            originData={this.state.course &&this.state.course.data}
-            onInit={this.getData}/>;
+    };
+
+    parseCourse = course => {
+        if (!course) return null;
+
+        const data = course.data;
+        let graphData = {
+            nodes: [],
+            edges: [],
+        };
+
+        data.forEach(node => {
+            graphData.nodes.push({ id: node._id, label: node.title });
+
+            if (node.hasChildNode.length > 0) {
+                node.hasChildNode.forEach(childId =>
+                    graphData.edges.push({
+                        from: node._id,
+                        to: data.filter(node => node._id === childId)[0]._id,
+                    })
+                )
+            }
+        });
+
+        return graphData;
+    };
+
+    handleNodeClick = nodeId => {
+        alert(`clicked ${nodeId}!`);
+    };
+
+    componentDidMount() {
+        this.getData();
+    }
+
+    render() {
+        let graphData = this.parseCourse(this.state.course);
+        console.log(graphData);
+
+        return (
+            <div id={'graph-container'}
+                 style={{ height: '100%', width: '100%' }}
+                 ref={dom => this.container=dom}
+            >
+                {graphData
+                    ? <Graph graph={graphData}
+                             events={{click: this.handleNodeClick}}
+                    />
+                    : <h1>等待载入课程...</h1>
+                }
+            </div>
+        );
     }
 }
 
