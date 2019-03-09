@@ -1,7 +1,5 @@
 import MaterialManage from './MaterialManage';
 
-export {
-    MaterialManage
-}
+export { MaterialManage };
 
-export default MaterialManage
+export default MaterialManage;

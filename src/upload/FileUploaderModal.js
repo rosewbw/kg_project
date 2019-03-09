@@ -4,56 +4,58 @@ import { Modal, Button } from 'antd';
 import FileUpload from './filesupload';
 
 class FileUploaderModal extends Component {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
 
-        this.state = {
-            loading: false,
-            visible: false,
-        }
-    }
-
-    handleClose = () => {
-        const { onClose } = this.props;
-        onClose();
+    this.state = {
+      loading: false,
+      visible: false
     };
+  }
 
-    handleStartUpload = () => {
-        this.setState({
-            loading: true,
-        })
-    };
+  handleClose = () => {
+    const { onClose } = this.props;
+    onClose();
+  };
 
-    handleFinishUpload = () => {
-        this.setState({
-            loading: false,
-        })
-    };
+  handleStartUpload = () => {
+    this.setState({
+      loading: true
+    });
+  };
 
-    render () {
-        const { loading } = this.state;
+  handleFinishUpload = () => {
+    this.setState({
+      loading: false
+    });
+  };
 
-        return (
-            <Modal
-                visible={this.props.visible}
-                title="上传资源"
-                closable={false}
-                footer={[
-                    <Button key="submit"
-                            type="primary"
-                            disabled={loading}
-                            onClick={this.handleClose}>
-                        完成
-                    </Button>,
-                ]}
-            >
-                <FileUpload
-                    onStart={this.handleStartUpload}
-                    onFinish={this.handleFinishUpload}
-                />
-            </Modal>
-        )
-    }
+  render() {
+    const { loading } = this.state;
+
+    return (
+      <Modal
+        visible={this.props.visible}
+        title="上传资源"
+        closable={false}
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            disabled={loading}
+            onClick={this.handleClose}
+          >
+            完成
+          </Button>
+        ]}
+      >
+        <FileUpload
+          onStart={this.handleStartUpload}
+          onFinish={this.handleFinishUpload}
+        />
+      </Modal>
+    );
+  }
 }
 
 export default FileUploaderModal;
