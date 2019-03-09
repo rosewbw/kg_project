@@ -54,7 +54,7 @@ class SearchKnowledgePreview extends Component {
     let pendingId = e.target.dataset.aid;
     const aidCourseInfo = this.state.knowledgeData.acourse;
 
-    aidCourseInfo.map(item => {
+    aidCourseInfo.forEach(item => {
       if (pendingId === item.id) {
         let type = item.data.learningObjectType;
         if (type === '') {
@@ -186,7 +186,7 @@ const DisplayArea = ({ type, url, unfoldPDFView }) => {
       />
     );
   } else if (type === 'image') {
-    return <img style={{ width: '100%', height: '100%' }} src={url} />;
+    return <img style={{ width: '100%', height: '100%' }} src={url} alt="" />;
   } else {
     return (
       <div

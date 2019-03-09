@@ -5,8 +5,6 @@ import SearchList from './searchList';
 
 import { Row, Col } from 'antd';
 
-import { Switch, Route, withRouter } from 'react-router-dom';
-
 class SearchPage extends Component {
   constructor(props) {
     super(props);

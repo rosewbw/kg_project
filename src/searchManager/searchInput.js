@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import fetch from 'isomorphic-fetch';
 
 import { Form, Row, Col, Input, Icon, Button } from 'antd';
 import { Checkbox } from 'antd';
 
 const FormItem = Form.Item;
-const Search = Input.Search;
 const CheckboxGroup = Checkbox.Group;
 
 const plainOptions = ['课程信息', '知识点信息'];

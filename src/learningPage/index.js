@@ -4,7 +4,6 @@ import { Redirect, Link, Route } from 'react-router-dom';
 
 import { LearnerCourseRoute } from '../course-manage';
 import { SearchRoute } from '../searchManager';
-import { SearchPage } from '../searchManager';
 import Home from '../homepage/homepage';
 
 const { Sider } = Layout;

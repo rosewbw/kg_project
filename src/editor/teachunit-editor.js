@@ -291,7 +291,7 @@ class MainVideoArea extends Component {
         <video id="editor-video" src={url} controls="controls" ref="view" />
       );
     } else if (type === '图片') {
-      playArea = <img id="editor-video" src={url} ref="view" />;
+      playArea = <img id="editor-video" src={url} ref="view" alt="" />;
     } else {
       playArea = (
         <video id="editor-video" src={url} controls="controls" ref="view" />
@@ -318,11 +318,6 @@ const BasicInfo = props => {
 
   function handleChange(value) {
     tUnit.keyword = value;
-    basicInfoChanged(tUnit);
-  }
-
-  function statusChange(value) {
-    tUnit.status = value;
     basicInfoChanged(tUnit);
   }
 

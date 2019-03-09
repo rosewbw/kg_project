@@ -6,7 +6,7 @@ function createElement(table) {
     case 'p':
       return $('<p></p>');
     case 'img':
-      return $('<img>');
+      return $('<img alt="">');
     case 'div':
       return $('<div></div>');
     case 'span':
@@ -25,6 +25,8 @@ function createElement(table) {
       return document.createElementNS(xmlns, 'path');
     case 'rect-ori':
       return document.createElementNS(xmlns, 'rect');
+    default:
+      return $('<div></div>');
   }
 }
 

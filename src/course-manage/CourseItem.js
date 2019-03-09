@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { withRouter, Link } from 'react-router-dom';
 
@@ -18,6 +18,7 @@ const CourseItem = props => {
   return (
     <div className="card mb-4 box-shadow">
       <img
+        alt=""
         className="card-img-top"
         data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=Thumbnail"
         style={{ height: '20rem', width: '100%', display: 'block' }}

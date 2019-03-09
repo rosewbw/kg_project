@@ -1,25 +1,11 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
 
-import {
-  Form,
-  Input,
-  Tooltip,
-  Icon,
-  Cascader,
-  Select,
-  Row,
-  Col,
-  Checkbox,
-  Button,
-  AutoComplete
-} from 'antd';
+import { Form, Input, Icon, Select, Button } from 'antd';
 import { Upload, message } from 'antd';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
-
-let uuid = 0;
 
 class FileUpload extends Component {
   constructor(props) {
@@ -116,8 +102,7 @@ class FileUpload extends Component {
   };
 
   render() {
-    const { getFieldDecorator, getFieldValue } = this.props.form;
-    const { autoCompleteResult } = this.state;
+    const { getFieldDecorator } = this.props.form;
     const { uploading } = this.state;
 
     const formItemLayout = {
@@ -128,12 +113,6 @@ class FileUpload extends Component {
       wrapperCol: {
         xs: { span: 24 },
         sm: { span: 16 }
-      }
-    };
-    const formItemLayoutWithOutLabel = {
-      wrapperCol: {
-        xs: { span: 24, offset: 0 },
-        sm: { span: 20, offset: 4 }
       }
     };
     const tailFormItemLayout = {
@@ -194,7 +173,7 @@ class FileUpload extends Component {
               },
               {
                 required: true,
-                message: '请输入上传的素材的类别' + ''
+                message: '请输入上传的素材的类别'
               }
             ]
           })(

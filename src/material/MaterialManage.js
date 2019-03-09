@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Button, Modal, message } from 'antd';
+import { Layout, Button, message } from 'antd';
 
 import { FileUploaderModal } from '../upload';
 import MaterialList from './MaterialList';

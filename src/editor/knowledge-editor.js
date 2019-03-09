@@ -11,7 +11,6 @@ import { Row, Col } from 'antd';
 import { Button } from 'antd';
 
 const Option = Select.Option;
-const InputGroup = Input.Group;
 
 class KnowledgeEditor extends Component {
   constructor(props) {
@@ -286,7 +285,7 @@ class KnowledgeEditor extends Component {
 
     for (let item in defaultChildren) {
       if (kUnit[item]) {
-        kUnit[item].map(object => {
+        kUnit[item].forEach(object => {
           defaultChildren[item].push(object._id);
         });
       }
@@ -373,7 +372,7 @@ class KnowledgeEditor extends Component {
                 </section>
                 <section id="skUnitUrl" className="skUnitUrl">
                   <div className="kUnitUrl">
-                    <img src={this.state.kUnit.thumbnailUrl} />
+                    <img alt="" src={this.state.kUnit.thumbnailUrl} />
                   </div>
                 </section>
               </Col>

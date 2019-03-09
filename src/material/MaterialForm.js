@@ -89,7 +89,7 @@ class MaterialForm extends Component {
       const { materialId } = this.props;
       let job;
       if (materialId) {
-        job = request.put('/updateMaterial' + '?materialId=' + materialId, {
+        job = request.put(`/updateMaterial?materialId=${materialId}`, {
           body: formData
         });
       } else {
@@ -172,7 +172,7 @@ class MaterialForm extends Component {
               },
               {
                 required: true,
-                message: '请输入资源的类别' + ''
+                message: '请输入资源的类别'
               }
             ],
             initialValue: this.initValues.materialType

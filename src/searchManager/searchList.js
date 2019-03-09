@@ -7,7 +7,7 @@ import SearchKnowledgePreview from './searchPreview';
 import { Row, Col } from 'antd';
 import { Progress } from 'antd';
 
-import { Redirect, withRouter, Link } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -278,6 +278,7 @@ const MainCourse = props => {
   return (
     <div className="card mb-4 box-shadow " key={knowledgeId}>
       <img
+        alt=""
         className="card-img-top"
         data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=Thumbnail"
         style={{ height: '12rem', width: '100%', display: 'block' }}
@@ -335,6 +336,7 @@ const SearchItemOfLesson = props => {
   return (
     <div className="card mb-4 box-shadow">
       <img
+        alt=""
         className="card-img-top"
         data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=Thumbnail"
         style={{ height: '20rem', width: '100%', display: 'block' }}

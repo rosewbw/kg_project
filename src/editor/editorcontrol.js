@@ -267,7 +267,7 @@ const ProjectBox = props => {
         className="card-img-top"
         src={pData.thumbnailUrl || defaultImg}
         style={{ height: '9rem' }}
-        alt="Card image cap"
+        alt=""
       />
       <div className="card-body">
         <div
@@ -323,7 +323,7 @@ const ProjectBox = props => {
   );
 };
 
-const NoProject = ({}) => {
+const NoProject = () => {
   let style = {
     margin: '100px auto',
     fontSize: '32px'

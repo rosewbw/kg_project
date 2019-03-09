@@ -113,6 +113,7 @@ const MaterialCard = ({
       cover={
         <Link to={url || DEFAULT_URL}>
           <img
+            alt=""
             src={DEFAULT_PATH + thumbnail || DEFAULT_IMAGE}
             style={{ height: '150px', width: '100%' }}
           />
