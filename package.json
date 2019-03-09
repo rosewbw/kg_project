@@ -12,15 +12,15 @@
     "jquery": "^3.3.1",
     "jquery-mousewheel": "^3.1.13",
     "query-string": "^6.1.0",
-    "react": "^16.2.0",
+    "react": "^16.8.4",
     "react-bootstrap": "^0.32.1",
-    "react-dom": "^16.2.0",
+    "react-dom": "^16.8.4",
     "react-fine-uploader": "^1.0.9",
     "react-graph-vis": "^1.0.2",
     "react-infinite-scroller": "^1.1.4",
     "react-pdf": "^3.0.5",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.1.1",
+    "react-scripts": "2.1.8",
     "reqwest": "^2.0.5",
     "webuploader": "^0.1.8"
   },
@@ -28,11 +28,11 @@
     "react-app-rewired": "react-app-rewired start",
     "start": "concurrently \"yarn react-app-rewired\" ",
     "react-build": "react-scripts build  \"cd server && yarn start\"",
-    "build": "concurrently \"yarn react-app-rewired\" \"cd server && yarn build\""
+    "build": "concurrently \"yarn react-app-rewired\" \"cd server && yarn build\"",
+    "eject": "react-scripts eject"
   },
   "devDependencies": {
     "babel-plugin-import": "^1.6.5",
     "react-app-rewired": "^1.4.1"
-  },
-  "proxy": "http://localhost:3001"
+  }
 }
